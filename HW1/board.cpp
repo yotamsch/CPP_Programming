@@ -1,4 +1,5 @@
 #include "board.h"
+#include <cassert>
 
 /**
  * @brief Construct a new Board:: Board object
@@ -7,10 +8,30 @@
  * @param m The number of colums in the board
  */
 Board::Board(int n, int m) : _m(m), _n(n) {
+    assert(n > 0);
+    assert(m > 0);
     _board = new Piece*[n];
-    for (int i=0;i < n; ++i) {
-        _board[i] = new Piece[m];
+    if (_board) {
+        for (int i=0;i < n; ++i) {
+            _board[i] = new Piece[m];
+            assert(_board[i]);
+        }
     }
+    
+}
+
+/**
+ * @brief Destroy the Board:: Board object
+ * 
+ */
+Board::~Board() {
+    if (_n == 0 && _m == 0) {
+        return;
+    }
+    for (int i=0; i < _n; ++i) {
+        delete[] _board[i];
+    }
+    delete[] _board;
 }
 
 /**

@@ -22,9 +22,10 @@ class Piece {
     private:
         int _index_x;
         int _index_y;
+        int _player_id;
     public:
         Piece() {}
-        Piece(int x, int y): _index_x(x), _index_y(y) {}
+        Piece(int x, int y, int player_id): _index_x(x), _index_y(y), _player_id(player_id) {}
         virtual ~Piece() {}
         int getX() const { return _index_x; }
         int getY() const { return _index_y; }
@@ -33,7 +34,7 @@ class Piece {
         virtual void move(int new_x, int new_y) { setX(new_x); setY(new_y); }
         
     friend ostream& operator<<(ostream& output, const Piece& piece) {
-        output << "(" << piece->_index_x << "," << piece->_index_y << ")";
+        output << "(" << piece.getX() << "," << piece.getY() << ")";
         return output;
     }
 };
@@ -43,7 +44,7 @@ class Rock : public Piece {
         const static int _max_pieces = R;
         static int _pieces_count;
     public:
-        Rock(int x, int y) : Piece(x, y) { _pieces_count++; }
+        Rock(int x, int y, int player_id) : Piece(x, y, player_id) { _pieces_count++; }
         static bool isExcessive() { return _pieces_count > _max_pieces; }
         ~Rock() override {}
 };
@@ -53,7 +54,7 @@ class Paper : public Piece {
         const static int _max_pieces = P;
         static int _pieces_count;
     public:
-        Paper(int x, int y) : Piece(x, y) {_pieces_count++; }
+        Paper(int x, int y, int player_id) : Piece(x, y, player_id) {_pieces_count++; }
         static bool isExcessive() { return _pieces_count > _max_pieces; }
         ~Paper() override {}
 };
@@ -63,7 +64,7 @@ class Scissors : public Piece {
         const static int _max_pieces = S;
         static int _pieces_count;
     public:
-        Scissors(int x, int y) : Piece(x, y) { _pieces_count++; }
+        Scissors(int x, int y, int player_id) : Piece(x, y, player_id) { _pieces_count++; }
         static bool isExcessive() { return _pieces_count > _max_pieces; }
         ~Scissors() override {}
 };
@@ -74,7 +75,7 @@ class Joker : public Piece {
         static int _pieces_count;
         int _piece_type;
     public:
-        Joker(int x, int y, int type) : Piece(x, y), _piece_type(type) {}
+        Joker(int x, int y, int player_id, int type) : Piece(x, y, player_id), _piece_type(type) {}
         int getPieceType() const { return _piece_type; }
         void setPieceType(int new_type) { _piece_type = new_type; }
         static bool isExcessive() { return _pieces_count > _max_pieces; }
@@ -86,6 +87,7 @@ class Bomb : public Piece {
         const static int _max_pieces = B;
         static int _pieces_count;
     public:
+        Bomb(int x, int y, int player_id) : Piece(x, y, player_id) {}
         static bool isExcessive() { return _pieces_count > _max_pieces; }
         ~Bomb() override {}
 };
@@ -95,6 +97,7 @@ class Flag : public Piece {
         const static int _max_pieces = F;
         static int _pieces_count;
     public:
+        Flag(int x, int y, int player_id) : Piece(x, y, player_id) {}
         static bool isExcessive() { return _pieces_count > _max_pieces; }
         ~Flag() override {}
 };
