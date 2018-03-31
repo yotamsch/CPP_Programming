@@ -12,6 +12,10 @@
 
 using namespace std;
 
+/**
+ * @brief An enum representing the different types of play pieces
+ * 
+ */
 enum {ROCK, PAPER, SCISSORS, BOMB, FLAG, JOKER};
 
 class Piece {
@@ -19,6 +23,7 @@ class Piece {
         int _index_x;
         int _index_y;
     public:
+        Piece() {}
         Piece(int x, int y): _index_x(x), _index_y(y) {}
         virtual ~Piece() {}
         int getX() const { return _index_x; }
