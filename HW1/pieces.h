@@ -2,7 +2,9 @@
 #define _H_PIECES
 
 #include <iostream>
+#include <ctype.h>
 
+#define NUM_OF_PIECES_TYPE 6
 #define R 2
 #define P 5
 #define S 1
@@ -16,90 +18,41 @@ using namespace std;
  * @brief An enum representing the different types of play pieces
  * 
  */
-enum {ROCK, PAPER, SCISSORS, BOMB, FLAG, JOKER};
+enum {NONE=-1, ROCK=0, PAPER, SCISSORS, BOMB, FLAG, JOKER};
+enum {PLAYER_1=1, PLAYER_2};
+char pieceTypeToChar(int type, int player_id);
 
 class Piece {
     private:
         int _index_x;
         int _index_y;
         int _player_id;
+        int _piece_type;
+        bool _is_joker;
+        static int* _counter;
     public:
-        Piece() {}
-        Piece(int x, int y, int player_id): _index_x(x), _index_y(y), _player_id(player_id) {}
+        // C'tors
+        Piece() : _piece_type(NONE) {}
+        Piece(int x, int y, int player_id, int type, bool is_joker): _index_x(x), _index_y(y), _player_id(player_id), _piece_type(type), _is_joker(is_joker) { ++_counter[type]; }
+        Piece(const Piece& p);
+        // D'tor
         virtual ~Piece() {}
+        // Get
         int getX() const { return _index_x; }
         int getY() const { return _index_y; }
-        void setX(int x) { _index_x = x; }
-        void setY(int y) {_index_y = y; }
-        virtual void move(int new_x, int new_y) { setX(new_x); setY(new_y); }
-        
-    friend ostream& operator<<(ostream& output, const Piece& piece) {
-        output << "(" << piece.getX() << "," << piece.getY() << ")";
-        return output;
-    }
-};
-
-class Rock : public Piece {
-    private:
-        const static int _max_pieces = R;
-        static int _pieces_count;
-    public:
-        Rock(int x, int y, int player_id) : Piece(x, y, player_id) { _pieces_count++; }
-        static bool isExcessive() { return _pieces_count > _max_pieces; }
-        ~Rock() override {}
-};
-
-class Paper : public Piece {
-    private:
-        const static int _max_pieces = P;
-        static int _pieces_count;
-    public:
-        Paper(int x, int y, int player_id) : Piece(x, y, player_id) {_pieces_count++; }
-        static bool isExcessive() { return _pieces_count > _max_pieces; }
-        ~Paper() override {}
-};
-
-class Scissors : public Piece {
-    private:
-        const static int _max_pieces = S;
-        static int _pieces_count;
-    public:
-        Scissors(int x, int y, int player_id) : Piece(x, y, player_id) { _pieces_count++; }
-        static bool isExcessive() { return _pieces_count > _max_pieces; }
-        ~Scissors() override {}
-};
-
-class Joker : public Piece {
-    private:
-        const static int _max_pieces = J;
-        static int _pieces_count;
-        int _piece_type;
-    public:
-        Joker(int x, int y, int player_id, int type) : Piece(x, y, player_id), _piece_type(type) {}
         int getPieceType() const { return _piece_type; }
-        void setPieceType(int new_type) { _piece_type = new_type; }
-        static bool isExcessive() { return _pieces_count > _max_pieces; }
-        ~Joker() override {}
-};
-
-class Bomb : public Piece {
-    private:
-        const static int _max_pieces = B;
-        static int _pieces_count;
-    public:
-        Bomb(int x, int y, int player_id) : Piece(x, y, player_id) {}
-        static bool isExcessive() { return _pieces_count > _max_pieces; }
-        ~Bomb() override {}
-};
-
-class Flag : public Piece {
-    private:
-        const static int _max_pieces = F;
-        static int _pieces_count;
-    public:
-        Flag(int x, int y, int player_id) : Piece(x, y, player_id) {}
-        static bool isExcessive() { return _pieces_count > _max_pieces; }
-        ~Flag() override {}
+        int getPlayerId() const { return _player_id; }
+        static int getCountByType(int type) { return _counter[type]; }
+        // Set
+        void setX(int x) { _index_x = x; }
+        void setY(int y) { _index_y = y; }
+        bool setType(int type) { if (_is_joker) { _piece_type = type; return true; } return false; }
+        // Utility
+        bool isJoker() { return _is_joker; }
+        bool isInitiated() { return _piece_type != NONE ? true : false; }
+        virtual bool move(int new_x, int new_y) { setX(new_x); setY(new_y); }
+        
+    friend ostream& operator<<(ostream& output, const Piece& piece);
 };
 
 #endif
