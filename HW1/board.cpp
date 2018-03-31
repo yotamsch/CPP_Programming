@@ -1,6 +1,5 @@
 
 #include "board.h"
-#include "pieces.h"
 #include <cassert>
 #include <iostream>
 
@@ -115,7 +114,7 @@ Board& Board::operator+(const Board& b) {
  * @return true If everything went fine and the piece has been inserted into the board.
  * @return false If an error occured, updating msg correctly
  */
-bool Board::placePiece(int player, int type, int x, int y, string& msg, bool is_joker) {
+bool Board::placePiece(Player player, PieceType type, int x, int y, string& msg, bool is_joker) {
     if (!isPositionValid(x, y)) {
         msg = "Bad position.";
         return false;

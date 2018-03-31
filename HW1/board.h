@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "pieces.h"
+#include "game.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ class Board {
         Board& operator+(const Board& b);
         Board& operator=(const Board& b);
         bool isPositionValid(int x, int y) { return (x <= _n) && (y <= _m); }
-        bool placePiece(int player, int type, int x, int y, string& msg, bool is_joker=false);
+        bool placePiece(Player player, PieceType type, int x, int y, string& msg, bool is_joker=false);
         bool movePiece(int x, int y, int new_x, int new_y, string& msg);
         void prettyPrint();
 };

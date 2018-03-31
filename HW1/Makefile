@@ -1,5 +1,5 @@
 CPP=g++
-CPPFLAGS=-c
+CPPFLAGS=-c -std=c++11
 
 all: game.o board.o pieces.o
 	$(CPP) game.o board.o pieces.o -o game

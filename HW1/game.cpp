@@ -21,12 +21,12 @@ int main(int argc, char** argv) {
     cout << "b2.isPositionValid(1,1)? " << b2.isPositionValid(1,1) << endl;
     cout << "b2.isPositionValid(4,1)? " << b2.isPositionValid(4,1) << endl;
     string msg = "";
-    if (!b1.placePiece(PLAYER_1,ROCK,0,0,msg)) cout << msg << endl;
-    if (!b1.placePiece(PLAYER_1,PAPER,1,1,msg,true)) cout << msg << endl;
-    if (!b1.placePiece(PLAYER_1,SCISSORS, 0,1, msg)) cout << msg << endl;
-    if (!b2.placePiece(PLAYER_2,ROCK,0,0,msg)) cout << msg << endl;
-    if (!b2.placePiece(PLAYER_2,PAPER,1,1,msg,true)) cout << msg << endl;
-    if (!b2.placePiece(PLAYER_2,SCISSORS, 1,0, msg)) cout << msg << endl;
+    if (!b1.placePiece(Player::PLAYER_1,PieceType::ROCK,0,0,msg)) cout << msg << endl;
+    if (!b1.placePiece(Player::PLAYER_1,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
+    if (!b1.placePiece(Player::PLAYER_1,PieceType::SCISSORS, 0,1, msg)) cout << msg << endl;
+    if (!b2.placePiece(Player::PLAYER_2,PieceType::ROCK,0,0,msg)) cout << msg << endl;
+    if (!b2.placePiece(Player::PLAYER_2,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
+    if (!b2.placePiece(Player::PLAYER_2,PieceType::SCISSORS, 1,0, msg)) cout << msg << endl;
     cout << "BOARD 1" << endl;
     b1.prettyPrint();
     cout << "BOARD 2" << endl;

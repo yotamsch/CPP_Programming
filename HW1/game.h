@@ -8,7 +8,7 @@
 #define B 2
 #define J 2
 #define F 1
-enum {PLAYER_1=1, PLAYER_2};
+enum class Player {PLAYER_1=1, PLAYER_2};
 
 // TODO: Maybe create a Player class with piece counting
 
