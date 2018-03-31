@@ -1,3 +1,4 @@
+
 #include "board.h"
 #include "pieces.h"
 #include <cassert>
@@ -24,17 +25,81 @@ Board::Board(int n, int m) : _m(m), _n(n) {
 }
 
 /**
+ * @brief Construct a new Board:: Board object (Copy C'tor)
+ * 
+ * @param b The board to copy from
+ */
+Board::Board(const Board& b) {
+    *this = b;
+}
+
+/**
  * @brief Destroy the Board:: Board object
  * 
  */
 Board::~Board() {
-    if (_n == 0 && _m == 0) {
-        return;
-    }
     for (int i=0; i < _n; ++i) {
         delete[] _board[i];
     }
     delete[] _board;
+}
+
+/**
+ * @brief Overloading on the assignment (=) operator.
+ * 
+ * @param b The assignment variable
+ * @return Board& Reference to the object for reassignment
+ */
+Board& Board::operator=(const Board& b) {
+    if (this != &b) {
+        if (_board != nullptr) {
+            for (int i=0; i < _n; ++i) {
+                delete[] _board[i];
+            }
+            delete[] _board;
+        }
+        _n = b._n;
+        _m = b._m;
+        _board = new Piece*[_n];
+        if (_board) {
+            for (int i=0;i < _n; ++i) {
+                _board[i] = new Piece[_m];
+                assert(_board[i]);
+            }
+        }
+        for (int i=0;i<_n;++i) {
+            if (!_board[i]) _board[i] = new Piece[_m];
+            for (int j=0;j<_m;++j) {
+                _board[i][j] = b._board[i][j];
+            }
+        }
+    }
+    return *this;
+}
+
+/**
+ * @brief Overloading on the addition (+) operator. It adds together 2 boards.
+ * Taking care of the rules. Used to combine the board for Player 1 and Player 2.
+ * 
+ * @param b The Board to add.
+ * @return Board& A new board of the addition
+ */
+Board& Board::operator+(const Board& b) {
+    assert(_m == b._m);
+    assert(_n == b._n);
+    Board* b_new = new Board(_n,_m);
+    for (int i=0;i<_n;++i) {
+        for (int j=0;j<_m;++j) {
+            if (_board[i][j].getPieceType() != b._board[i][j].getPieceType()) {
+                if (_board[i][j] < b._board[i][j]) {
+                    b_new->_board[i][j] = b._board[i][j];
+                } else {
+                    b_new->_board[i][j] = _board[i][j];
+                }
+            }
+        }
+    }
+    return *b_new;
 }
 
 /**
@@ -64,8 +129,13 @@ bool Board::placePiece(int player, int type, int x, int y, string& msg, bool is_
     return true;
 }
 
-void printLineOfDashes(int colums) {
-    for (int i=0; i< (colums*4+1); ++i) {
+/**
+ * @brief Helper function for Board::prettyPrint(). prints a line of dashes based on the number of columns
+ * 
+ * @param columns An integer
+ */
+void printLineOfDashes(int columns) {
+    for (int i=0; i< (columns*4+1); ++i) {
         cout << "-";
     }
     cout << endl;
@@ -91,4 +161,19 @@ void Board::prettyPrint() {
         cout << "-" << endl;
         printLineOfDashes(_m);
     }
+}
+
+/**
+ * @brief Moves a piece from (x,y) to (new_x,new_y). Based on the rules of the game.
+ * 
+ * @param x The origin X
+ * @param y The origin Y
+ * @param new_x The destination X
+ * @param new_y The destination Y
+ * @param msg A message if any error occured, or the move is illegal
+ * @return true If everything went ok
+ * @return false If an error occured
+ */
+bool movePiece(int x, int y, int new_x, int new_y, string& msg) {
+    // TODO: Implement the function movePiece
 }

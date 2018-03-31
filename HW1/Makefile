@@ -5,7 +5,7 @@ all: game.o board.o pieces.o
 	$(CPP) game.o board.o pieces.o -o game
 
 game.o: game.cpp
-	$(CPP) $(CPPFLAGS) game.cpp
+	$(CPP) $(CPPFLAGS) game.cpp -I.
 
 board.o: board.cpp
 	$(CPP) $(CPPFLAGS) board.cpp -I.
