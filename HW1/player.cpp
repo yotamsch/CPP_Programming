@@ -19,6 +19,6 @@ bool Player::IsLosing() {
 }
 
 ostream& operator<<(ostream& output, const Player& p) {
-    output << "Player " << int(p._type);
+    output << "Player " << int(p._type) << " Flags: " << p._number_of_flags << ", Total Pieces: " << p._number_of_pieces;
     return output;
 }

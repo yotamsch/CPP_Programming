@@ -9,8 +9,9 @@
 #define J 2
 #define F 1
 
+#define DEBUG 1
 
-// TODO: Maybe create a Player class with piece counting
+
 /**
  * @brief An enum representing the player type (player 1 or player 2)
  * 

@@ -1,4 +1,7 @@
 
+#ifndef _H_PLAYER
+#define _H_PLAYER
+
 #include <iostream>
 #include "game.h"
 
@@ -14,7 +17,7 @@ class Player {
         Player();
         Player(PlayerType type) : _type(type), _number_of_flags(0), _number_of_pieces(0) {}
         // D'tor
-        ~Player() {}
+        ~Player() { cout << "-> Freed Player " << int(_type) << endl; }
         // Get
         PlayerType GetType() { return _type; }
         // Utilities
@@ -24,3 +27,5 @@ class Player {
     
     friend ostream& operator<<(ostream& output, const Player& p);
 };
+
+#endif

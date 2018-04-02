@@ -20,14 +20,11 @@ bool Piece::operator<(const Piece& p) {
 
 Piece& Piece::operator=(const Piece& p) {
     if (this != &p) {
-        this->_index_x = p._index_x;
-        this->_index_y = p._index_y;
         this->_is_joker = p._is_joker;
         this->_piece_type = p._piece_type;
         this->_player_type = p._player_type;
+        this->_owner = p._owner;
     }
-    if (DEBUG) cout << "- Counter=" << _piece_counter << endl;
-    if (DEBUG) cout << "(" << this->_index_x << "," << this->_index_y << ") " << endl;
     return *this;
 }
 
@@ -51,8 +48,18 @@ ostream& operator<<(ostream& output, const Piece& piece) {
  * @brief Clears a piece content and nullifies the piece (empty piece).
  * 
  */
-void Piece::ClearPiece() {
+void Piece::NullifyPiece() {
     this->_piece_type = PieceType::NONE;
+}
+
+/**
+ * @brief Removed the piece from the owning player.
+ * 
+ */
+void Piece::RemovePieceFromPlayer() {
+    if (this->_piece_type == PieceType::NONE)
+        return;
+    this->_owner->DecrementPieceCount(this->_piece_type);
 }
 
 /**

@@ -10,29 +10,23 @@ using namespace std;
 
 class Piece {
     private:
-        int _index_x;
-        int _index_y;
         bool _is_joker;
         PieceType _piece_type;
+        Player* _owner;
         PlayerType _player_type;
         static int _piece_counter;
     public:
         // C'tors
         Piece() : _piece_type(PieceType::NONE) { ++_piece_counter; }
-        Piece(int x, int y, PlayerType player, PieceType type, bool is_joker): _index_x(x), _index_y(y), _player_type(player), _piece_type(type), _is_joker(is_joker) { ++_piece_counter; }
+        Piece(PlayerType player, PieceType type, bool is_joker, Player* owner): _player_type(player), _piece_type(type), _is_joker(is_joker), _owner(owner) { ++_piece_counter; _owner->IncrementPieceCount(_piece_type); }
         Piece(const Piece& p) { *this = p; }
         // D'tor
-        virtual ~Piece() { --_piece_counter; }
+        ~Piece() { --_piece_counter; }
         // Get
-        int GetX() const { return _index_x; }
-        int GetY() const { return _index_y; }
         PieceType GetPieceType() const { return _piece_type; }
         PlayerType GetPlayerType() const { return _player_type; }
         static int GetPieceCounter() {return _piece_counter; }
         // Set
-        void SetX(int x) { _index_x = x; }
-        void SetY(int y) { _index_y = y; }
-        void SetPosition(int new_x, int new_y) { SetX(new_x); SetY(new_y); }
         bool SetType(PieceType type) { if (_is_joker) { _piece_type = type; return true; } return false; }
         // Utility
         bool IsJoker() { return _is_joker; }
@@ -41,7 +35,8 @@ class Piece {
         bool operator==(const Piece& p) { if ( this->GetPieceType() == p.GetPieceType()) return true; return false; }
         bool operator>(const Piece& p) { if ((*this) < p || (*this) == p) return false; return true; }
         Piece& operator=(const Piece& p);
-        void ClearPiece();
+        void NullifyPiece();
+        void RemovePieceFromPlayer();
         
     friend ostream& operator<<(ostream& output, const Piece& piece);
 };

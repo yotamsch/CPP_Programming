@@ -1,7 +1,15 @@
 
 #include "board.h"
+#include "piece.h"
+#include "player.h"
 #include <cassert>
 #include <iostream>
+
+#define ILLEGAL_MOVE "The attempted move is illegal."
+#define EMPTY_DEST_PIECE "The destination has no piece."
+#define ORIGIN_PIECE_LOST "The origin piece lost and was eaten."
+#define DEST_PIECE_LOST "The destination piece lost and was eaten."
+#define DEST_AND_ORIGIN_TIE "Both origin and destination are tied (both eaten)."
 
 using namespace std;
 
@@ -37,10 +45,14 @@ Board::Board(const Board& b) {
  * 
  */
 Board::~Board() {
+    if (DEBUG) cout << "-> Freeing BOARD : " << this << endl;
     for (int i=0; i < _n; ++i) {
-        delete[] _board[i];
+        delete[] (_board[i]);
+        if (DEBUG) cout << "--> Freed _board[" << i << "]" << endl;
     }
     delete[] _board;
+    if (DEBUG) cout << "--> Freed _board" << endl;
+    if (DEBUG) cout << "- Counter=" << Piece::GetPieceCounter() << endl;
 }
 
 /**
@@ -50,6 +62,7 @@ Board::~Board() {
  * @return Board& Reference to the object for reassignment
  */
 Board& Board::operator=(const Board& b) {
+    cout << this << ", " << (*this) << endl;
     if (this != &b) {
         if (_board != nullptr) {
             for (int i=0; i < _n; ++i) {
@@ -92,9 +105,14 @@ Board& Board::operator+(const Board& b) {
             if (_board[i][j].GetPieceType() != b._board[i][j].GetPieceType()) {
                 if (_board[i][j] < b._board[i][j]) {
                     b_new->_board[i][j] = b._board[i][j];
+                    _board[i][j].RemovePieceFromPlayer();
                 } else {
                     b_new->_board[i][j] = _board[i][j];
+                    b._board[i][j].RemovePieceFromPlayer();
                 }
+            } else {
+                _board[i][j].RemovePieceFromPlayer();
+                b._board[i][j].RemovePieceFromPlayer();
             }
         }
     }
@@ -114,7 +132,7 @@ Board& Board::operator+(const Board& b) {
  * @return true If everything went fine and the piece has been inserted into the board.
  * @return false If an error occured, updating msg correctly
  */
-bool Board::PlacePiece(PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker) {
+bool Board::PlacePiece(Player* owner, PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker) {
     if (!IsPositionValid(x, y)) {
         msg = "Bad position.";
         return false;
@@ -123,7 +141,7 @@ bool Board::PlacePiece(PlayerType player, PieceType type, int x, int y, string& 
         msg = "Piece already exists.";
         return false;
     }
-    Piece p(x, y, player, type, is_joker);
+    Piece p(player, type, is_joker, owner);
     _board[x][y] = p;
     return true;
 }
@@ -163,34 +181,69 @@ void Board::PrettyPrint() {
 }
 
 /**
- * @brief Moves a piece from (x,y) to (new_x,new_y). Based on the rules of the game.
+ * @brief Checks if a certain move is legal. If not updates a message correctly.
+ * 
+ * @param x The origin X.
+ * @param y The origin Y.
+ * @param new_x The destination X.
+ * @param new_y The destination Y.
+ * @param msg The message will be updated into this.
+ * @return true The move is legal.
+ * @return false The move is illegal.
+ */
+bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
+    Piece& origin_piece = _board[x][y];
+    Piece& destination_piece = _board[new_x][new_y];
+    if (!origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG) {
+        msg = ILLEGAL_MOVE;
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Moves a piece from (x,y) to (new_x,new_y). Based on the rules of the game. Assumes the move is legal. Message is updated correctly.
  * 
  * @param x The origin X
  * @param y The origin Y
  * @param new_x The destination X
  * @param new_y The destination Y
  * @param msg A message if any error occured, or the Move is illegal
- * @return true If origin piece won
- * @return false If destination piece won
  */
-bool Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
+void Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
     Piece& origin_piece = _board[x][y];
     Piece& destination_piece = _board[new_x][new_y];
-    if (!origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG) {
-        // The piece cannot be moved
-        msg = "The piece canot be moved, or doesn't exist.";
-        return false;
+    Piece temp_p;
+
+    if (origin_piece == destination_piece) {
+        msg = DEST_AND_ORIGIN_TIE;
+        origin_piece.RemovePieceFromPlayer();
+        destination_piece.RemovePieceFromPlayer();
     }
-    else if (!destination_piece.IsInitiated() || origin_piece > destination_piece) {
-        // origin piece wins
-        msg = "Origin piece wins.";
-        destination_piece = origin_piece;
-        destination_piece.SetPosition(new_x, new_y);
-        origin_piece.ClearPiece();
-        return true;
+    else if (!destination_piece.IsInitiated()) {
+        msg = EMPTY_DEST_PIECE;
+        temp_p = origin_piece;
     }
-    // destination piece wins
-    msg = "Destination piece wins.";
-    origin_piece.ClearPiece();
-    return false;
+    else if (origin_piece > destination_piece) {
+        msg = DEST_PIECE_LOST;
+        temp_p = origin_piece;
+        destination_piece.RemovePieceFromPlayer();
+    }
+    else if (origin_piece < destination_piece) {
+        msg = ORIGIN_PIECE_LOST;
+        temp_p = destination_piece;
+        origin_piece.RemovePieceFromPlayer();
+    }
+    destination_piece = temp_p;
+    origin_piece.NullifyPiece();
+}
+
+ostream& operator<<(ostream& output, const Board& b) {
+    for (int i=0; i<b._n; ++i) {
+        for (int j=0; j<b._m;++j) {
+            output  << b._board[i][j];
+        }
+        output << endl;
+    }
+    return output;
 }

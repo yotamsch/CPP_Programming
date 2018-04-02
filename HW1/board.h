@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include "pieces.h"
+#include "piece.h"
 #include "game.h"
 
 using namespace std;
@@ -23,13 +23,15 @@ class Board {
         int GetDimentionX() { return _n; }
         int GetDimentionY() { return _m; }
         // Utility
-        Piece* operator[](int index) { return _board[index]; }
         Board& operator+(const Board& b);
         Board& operator=(const Board& b);
         bool IsPositionValid(int x, int y) { return (x <= _n) && (y <= _m); }
-        bool PlacePiece(PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker=false);
-        bool MovePiece(int x, int y, int new_x, int new_y, string& msg);
+        bool IsMoveLegal(int x, int y, int new_x, int new_y, string& msg);
+        bool PlacePiece(Player* owner, PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker=false);
+        void MovePiece(int x, int y, int new_x, int new_y, string& msg);
         void PrettyPrint();
+    
+    friend ostream& operator<<(ostream& output, const Board& b);
 };
 
 #endif
