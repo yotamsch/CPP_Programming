@@ -1,6 +1,8 @@
 
-#include "pieces.h"
+#include "piece.h"
 
+
+int Piece::_piece_counter = 0;
 
 /**
  * @brief Overloading on the lower than (<) operator. According to the rules of the game. Returns true only if the left side is lower "in strength" than the right side.
@@ -14,6 +16,19 @@ bool Piece::operator<(const Piece& p) {
         return true;
     }
     return false;
+}
+
+Piece& Piece::operator=(const Piece& p) {
+    if (this != &p) {
+        this->_index_x = p._index_x;
+        this->_index_y = p._index_y;
+        this->_is_joker = p._is_joker;
+        this->_piece_type = p._piece_type;
+        this->_player_type = p._player_type;
+    }
+    if (DEBUG) cout << "- Counter=" << _piece_counter << endl;
+    if (DEBUG) cout << "(" << this->_index_x << "," << this->_index_y << ") " << endl;
+    return *this;
 }
 
 /**
@@ -49,7 +64,7 @@ void Piece::ClearPiece() {
 char PieceTypeToChar(PieceType type) {
     switch(type) {
         case PieceType::NONE:
-            return '_';
+            return ' ';
         case PieceType::ROCK:
             return 'R';
         case PieceType::PAPER:
