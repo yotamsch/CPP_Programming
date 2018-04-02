@@ -90,28 +90,28 @@ Board& Board::operator=(const Board& b) {
 }
 
 /**
- * @brief Overloading on the addition (+) operator. It adds together 2 boards.
- * Taking care of the rules. Used to combine the board for Player 1 and Player 2.
+ * @brief Overloading on the addition (+) operator. It adds together 2 boards. Taking care of the rules. Used to combine the board for Player 1 and Player 2.
  * 
- * @param b The Board to add.
- * @return Board& A new board of the addition
+ * @param a The first board to add
+ * @param b The second board to add
+ * @return Board& A reference to the heap allocated result
  */
-Board& Board::operator+(const Board& b) {
-    assert(_m == b._m);
-    assert(_n == b._n);
-    Board* b_new = new Board(_n,_m);
-    for (int i=0;i<_n;++i) {
-        for (int j=0;j<_m;++j) {
-            if (_board[i][j].GetPieceType() != b._board[i][j].GetPieceType()) {
-                if (_board[i][j] < b._board[i][j]) {
+Board& operator+(const Board& a, const Board& b) {
+    assert(a._m == b._m);
+    assert(a._n == b._n);
+    Board* b_new = new Board(a._n,a._m);
+    for (int i=0;i<a._n;++i) {
+        for (int j=0;j<a._m;++j) {
+            if (a._board[i][j].GetPieceType() != b._board[i][j].GetPieceType()) {
+                if (a._board[i][j] < b._board[i][j]) {
                     b_new->_board[i][j] = b._board[i][j];
-                    _board[i][j].RemovePieceFromPlayer();
+                    a._board[i][j].RemovePieceFromPlayer();
                 } else {
-                    b_new->_board[i][j] = _board[i][j];
+                    b_new->_board[i][j] = a._board[i][j];
                     b._board[i][j].RemovePieceFromPlayer();
                 }
             } else {
-                _board[i][j].RemovePieceFromPlayer();
+                a._board[i][j].RemovePieceFromPlayer();
                 b._board[i][j].RemovePieceFromPlayer();
             }
         }
