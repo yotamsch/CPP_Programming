@@ -89,7 +89,7 @@ Board& Board::operator+(const Board& b) {
     Board* b_new = new Board(_n,_m);
     for (int i=0;i<_n;++i) {
         for (int j=0;j<_m;++j) {
-            if (_board[i][j].getPieceType() != b._board[i][j].getPieceType()) {
+            if (_board[i][j].GetPieceType() != b._board[i][j].GetPieceType()) {
                 if (_board[i][j] < b._board[i][j]) {
                     b_new->_board[i][j] = b._board[i][j];
                 } else {
@@ -114,12 +114,12 @@ Board& Board::operator+(const Board& b) {
  * @return true If everything went fine and the piece has been inserted into the board.
  * @return false If an error occured, updating msg correctly
  */
-bool Board::placePiece(Player player, PieceType type, int x, int y, string& msg, bool is_joker) {
-    if (!isPositionValid(x, y)) {
+bool Board::PlacePiece(PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker) {
+    if (!IsPositionValid(x, y)) {
         msg = "Bad position.";
         return false;
     }
-    if (_board[x][y].isInitiated()) {
+    if (_board[x][y].IsInitiated()) {
         msg = "Piece already exists.";
         return false;
     }
@@ -129,7 +129,7 @@ bool Board::placePiece(Player player, PieceType type, int x, int y, string& msg,
 }
 
 /**
- * @brief Helper function for Board::prettyPrint(). prints a line of dashes based on the number of columns
+ * @brief Helper function for Board::PrettyPrint(). prints a line of dashes based on the number of columns
  * 
  * @param columns An integer
  */
@@ -144,7 +144,7 @@ void printLineOfDashes(int columns) {
  * @brief Prints the board.
  * 
  */
-void Board::prettyPrint() {
+void Board::PrettyPrint() {
     if (_n == 0 && _m == 0) {
         cout << "[...]" << endl;
         return;
@@ -169,10 +169,28 @@ void Board::prettyPrint() {
  * @param y The origin Y
  * @param new_x The destination X
  * @param new_y The destination Y
- * @param msg A message if any error occured, or the move is illegal
- * @return true If everything went ok
- * @return false If an error occured
+ * @param msg A message if any error occured, or the Move is illegal
+ * @return true If origin piece won
+ * @return false If destination piece won
  */
-bool movePiece(int x, int y, int new_x, int new_y, string& msg) {
-    // TODO: Implement the function movePiece
+bool Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
+    Piece& origin_piece = _board[x][y];
+    Piece& destination_piece = _board[new_x][new_y];
+    if (!origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG) {
+        // The piece cannot be moved
+        msg = "The piece canot be moved, or doesn't exist.";
+        return false;
+    }
+    else if (!destination_piece.IsInitiated() || origin_piece > destination_piece) {
+        // origin piece wins
+        msg = "Origin piece wins.";
+        destination_piece = origin_piece;
+        destination_piece.SetPosition(new_x, new_y);
+        origin_piece.ClearPiece();
+        return true;
+    }
+    // destination piece wins
+    msg = "Destination piece wins.";
+    origin_piece.ClearPiece();
+    return false;
 }

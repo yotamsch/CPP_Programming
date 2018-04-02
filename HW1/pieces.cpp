@@ -1,32 +1,6 @@
 
 #include "pieces.h"
 
-/**
- * @brief Converts the recieved type to a representing char
- * 
- * @param type The type to convert (e.g. ROCK, PAPER...)
- * @return char The representing character
- */
-char pieceTypeToChar(PieceType type) {
-    switch(type) {
-        case PieceType::NONE:
-            return '_';
-        case PieceType::ROCK:
-            return 'R';
-        case PieceType::PAPER:
-            return 'P';
-        case PieceType::SCISSORS:
-            return 'S';
-        case PieceType::FLAG:
-            return 'F';
-        case PieceType::BOMB:
-            return 'B';
-        case PieceType::JOKER:
-            return 'J';
-        default:
-            return '?';
-    }
-}
 
 /**
  * @brief Overloading on the lower than (<) operator. According to the rules of the game. Returns true only if the left side is lower "in strength" than the right side.
@@ -50,12 +24,47 @@ bool Piece::operator<(const Piece& p) {
  * @return ostream& The modified ostream
  */
 ostream& operator<<(ostream& output, const Piece& piece) {
-    if (piece.getPlayer() == Player::PLAYER_1) {
-        output <<  (char)toupper(pieceTypeToChar(piece.getPieceType()));
+    if (piece.GetPlayerType() == PlayerType::PLAYER_1) {
+        output <<  (char)toupper(PieceTypeToChar(piece.GetPieceType()));
     } else {
-        output <<  (char)tolower(pieceTypeToChar(piece.getPieceType()));
+        output <<  (char)tolower(PieceTypeToChar(piece.GetPieceType()));
     }
     return output;
+}
+
+/**
+ * @brief Clears a piece content and nullifies the piece (empty piece).
+ * 
+ */
+void Piece::ClearPiece() {
+    this->_piece_type = PieceType::NONE;
+}
+
+/**
+ * @brief Converts the recieved type to a representing char
+ * 
+ * @param type The type to convert (e.g. ROCK, PAPER...)
+ * @return char The representing character
+ */
+char PieceTypeToChar(PieceType type) {
+    switch(type) {
+        case PieceType::NONE:
+            return '_';
+        case PieceType::ROCK:
+            return 'R';
+        case PieceType::PAPER:
+            return 'P';
+        case PieceType::SCISSORS:
+            return 'S';
+        case PieceType::FLAG:
+            return 'F';
+        case PieceType::BOMB:
+            return 'B';
+        case PieceType::JOKER:
+            return 'J';
+        default:
+            return '?';
+    }
 }
 
 

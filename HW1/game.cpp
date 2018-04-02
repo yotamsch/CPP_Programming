@@ -15,25 +15,58 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-    Board b1(2, 2);
-    Board b2(2, 2);
-    cout << "Board b2=("<< b2.getDimentionX() << "," << b2.getDimentionY() << ")" << endl;
-    cout << "b2.isPositionValid(1,1)? " << b2.isPositionValid(1,1) << endl;
-    cout << "b2.isPositionValid(4,1)? " << b2.isPositionValid(4,1) << endl;
+    Board b1(3, 3);
+    Board b2(3, 3);
+    cout << "Board b2=("<< b2.GetDimentionX() << "," << b2.GetDimentionY() << ")" << endl;
+    cout << "b2.IsPositionValid(1,1)? " << b2.IsPositionValid(1,1) << endl;
+    cout << "b2.IsPositionValid(4,1)? " << b2.IsPositionValid(4,1) << endl;
     string msg = "";
-    if (!b1.placePiece(Player::PLAYER_1,PieceType::ROCK,0,0,msg)) cout << msg << endl;
-    if (!b1.placePiece(Player::PLAYER_1,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
-    if (!b1.placePiece(Player::PLAYER_1,PieceType::SCISSORS, 0,1, msg)) cout << msg << endl;
-    if (!b2.placePiece(Player::PLAYER_2,PieceType::ROCK,0,0,msg)) cout << msg << endl;
-    if (!b2.placePiece(Player::PLAYER_2,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
-    if (!b2.placePiece(Player::PLAYER_2,PieceType::SCISSORS, 1,0, msg)) cout << msg << endl;
+    if (!b1.PlacePiece(PlayerType::PLAYER_1,PieceType::ROCK,0,0,msg)) cout << msg << endl;
+    if (!b1.PlacePiece(PlayerType::PLAYER_1,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
+    if (!b1.PlacePiece(PlayerType::PLAYER_1,PieceType::SCISSORS, 0,1, msg)) cout << msg << endl;
+    if (!b1.PlacePiece(PlayerType::PLAYER_1,PieceType::FLAG, 2,1, msg)) cout << msg << endl;
+    if (!b1.PlacePiece(PlayerType::PLAYER_1,PieceType::BOMB, 2,2, msg)) cout << msg << endl;
+    if (!b2.PlacePiece(PlayerType::PLAYER_2,PieceType::ROCK,0,0,msg)) cout << msg << endl;
+    if (!b2.PlacePiece(PlayerType::PLAYER_2,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
+    if (!b2.PlacePiece(PlayerType::PLAYER_2,PieceType::ROCK, 1,0, msg)) cout << msg << endl;
+    if (!b2.PlacePiece(PlayerType::PLAYER_2,PieceType::SCISSORS, 2,0, msg)) cout << msg << endl;
+    if (!b2.PlacePiece(PlayerType::PLAYER_2,PieceType::FLAG, 2,1, msg)) cout << msg << endl;
+    if (!b2.PlacePiece(PlayerType::PLAYER_2,PieceType::BOMB, 1,2, msg)) cout << msg << endl;
+    //
     cout << "BOARD 1" << endl;
-    b1.prettyPrint();
+    b1.PrettyPrint();
+    //
     cout << "BOARD 2" << endl;
-    b2.prettyPrint();
+    b2.PrettyPrint();
+    //
     Board b3 = b1 + b2;
     cout << "BOARD 3" << endl;
-    b3.prettyPrint();
+    b3.PrettyPrint();
+    //
+    cout << "MovePiece(0,1,1,0)" << endl;
+    b3.MovePiece(0,1,1,0,msg);
+    cout << msg << endl;
+    cout << "BOARD 3" << endl;
+    b3.PrettyPrint();
+    //
+    cout << "MovePiece(1,2,1,0)" << endl;
+    b3.MovePiece(1,2,1,0,msg);
+    cout << msg << endl;
+    cout << "BOARD 3" << endl;
+    b3.PrettyPrint();
+    //
+    cout << "MovePiece(1,2,2,2)" << endl;
+    b3.MovePiece(1,2,2,2,msg);
+    cout << msg << endl;
+    cout << "BOARD 3" << endl;
+    b3.PrettyPrint();
+    //
+    cout << "MovePiece(2,0,2,1)" << endl;
+    b3.MovePiece(2,0,2,1,msg);
+    cout << msg << endl;
+    cout << "BOARD 3" << endl;
+    b3.PrettyPrint();
+    //
     cout << "End" << endl;
     return 0;
 }
