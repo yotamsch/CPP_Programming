@@ -5,12 +5,6 @@
 #include <cassert>
 #include <iostream>
 
-#define ILLEGAL_MOVE "The attempted move is illegal."
-#define EMPTY_DEST_PIECE "The destination has no piece."
-#define ORIGIN_PIECE_LOST "The origin piece lost and was eaten."
-#define DEST_PIECE_LOST "The destination piece lost and was eaten."
-#define DEST_AND_ORIGIN_TIE "Both origin and destination are tied (both eaten)."
-
 using namespace std;
 
 /**
@@ -48,7 +42,6 @@ Board::~Board() {
     if (DEBUG) cout << "-> Freeing BOARD : " << this << endl;
     for (int i=0; i < _n; ++i) {
         delete[] (_board[i]);
-        if (DEBUG) cout << "--> Freed _board[" << i << "]" << endl;
     }
     delete[] _board;
     if (DEBUG) cout << "--> Freed _board" << endl;
@@ -90,33 +83,31 @@ Board& Board::operator=(const Board& b) {
 }
 
 /**
- * @brief Overloading on the addition (+) operator. It adds together 2 boards. Taking care of the rules. Used to combine the board for Player 1 and Player 2.
+ * @brief Merges a second board to the current board based on the rules of the game.
  * 
- * @param a The first board to add
- * @param b The second board to add
- * @return Board& A reference to the heap allocated result
+ * @param b The board to merge into the calling board.
+ * @return Board& the current board as reference type.
  */
-Board& operator+(const Board& a, const Board& b) {
-    assert(a._m == b._m);
-    assert(a._n == b._n);
-    Board* b_new = new Board(a._n,a._m);
-    for (int i=0;i<a._n;++i) {
-        for (int j=0;j<a._m;++j) {
-            if (a._board[i][j].GetPieceType() != b._board[i][j].GetPieceType()) {
-                if (a._board[i][j] < b._board[i][j]) {
-                    b_new->_board[i][j] = b._board[i][j];
-                    a._board[i][j].RemovePieceFromPlayer();
+Board& Board::Merge(const Board& b) {
+    assert(_m == b._m);
+    assert(_n == b._n);
+    for (int i=0;i<_n;++i) {
+        for (int j=0;j<_m;++j) {
+            if (_board[i][j].GetPieceType() != b._board[i][j].GetPieceType()) {
+                if (_board[i][j] < b._board[i][j]) {
+                    _board[i][j].RemovePieceFromPlayer();
+                    _board[i][j] = b._board[i][j];
                 } else {
-                    b_new->_board[i][j] = a._board[i][j];
                     b._board[i][j].RemovePieceFromPlayer();
                 }
             } else {
-                a._board[i][j].RemovePieceFromPlayer();
+                _board[i][j].RemovePieceFromPlayer();
                 b._board[i][j].RemovePieceFromPlayer();
+                _board[i][j].NullifyPiece();
             }
         }
     }
-    return *b_new;
+    return *this;
 }
 
 /**
@@ -134,50 +125,20 @@ Board& operator+(const Board& a, const Board& b) {
  */
 bool Board::PlacePiece(Player* owner, PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker) {
     if (!IsPositionValid(x, y)) {
-        msg = "Bad position.";
+        msg = MSG_INVALID_POSITION;
         return false;
     }
     if (_board[x][y].IsInitiated()) {
-        msg = "Piece already exists.";
+        msg = MSG_PIECE_ALREADY_IN_PLACE;
+        return false;
+    }
+    if (is_joker && (type == PieceType::FLAG)) {
+        // joker cannot be flag
         return false;
     }
     Piece p(player, type, is_joker, owner);
     _board[x][y] = p;
     return true;
-}
-
-/**
- * @brief Helper function for Board::PrettyPrint(). prints a line of dashes based on the number of columns
- * 
- * @param columns An integer
- */
-void printLineOfDashes(int columns) {
-    for (int i=0; i< (columns*4+1); ++i) {
-        cout << "-";
-    }
-    cout << endl;
-}
-
-/**
- * @brief Prints the board.
- * 
- */
-void Board::PrettyPrint() {
-    if (_n == 0 && _m == 0) {
-        cout << "[...]" << endl;
-        return;
-    }
-    printLineOfDashes(_m);
-    for (int i=0; i<_n; ++i) {
-        cout << "-";
-        for (int j=0; j<_m;++j) {
-            if (j%2 == 1) cout << " ";
-            cout << "[" << _board[i][j] << "]";
-            if (j%2 == 1) cout << " ";
-        }
-        cout << "-" << endl;
-        printLineOfDashes(_m);
-    }
 }
 
 /**
@@ -194,8 +155,8 @@ void Board::PrettyPrint() {
 bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
     Piece& origin_piece = _board[x][y];
     Piece& destination_piece = _board[new_x][new_y];
-    if (!origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG) {
-        msg = ILLEGAL_MOVE;
+    if (!IsPositionValid(x, y) || !IsPositionValid(new_x, new_y) || !origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG) {
+        msg = MSG_ILLEGAL_MOVE;
         return false;
     }
     return true;
@@ -210,32 +171,54 @@ bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
  * @param new_y The destination Y
  * @param msg A message if any error occured, or the Move is illegal
  */
-void Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
+bool Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
+    if (DEBUG) cout << "Moving (" << x << "," << y << "), to (" << new_x << "," << new_y << ")" << endl;
+    if (!IsMoveLegal(x, y, new_x, new_y, msg)) {
+        return false;
+    }
+
     Piece& origin_piece = _board[x][y];
     Piece& destination_piece = _board[new_x][new_y];
     Piece temp_p;
-
     if (origin_piece == destination_piece) {
-        msg = DEST_AND_ORIGIN_TIE;
+        msg = MSG_DEST_AND_ORIGIN_TIE;
         origin_piece.RemovePieceFromPlayer();
         destination_piece.RemovePieceFromPlayer();
     }
     else if (!destination_piece.IsInitiated()) {
-        msg = EMPTY_DEST_PIECE;
+        msg = MSG_EMPTY_DEST_PIECE;
         temp_p = origin_piece;
     }
     else if (origin_piece > destination_piece) {
-        msg = DEST_PIECE_LOST;
+        msg = MSG_DEST_PIECE_LOST;
         temp_p = origin_piece;
         destination_piece.RemovePieceFromPlayer();
     }
     else if (origin_piece < destination_piece) {
-        msg = ORIGIN_PIECE_LOST;
+        msg = MSG_ORIGIN_PIECE_LOST;
         temp_p = destination_piece;
         origin_piece.RemovePieceFromPlayer();
     }
     destination_piece = temp_p;
     origin_piece.NullifyPiece();
+    if (destination_piece.GetPieceType() == PieceType::BOMB) {
+        destination_piece.NullifyPiece();
+    }
+    return true;
+}
+
+bool Board::ChangeJoker(int x, int y, PieceType new_type, string& msg) {
+    if (!IsPositionValid(x,y)) {
+        msg = MSG_ILLEGAL_MOVE;
+        return false;
+    }
+    Piece& piece = _board[x][y];
+    if (!piece.IsJoker() || new_type == PieceType::FLAG) {
+        msg = MSG_ILLEGAL_MOVE;
+        return false;
+    }
+    piece.SetType(new_type); // handles joker piece count
+    return true;
 }
 
 ostream& operator<<(ostream& output, const Board& b) {
@@ -246,4 +229,39 @@ ostream& operator<<(ostream& output, const Board& b) {
         output << endl;
     }
     return output;
+}
+
+/**
+ * @brief Helper function for Board::PrettyPrint(). prints a line of dashes based on the number of columns
+ * 
+ * @param columns An integer
+ */
+void printLineOfDashes(int columns) {
+    cout << "\t";
+    for (int i=0; i< (columns*4 - 1); ++i) {
+        cout << "-";
+    }
+    cout << endl;
+}
+
+/**
+ * @brief Prints the board.
+ * 
+ */
+void Board::PrettyPrint() {
+    if (_n == 0 && _m == 0) {
+        cout << "[...]" << endl;
+        return;
+    }
+    printLineOfDashes(_m);
+    for (int i=0; i<_n; ++i) {
+        cout << i+1 << "\t";
+        for (int j=0; j<_m;++j) {
+            if (j%2 == 1) cout << " ";
+            cout << "[" << _board[i][j] << "]";
+            if (j%2 == 1) cout << " ";
+        }
+        cout << endl;
+        printLineOfDashes(_m);
+    }
 }

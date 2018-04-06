@@ -9,17 +9,16 @@
 using namespace std;
 
 class Piece {
-    private:
         bool _is_joker;
         PieceType _piece_type;
         Player* _owner;
         PlayerType _player_type;
-        static int _piece_counter;
+        static int _piece_counter; // general piece counter for debugging
     public:
         // C'tors
         Piece() : _piece_type(PieceType::NONE) { ++_piece_counter; }
-        Piece(PlayerType player, PieceType type, bool is_joker, Player* owner): _player_type(player), _piece_type(type), _is_joker(is_joker), _owner(owner) { ++_piece_counter; _owner->IncrementPieceCount(_piece_type); }
-        Piece(const Piece& p) { *this = p; }
+        Piece(PlayerType player, PieceType type, bool is_joker, Player* owner);
+		Piece(const Piece& p) { *this = p; }
         // D'tor
         ~Piece() { --_piece_counter; }
         // Get
@@ -27,7 +26,7 @@ class Piece {
         PlayerType GetPlayerType() const { return _player_type; }
         static int GetPieceCounter() {return _piece_counter; }
         // Set
-        bool SetType(PieceType type) { if (_is_joker) { _piece_type = type; return true; } return false; }
+        bool SetType(PieceType type);
         // Utility
         bool IsJoker() { return _is_joker; }
         bool IsInitiated() { return _piece_type != PieceType::NONE ? true : false; }
@@ -42,6 +41,7 @@ class Piece {
 };
 
 char PieceTypeToChar(PieceType type);
+PieceType CharToPieceType(char chr);
 
 #endif
 

@@ -4,12 +4,12 @@
 
 void Player::IncrementPieceCount(PieceType type) {
     if (type == PieceType::FLAG) this->_number_of_flags++;
-    this->_number_of_pieces++;
+    else if (type != PieceType::BOMB) this->_number_of_pieces++;
 }
 
 void Player::DecrementPieceCount(PieceType type) {
     if (type == PieceType::FLAG) this->_number_of_flags--;
-    this->_number_of_pieces--;
+    else if (type != PieceType::BOMB) this->_number_of_pieces--;
 }
 
 bool Player::IsLosing() {

@@ -1,11 +1,14 @@
 CPP=g++
 CPPFLAGS=-c -std=c++11
 
-all: game.o board.o piece.o player.o
-	$(CPP) game.o board.o piece.o player.o -o game
+all: game.o file.o board.o piece.o player.o
+	$(CPP) game.o file.o board.o piece.o player.o -o game
 
 game.o: game.cpp
 	$(CPP) $(CPPFLAGS) game.cpp -I.
+
+file.o: file.cpp
+	$(CPP) $(CPPFLAGS) file.cpp -I.
 
 board.o: board.cpp
 	$(CPP) $(CPPFLAGS) board.cpp -I.

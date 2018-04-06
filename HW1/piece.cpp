@@ -4,6 +4,11 @@
 
 int Piece::_piece_counter = 0;
 
+Piece::Piece(PlayerType player, PieceType type, bool is_joker, Player* owner): _player_type(player), _piece_type(type), _is_joker(is_joker), _owner(owner) { 
+    ++_piece_counter; 
+    _owner->IncrementPieceCount(_piece_type); 
+}
+
 /**
  * @brief Overloading on the lower than (<) operator. According to the rules of the game. Returns true only if the left side is lower "in strength" than the right side.
  * 
@@ -50,6 +55,7 @@ ostream& operator<<(ostream& output, const Piece& piece) {
  */
 void Piece::NullifyPiece() {
     this->_piece_type = PieceType::NONE;
+    this->_owner = nullptr;
 }
 
 /**
@@ -60,6 +66,16 @@ void Piece::RemovePieceFromPlayer() {
     if (this->_piece_type == PieceType::NONE)
         return;
     this->_owner->DecrementPieceCount(this->_piece_type);
+}
+
+bool Piece::SetType(PieceType type) { 
+    if (_is_joker) {
+        _owner->DecrementPieceCount(_piece_type);
+        _piece_type = type; 
+        _owner->IncrementPieceCount(_piece_type);
+        return true;
+    } 
+    return false; 
 }
 
 /**
@@ -89,5 +105,21 @@ char PieceTypeToChar(PieceType type) {
     }
 }
 
-
-// ? maybe something to implement
+PieceType CharToPieceType(char chr) {
+    switch(chr) {
+        case 'R':
+            return PieceType::ROCK;
+        case 'P':
+            return PieceType::PAPER;
+        case 'S':
+            return PieceType::SCISSORS;
+        case 'F':
+            return PieceType::FLAG;
+        case 'B':
+            return PieceType::BOMB;
+        case 'J':
+            return PieceType::JOKER;
+        default:
+            return PieceType::NONE;
+    }
+}

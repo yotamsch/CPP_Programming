@@ -22,7 +22,7 @@ enum class PlayerType {PLAYER_1=1, PLAYER_2};
  * @brief An enum representing the different types of play pieces
  * 
  */
-enum class PieceType {NONE=-1, ROCK=0, PAPER, SCISSORS, BOMB, FLAG, JOKER};
+enum class PieceType {NONE=-1, ROCK=0, PAPER, SCISSORS, FLAG, BOMB, JOKER};
 
 
 #endif
