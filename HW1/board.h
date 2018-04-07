@@ -23,7 +23,6 @@ class Board {
         Piece** _board = nullptr;
     public:
         // C'tor
-        Board() {}
         Board(int n, int m);
         Board(const Board& b);
         // D'tor

@@ -126,7 +126,7 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 	return Reason::SUCCESS;
 }
 
-Reason MoveFile::NextMove(const Player* player, string& msg) {
+Reason MoveFile::NextMove(string& msg) {
 	// get a move from the file and parse it
 	const char delim = ' ';
 	const char* joker_str = "J:";

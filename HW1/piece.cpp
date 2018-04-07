@@ -4,7 +4,10 @@
 
 int Piece::_piece_counter = 0;
 
-Piece::Piece(PieceType type, bool is_joker, Player* owner): _piece_type(type), _is_joker(is_joker), _owner(owner) { 
+Piece::Piece(PieceType type, bool is_joker, Player* owner) { 
+    _piece_type = type; 
+    _is_joker = is_joker;
+    _owner = owner;
     ++_piece_counter; 
     _owner->IncrementPieceCount(_piece_type); 
 }

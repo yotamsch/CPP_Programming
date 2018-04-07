@@ -14,9 +14,9 @@ using namespace std;
  * @param n The number of rows in the board
  * @param m The number of colums in the board
  */
-Board::Board(int n, int m) : _m(m), _n(n) {
-    assert(n > 0);
-    assert(m > 0);
+Board::Board(int n, int m) {
+    _n = n;
+    _m = m;
     _board = new Piece*[n];
     if (_board) {
         for (int i=0;i < n; ++i) {
