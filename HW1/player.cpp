@@ -12,10 +12,10 @@ void Player::DecrementPieceCount(PieceType type) {
     else if (type != PieceType::BOMB) this->_number_of_pieces--;
 }
 
-bool Player::IsLosing() {
-    if (_number_of_flags <= 0 || _number_of_pieces <= 0) 
-        return true;
-    return false; 
+Reason Player::IsLosing() {
+    if (_number_of_flags <= 0) return Reason::NO_FLAGS;
+    if (_number_of_pieces <= 0) return Reason::NO_PIECES;
+    return Reason::SUCCESS;
 }
 
 ostream& operator<<(ostream& output, const Player& p) {

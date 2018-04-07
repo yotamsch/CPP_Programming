@@ -12,18 +12,17 @@ class Piece {
         bool _is_joker;
         PieceType _piece_type;
         Player* _owner;
-        PlayerType _player_type;
         static int _piece_counter; // general piece counter for debugging
     public:
         // C'tors
         Piece() : _piece_type(PieceType::NONE) { ++_piece_counter; }
-        Piece(PlayerType player, PieceType type, bool is_joker, Player* owner);
+        Piece(PieceType type, bool is_joker, Player* owner);
 		Piece(const Piece& p) { *this = p; }
         // D'tor
         ~Piece() { --_piece_counter; }
         // Get
         PieceType GetPieceType() const { return _piece_type; }
-        PlayerType GetPlayerType() const { return _player_type; }
+        PlayerType GetPlayerType() const { return _owner ? _owner->GetType() : PlayerType::NONE; }
         static int GetPieceCounter() {return _piece_counter; }
         // Set
         bool SetType(PieceType type);
@@ -32,7 +31,7 @@ class Piece {
         bool IsInitiated() { return _piece_type != PieceType::NONE ? true : false; }
         bool operator<(const Piece& p);
         bool operator==(const Piece& p) { if ( this->GetPieceType() == p.GetPieceType()) return true; return false; }
-        bool operator>(const Piece& p) { if ((*this) < p || (*this) == p) return false; return true; }
+        bool operator>(const Piece& p) { return (*this) < p || (*this) == p ? false : true; }
         Piece& operator=(const Piece& p);
         void NullifyPiece();
         void RemovePieceFromPlayer();

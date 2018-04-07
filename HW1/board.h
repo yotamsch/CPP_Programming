@@ -33,9 +33,9 @@ class Board {
         int GetDimentionY() { return _m; }
         // Utility
         Board& operator=(const Board& b);
-        bool IsPositionValid(int x, int y) { return (x <= _n) && (y <= _m); }
+        bool IsPositionValid(int x, int y) { return (x >= 0 && x < _n) && (y >= 0 && y < _m); }
         bool IsMoveLegal(int x, int y, int new_x, int new_y, string& msg);
-        bool PlacePiece(Player* owner, PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker=false);
+        bool PlacePiece(Player* owner, PieceType type, int x, int y, string& msg, bool is_joker=false);
         bool MovePiece(int x, int y, int new_x, int new_y, string& msg);
         bool ChangeJoker(int x, int y, PieceType new_type, string& msg);
         Board& Merge(const Board& b);

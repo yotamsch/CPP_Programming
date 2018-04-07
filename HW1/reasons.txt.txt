@@ -1,0 +1,7 @@
+All flags of the opponent are captured
+All moving PIECEs of the opponent are eaten
+A tie - both Moves input files done without a winner
+A tie - all flags are eaten by both players in the position files
+Bad Positioning input file for player <player> - line <bad line number>
+Bad Positioning input file for both players - player 1: line <X>, player 2: line <Y>
+Bad Moves input file for player <player> - line <bad line number>

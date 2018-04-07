@@ -4,6 +4,7 @@
 #include "player.h"
 #include <cassert>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -22,6 +23,7 @@ Board::Board(int n, int m) : _m(m), _n(n) {
             _board[i] = new Piece[m];
             assert(_board[i]);
         }
+        if (DEBUG) cout << "-> Created new board, (" << n << "," << m << ")" << ", [0,0]=" << _board[0][0] << endl;
     }
 }
 
@@ -39,13 +41,12 @@ Board::Board(const Board& b) {
  * 
  */
 Board::~Board() {
-    if (DEBUG) cout << "-> Freeing BOARD : " << this << endl;
     for (int i=0; i < _n; ++i) {
         delete[] (_board[i]);
     }
     delete[] _board;
     if (DEBUG) cout << "--> Freed _board" << endl;
-    if (DEBUG) cout << "- Counter=" << Piece::GetPieceCounter() << endl;
+    if (DEBUG) cout << "- Piece count=" << Piece::GetPieceCounter() << endl;
 }
 
 /**
@@ -123,7 +124,7 @@ Board& Board::Merge(const Board& b) {
  * @return true If everything went fine and the piece has been inserted into the board.
  * @return false If an error occured, updating msg correctly
  */
-bool Board::PlacePiece(Player* owner, PlayerType player, PieceType type, int x, int y, string& msg, bool is_joker) {
+bool Board::PlacePiece(Player* owner, PieceType type, int x, int y, string& msg, bool is_joker) {
     if (!IsPositionValid(x, y)) {
         msg = MSG_INVALID_POSITION;
         return false;
@@ -136,8 +137,9 @@ bool Board::PlacePiece(Player* owner, PlayerType player, PieceType type, int x, 
         // joker cannot be flag
         return false;
     }
-    Piece p(player, type, is_joker, owner);
+    Piece p(type, is_joker, owner);
     _board[x][y] = p;
+    if (DEBUG) cout << "--> Piece initialized, " << _board[x][y] << endl;
     return true;
 }
 
@@ -155,7 +157,7 @@ bool Board::PlacePiece(Player* owner, PlayerType player, PieceType type, int x, 
 bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
     Piece& origin_piece = _board[x][y];
     Piece& destination_piece = _board[new_x][new_y];
-    if (!IsPositionValid(x, y) || !IsPositionValid(new_x, new_y) || !origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG) {
+    if (!IsPositionValid(x, y) || !IsPositionValid(new_x, new_y) || !origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG || (abs(x - new_x) == 1 && abs(y - new_y) == 1) || abs(x-new_x) > 1 || abs(y - new_y) > 1) {
         msg = MSG_ILLEGAL_MOVE;
         return false;
     }

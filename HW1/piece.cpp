@@ -4,7 +4,7 @@
 
 int Piece::_piece_counter = 0;
 
-Piece::Piece(PlayerType player, PieceType type, bool is_joker, Player* owner): _player_type(player), _piece_type(type), _is_joker(is_joker), _owner(owner) { 
+Piece::Piece(PieceType type, bool is_joker, Player* owner): _piece_type(type), _is_joker(is_joker), _owner(owner) { 
     ++_piece_counter; 
     _owner->IncrementPieceCount(_piece_type); 
 }
@@ -17,9 +17,12 @@ Piece::Piece(PlayerType player, PieceType type, bool is_joker, Player* owner): _
  * @return false Otherwise
  */
 bool Piece::operator<(const Piece& p) {
-    if (p._piece_type == PieceType::BOMB || (p._piece_type == PieceType::ROCK && _piece_type == PieceType::SCISSORS) || (p._piece_type == PieceType::SCISSORS && _piece_type == PieceType::PAPER) || (p._piece_type == PieceType::PAPER && _piece_type == PieceType::ROCK) || _piece_type == PieceType::FLAG || _piece_type == PieceType::NONE) {
+    if (DEBUG) cout << "--> Checking " << *this << " < " << p << " ?" << endl;
+    if (_piece_type == PieceType::NONE || p._piece_type == PieceType::BOMB || (p._piece_type == PieceType::ROCK && _piece_type == PieceType::SCISSORS) || (p._piece_type == PieceType::SCISSORS && _piece_type == PieceType::PAPER) || (p._piece_type == PieceType::PAPER && _piece_type == PieceType::ROCK) || (_piece_type == PieceType::FLAG && p._piece_type != PieceType::NONE)) {
+        if (DEBUG) cout << "---> true" << endl;
         return true;
     }
+    if (DEBUG) cout << "---> false" << endl;
     return false;
 }
 
@@ -27,7 +30,6 @@ Piece& Piece::operator=(const Piece& p) {
     if (this != &p) {
         this->_is_joker = p._is_joker;
         this->_piece_type = p._piece_type;
-        this->_player_type = p._player_type;
         this->_owner = p._owner;
     }
     return *this;

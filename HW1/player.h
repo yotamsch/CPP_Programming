@@ -23,7 +23,7 @@ class Player {
         // Utilities
         void IncrementPieceCount(PieceType type);
         void DecrementPieceCount(PieceType type);
-        bool IsLosing();
+        Reason IsLosing();
     
     friend ostream& operator<<(ostream& output, const Player& p);
 };

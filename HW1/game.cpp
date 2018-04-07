@@ -13,143 +13,52 @@
 #include "file.h"
 #include <iostream>
 #include <string>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
-void Testing() {
-    bool res;
-    Player p1(PlayerType::PLAYER_1);
-    Player p2(PlayerType::PLAYER_2);
+string GenerateOutputResult(Reason p1_r, Reason p2_r, Reason g_r, const string& info, bool is_finished=false) {
+    int winner;
+    string msg_reason;
 
-    if (DEBUG) cout << "1. Counter=" << Piece::GetPieceCounter() << endl;
-    Board b1(3, 3);
-    if (DEBUG) cout << "2. Counter=" << Piece::GetPieceCounter() << endl;
-    Board b2(3, 3);
-    
-    if (DEBUG) cout << "3. Counter=" << Piece::GetPieceCounter() << endl;
-    cout << "Board b1=("<< b1.GetDimentionX() << "," << b1.GetDimentionY() << ")" << endl;
-    b1.PrettyPrint();
-    cout << "Board b2=("<< b2.GetDimentionX() << "," << b2.GetDimentionY() << ")" << endl;
-    b2.PrettyPrint();
+    if (is_finished && p1_r == p2_r) {
+        // tie at end
+        // ? only SUCCESS ??
+        winner = 0;
+        msg_reason = RSN_MOVE_FILES_NO_WINNER;
+    }
+    else {
+        // only one player won
+        winner = p1_r == Reason::SUCCESS ? int(PlayerType::PLAYER_1) : int(PlayerType::PLAYER_2);
+        if (p1_r == Reason::NO_FLAGS || p2_r == Reason::NO_FLAGS)
+            msg_reason = RSN_ALL_FLAGS_CAPTURED;
+        else if (p1_r == Reason::NO_PIECES || p2_r == Reason::NO_PIECES)
+            msg_reason = RSN_ALL_PIECES_EATEN;
+        else if (p1_r == Reason::LINE_ERROR || p2_r == Reason::LINE_ERROR)
+            msg_reason = g_r == Reason::LINE_ERROR ? RSN_BAD_MOVE_FILE_SINGLE + info : RSN_BAD_POSISION_FILE_SINGLE + info;
+        if (p1_r == p2_r) {
+            winner = 0;
+            if (p1_r == Reason::NO_FLAGS) msg_reason = RSN_POSITION_NO_FLAGS;
+            if (p1_r == Reason::NO_PIECES) msg_reason = RSN_POSITION_NO_PIECES;
+            if (p1_r == Reason::LINE_ERROR) msg_reason = RSN_BAD_POSITION_FILE_DOUBLE + info;
+        }
+    }
+    stringstream ss;
+    ss << "Winner: " << winner << endl << "Reason: " << msg_reason << endl << endl;
+    return ss.str();
+}
 
-    cout << p1 << endl;
-    cout << p2 << endl;
-    
-    string msg = "";
-    if (!b1.PlacePiece(&p1, PlayerType::PLAYER_1,PieceType::ROCK,0,0,msg)) cout << msg << endl;
-    if (!b1.PlacePiece(&p1, PlayerType::PLAYER_1,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
-    if (!b1.PlacePiece(&p1, PlayerType::PLAYER_1,PieceType::SCISSORS, 0,1, msg)) cout << msg << endl;
-    if (!b1.PlacePiece(&p1, PlayerType::PLAYER_1,PieceType::FLAG, 2,1, msg)) cout << msg << endl;
-    if (!b1.PlacePiece(&p1, PlayerType::PLAYER_1,PieceType::BOMB, 2,2, msg)) cout << msg << endl;
-    if (!b2.PlacePiece(&p2, PlayerType::PLAYER_2,PieceType::ROCK,0,0,msg)) cout << msg << endl;
-    if (!b2.PlacePiece(&p2, PlayerType::PLAYER_2,PieceType::PAPER,1,1,msg,true)) cout << msg << endl;
-    if (!b2.PlacePiece(&p2, PlayerType::PLAYER_2,PieceType::ROCK, 1,0, msg)) cout << msg << endl;
-    if (!b2.PlacePiece(&p2, PlayerType::PLAYER_2,PieceType::SCISSORS, 2,0, msg)) cout << msg << endl;
-    if (!b2.PlacePiece(&p2, PlayerType::PLAYER_2,PieceType::FLAG, 2,1, msg)) cout << msg << endl;
-    if (!b2.PlacePiece(&p2, PlayerType::PLAYER_2,PieceType::BOMB, 1,2, msg)) cout << msg << endl;
-    if (DEBUG) cout << "4. Counter=" << Piece::GetPieceCounter() << endl;
-    cout << p1 << endl;
-    cout << p2 << endl;
-    //
-    cout << "BOARD 1" << endl;
-    b1.PrettyPrint();
-    //
-    cout << "BOARD 2" << endl;
-    b2.PrettyPrint();
-    //
-    // The plus (+) operator returns a new heap assigned object, so in order to not lose the object we define b3 as a reference to that object. so we have a name for the returned object.
-    Board b3(3,3);
-    b3.Merge(b1).Merge(b2);
-    cout << "BOARD 3" << endl;
-    b3.PrettyPrint();
-    cout << p1 << endl;
-    cout << p2 << endl;
-    //
-    if (DEBUG) cout << "5. Counter=" << Piece::GetPieceCounter() << endl;
-    cout << "MovePiece(0,1,1,0)" << endl;
-    if (b3.IsMoveLegal(0,1,1,0,msg)) b3.MovePiece(0,1,1,0,msg);
-    cout << msg << endl;
-    cout << "BOARD 3" << endl;
-    b3.PrettyPrint();
-    cout << p1 << endl;
-    cout << p2 << endl;
-    //
-    if (DEBUG) cout << "6. Counter=" << Piece::GetPieceCounter() << endl;
-    cout << "MovePiece(1,2,1,0)" << endl;
-    if (b3.IsMoveLegal(1,2,1,0,msg)) b3.MovePiece(1,2,1,0,msg);
-    cout << msg << endl;
-    cout << "BOARD 3" << endl;
-    b3.PrettyPrint();
-    cout << p1 << endl;
-    cout << p2 << endl;
-    //
-    if (DEBUG) cout << "7. Counter=" << Piece::GetPieceCounter() << endl;
-    cout << "MovePiece(1,1,2,2)" << endl;
-    if (b3.IsMoveLegal(1,1,2,2,msg)) b3.MovePiece(1,1,2,2,msg);
-    cout << msg << endl;
-    cout << "BOARD 3" << endl;
-    b3.PrettyPrint();
-    cout << p1 << endl;
-    cout << p2 << endl;
-    //
-    if (DEBUG) cout << "8. Counter=" << Piece::GetPieceCounter() << endl;
-    cout << "MovePiece(2,0,2,1)" << endl;
-    if (b3.IsMoveLegal(2,0,2,1,msg)) b3.MovePiece(2,0,2,1,msg);
-    cout << msg << endl;
-    //
-    cout << "BOARD 1" << endl;
-    b1.PrettyPrint();
-    //
-    cout << "BOARD 2" << endl;
-    b2.PrettyPrint();
-    //
-    cout << "BOARD 3" << endl;
-    b3.PrettyPrint();
-    //
-    cout << p1 << endl;
-    cout << p2 << endl;
-    //
-    if (DEBUG) cout << "9. Counter=" << Piece::GetPieceCounter() << endl;
-    cout << "End Board/Piece test\n\n" << endl;
-    // File 1
-    const char* f_path_1 = "/home/tom/Documents/CPP_Programming_CS3058/HW1/resaurces/ex1_simpletest/player1.rps_board";
-    PositionFile f1(f_path_1);
-    cout << "FILE 01: Initialize (1=true): " << f1.InitializeFile() << endl;
-    res = f1.ParseFile(&p1, msg);
-    cout << "FILE 01: File Parsing (1=true): " << res << endl;
-    if (!res) cout << "-> Message: " << msg << endl;
-    // File 2
-    const char* f_path_2 = "/home/tom/Documents/CPP_Programming_CS3058/HW1/resaurces/ex1_simpletest/player2.rps_board";
-    PositionFile f2(f_path_2);
-    cout << "FILE 02: Initialize (1=true): " << f2.InitializeFile() << endl;
-    res = f2.ParseFile(&p2, msg);
-    cout << "FILE 02: File Parsing (1=true): " << res << endl;
-    if (!res) cout << "-> Message: " << msg << endl;
-    Board b_file(DIM_X, DIM_Y);
-    b_file.Merge(f1.GetBoard()).Merge(f2.GetBoard());
-    //
-    cout << "BOARD FILE" << endl;
-    b_file.PrettyPrint();
-    //
-    const char * m_path_1 = "/home/tom/Documents/CPP_Programming_CS3058/HW1/resaurces/ex1_simpletest/player1.rps_moves";
-    MoveFile mf1(m_path_1, &b_file);
-    cout << "MOVE FILE 01: Initialize (1=true): " << mf1.InitializeFile() << endl;
-    //
-    const char * m_path_2 = "/home/tom/Documents/CPP_Programming_CS3058/HW1/resaurces/ex1_simpletest/player2.rps_moves";
-    MoveFile mf2(m_path_2, &b_file);
-    cout << "MOVE FILE 01: Initialize (1=true): " << mf2.InitializeFile() << endl;
-    //
-    cout << "Moving player 1..." << endl;
-    res = mf1.NextMove(&p1, msg);
-    if (!res) cout << "-> Message: " << msg << endl;
-    cout << "Moving player 2..." << endl;
-    res = mf2.NextMove(&p2, msg);
-    if (!res) cout << "-> Message: " << msg << endl;
-    //
-    cout << "BOARD FILE" << endl;
-    b_file.PrettyPrint();
-    //
-    cout << "\nFreeing memory..." << endl;
+void OutputResult(const char* path, const string info, const Board& b) {
+    ofstream out;
+    try {
+		out.open(path, ios::trunc); 
+        out << info << b;
+        out.close();
+	}
+	catch (...) {
+		cout << "[ERROR] Failed to open/create output file." << endl << "Exiting..." << endl;
+	}
 }
 
 int main(int argc, char** argv) {
@@ -157,86 +66,144 @@ int main(int argc, char** argv) {
     const char* p2_posfile_path = "./resaurces/ex1_simpletest/player2.rps_board";
     const char* p1_movfile_path = "./resaurces/ex1_simpletest/player1.rps_moves";
     const char* p2_movfile_path = "./resaurces/ex1_simpletest/player2.rps_moves";
+    const char* outfile_path = "./rps.output";
 
     string msg; // will have output message from functions
-    bool p1_lose, p2_lose;
+    Reason p1_reason, p2_reason;
+    Reason p1_lose, p2_lose;
 
     // Create player instances
     Player p1(PlayerType::PLAYER_1);
     Player p2(PlayerType::PLAYER_2);
+    Board b(DIM_X, DIM_Y);
 
     // Analyze position files
     PositionFile pos_p1(p1_posfile_path);
-    if (!pos_p1.InitializeFile()) {
-        // handle case
-        cout << "A1" << endl;
+    p1_reason = pos_p1.InitializeFile();
+    if (p1_reason == Reason::UNKNOWN_ERROR) {
+        // handle case: File can't be opened
+        cout << "[ERROR] Can't open the position file of PLAYER 1." << endl;
+    }
+    if (p1_reason == Reason::FILE_ERROR) {
+        // handle case: File is empty
+        cout << "[INFO] The position file of PLAYER 1 is empty." << endl;
     }
     PositionFile pos_p2(p2_posfile_path);
-    if (!pos_p2.InitializeFile()) {
-        // handle case
-        cout << "A2" << endl;
+    p2_reason = pos_p2.InitializeFile();
+    if (p2_reason == Reason::UNKNOWN_ERROR) {
+        // handle case: File can't be opened
+        cout << "[ERROR] Can't open the position file of PLAYER 2." << endl;
     }
-    if (!pos_p1.ParseFile(&p1, msg)) {
-        // handle case
-        cout << "B1" << " " << msg << endl;
+    if (p2_reason == Reason::FILE_ERROR) {
+        // handle case: File is empty
+        cout << "[INFO] The position file of PLAYER 2 is empty." << endl;
     }
-    if (!pos_p2.ParseFile(&p2, msg)) {
-        // handle case
-        cout << "B2" << " " << msg << endl;
-    }
-    // Get combined board 
-    Board b(DIM_X, DIM_Y);
-    b.Merge(pos_p1.GetBoard()).Merge(pos_p2.GetBoard());
-    // -> Check if win/lose
-    if (p1.IsLosing()) {
-        cout << "C1" << endl;
-    }
-    if (p2.IsLosing()) {
-        cout << "C2" << endl;
-    }
-
-    // Start practicing the moves
     MoveFile mov_p1(p1_movfile_path, &b);
     MoveFile mov_p2(p2_movfile_path, &b);
-
-    if (!mov_p1.InitializeFile()) {
-        // invalid file case
-        cout << "D1" << endl;
+    p1_reason = mov_p1.InitializeFile();
+    if (p1_reason == Reason::UNKNOWN_ERROR) {
+        // handle case: File can't be opened
+        cout << "[ERROR] Can't open the moves file of PLAYER 1." << endl;
     }
-    if (!mov_p2.InitializeFile()) {
-        // invalid file case
-        cout << "D2" << endl;
+    if (p1_reason == Reason::FILE_ERROR) {
+        // handle case: File is empty
+        cout << "[INFO] The moves file of PLAYER 1 is empty." << endl;
+    }
+    p2_reason = mov_p2.InitializeFile();
+    if (p2_reason == Reason::UNKNOWN_ERROR) {
+        // handle case: File can't be opened
+        cout << "[ERROR] Can't open the moves file of PLAYER 2." << endl;
+    }
+    if (p2_reason == Reason::FILE_ERROR) {
+        // handle case: File is empty
+        cout << "[INFO] The moves file of PLAYER 2 is empty." << endl;
+    }
+    if (p1_reason == Reason::UNKNOWN_ERROR || p2_reason == Reason::UNKNOWN_ERROR) {
+        cout << "Please fix the mentioned error(s) and retry." << endl;
+        return 1;
     }
 
-    while ((!mov_p1.IsEOF() || !mov_p2.IsEOF()) && (!p1_lose && !p2_lose)) {
-        b.PrettyPrint();
-        p1_lose = false;
-        p2_lose = false;
+    // Files loaded fine
+    p1_reason = pos_p1.ParseFile(&p1, msg);
+    if (p1_reason == Reason::FILE_ERROR) {
+        // handle case: File error (not enough flags)
+        cout << "Not enough flags implemented in positioning file for PLAYER 1." << endl;
+        // TODO: Decide what to do in this case, leave it or report it now?
+    }
+    if (p1_reason == Reason::LINE_ERROR) {
+        // handle case: Incorrect line
+        msg = "player 1 - line " + to_string(pos_p1.GetCurrentLineNumber());
+        return 0;
+    }
+    p2_reason = pos_p2.ParseFile(&p2, msg);
+    if (p2_reason == Reason::FILE_ERROR) {
+        // handle case: File error (not enough flags)
+        cout << "Not enough flags implemented in positioning file for PLAYER 2." << endl;
+        // TODO: Decide what to do in this case, leave it or report it now?
+    }
+    if (p2_reason == Reason::LINE_ERROR) {
+        // handle case: Incorrect line
+        msg = "player 2 - line " + to_string(pos_p2.GetCurrentLineNumber());
+        return 0;
+    }
+    // Check win/lose
+    if (p1_reason != Reason::SUCCESS || p2_reason != Reason::SUCCESS) {
+        if (p1_reason == p2_reason) {
+            msg = "player 1: line " + to_string(pos_p1.GetCurrentLineNumber());
+            msg += ", player 2: line " + to_string(pos_p2.GetCurrentLineNumber());
+        }
+        OutputResult(outfile_path, GenerateOutputResult(p1_reason, p2_reason, Reason::FILE_ERROR, msg), b.Merge(pos_p1.GetBoard()).Merge(pos_p2.GetBoard()));
+        return 0;
+    }
+
+    if (DEBUG) {cout << "Board 1" << endl; pos_p1.GetBoard().PrettyPrint();}
+    if (DEBUG) {cout << "Board 2" << endl; pos_p2.GetBoard().PrettyPrint();}
+
+    // Get combined board 
+    b.Merge(pos_p1.GetBoard()).Merge(pos_p2.GetBoard());
+    if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
+
+    // -> Check if win/lose
+    p1_lose = p1.IsLosing();
+    p2_lose = p2.IsLosing();
+
+    // Start parsing moves
+    while ((!mov_p1.IsEOF() || !mov_p2.IsEOF()) && (p1_lose == Reason::SUCCESS && p2_lose == Reason::SUCCESS)) {
+        if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
         // -> Handle moves
         if (!mov_p1.IsEOF()) {
-            if (!mov_p1.NextMove(&p1, msg)) {
-                cout << "E1" << " " << msg << endl;
-                p1_lose = true;
+            p1_reason = mov_p1.NextMove(&p1, msg);
+            if (p1_reason == Reason::UNKNOWN_ERROR) {
+                // handle case: File error (while reading the file)
+                cout << "[ERROR] Failed while reading moves file for PLAYER 1." << endl << "Please fix the mentioned error(s) and retry." << endl;
+                return 1;
+            }
+            if (p1_reason == Reason::LINE_ERROR) {
+                // handle case: Incorrect line
+                msg = "player 1 - line " + to_string(mov_p1.GetCurrentLineNumber());
+                OutputResult(outfile_path, GenerateOutputResult(p1_reason,Reason::SUCCESS, Reason::LINE_ERROR, msg), b);
+                return 0;
             }
         }
         if (!mov_p2.IsEOF()) {
-            if (!mov_p2.NextMove(&p2, msg)) {
-                cout << "E2" << " " << msg << endl;
-                p2_lose = true;
+            p2_reason = mov_p2.NextMove(&p2, msg);
+            if (p2_reason == Reason::UNKNOWN_ERROR) {
+                // handle case: File error (while reading the file)
+                cout << "[ERROR] Failed while reading moves file for PLAYER 2." << endl << "Please fix the mentioned error(s) and retry." << endl;
+                return 1;
+            }
+            if (p2_reason == Reason::LINE_ERROR) {
+                // handle case: Incorrect line
+                msg = "player 2 - line " + to_string(mov_p2.GetCurrentLineNumber());
+                OutputResult(outfile_path, GenerateOutputResult(Reason::SUCCESS,p2_reason, Reason::LINE_ERROR, msg), b);
+                return 0;
             }
         }
+        p1_lose = p1.IsLosing();
+        p2_lose = p2.IsLosing();
         // -> check win/lose after each move set
-        if (p1.IsLosing()) {
-            p1_lose = true;
-        }
-        if (p2.IsLosing()) {
-            p2_lose = true;
-        }
     }
-    if (p1_lose) {
-        cout << "player 1 lost" << endl;
-    }
-    if (p2_lose) {
-        cout << "player 2 lost" << endl;
-    }
+    bool is_finished = mov_p1.IsEOF() && mov_p2.IsEOF();
+    OutputResult(outfile_path, GenerateOutputResult(p1_lose,p2_lose, Reason::SUCCESS, msg, is_finished), b);
+    if (DEBUG) cout << "- Piece count=" << Piece::GetPieceCounter() << endl;
 }

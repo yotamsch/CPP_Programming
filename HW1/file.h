@@ -23,21 +23,22 @@ class FileHandler {
 	private:
 		const char* _file_path;
 		ifstream _f;
+		int _current_line;
 	public:
 		// C'tor
-		FileHandler(const char* f_path) : _file_path(f_path) {}
+		FileHandler(const char* f_path) : _file_path(f_path), _current_line(0) {}
 		// D'tor
-		virtual ~FileHandler() { _f.close(); if (DEBUG) cout << "-> Freed File" << endl; }
+		virtual ~FileHandler() { _f.close(); if (DEBUG) cout << "-> Freed File" << _file_path << endl; }
+		// Get
+		int GetCurrentLineNumber() { return _current_line; }
 		// Utility
 		bool IsEOF() { return _f.eof(); }
-		bool InitializeFile();
-		virtual bool ReadLine(string& line);
+		Reason InitializeFile();
+		virtual Reason ReadLine(string& line);
 };
 
 class PositionFile : public FileHandler {
 	private:
-		int _dim_x; // will get value in initialization
-		int _dim_y; // will get value in initialization
 		Board _board;
 	public:
 		// C'tor
@@ -47,7 +48,7 @@ class PositionFile : public FileHandler {
 		// Get
 		Board& GetBoard() { return _board; }
 		// Utility
-		bool ParseFile(Player* player, string& msg);
+		Reason ParseFile(Player* player, string& msg);
 };
 
 class MoveFile : public FileHandler {
@@ -59,7 +60,7 @@ class MoveFile : public FileHandler {
 	// D'tor
 	~MoveFile() {}
 	// Utility
-	bool NextMove(const Player* player, string& msg);
+	Reason NextMove(const Player* player, string& msg);
 };
 
 #endif

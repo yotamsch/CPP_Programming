@@ -23,44 +23,48 @@ vector<string> SplitLine(const string& s, const char delimiter) {
 	return result;
 }
 
-bool FileHandler::InitializeFile() { 
+Reason FileHandler::InitializeFile() { 
 	try {
 		_f.open(_file_path); 
 	}
 	catch (...) {
-		return false;
+		return Reason::UNKNOWN_ERROR;
 	}
 	string line;
 	if (_f.is_open()) {
+	_current_line = 0;
 		while (!_f.eof()) {
 			getline(_f, line);
 			if (TrimLine(line).size() > 0) {
 				_f.seekg(0, ios::beg);
-				return true;
+				return Reason::SUCCESS;
 			}
 		}
+	} else {
+		return Reason::UNKNOWN_ERROR;
 	}
-	return false;
+	return Reason::FILE_ERROR;
 }
 
-bool FileHandler::ReadLine(string& line) {
+Reason FileHandler::ReadLine(string& line) {
 	try {
 		if (!_f.eof()) {
 			do {
 				getline(_f, line);
 				line = TrimLine(line);
+				++_current_line;
 			} while (line.size() <= 0 && !_f.eof());
 		}
 	} catch (...) {
-		return false;
+		return Reason::UNKNOWN_ERROR;
 	}
 	if (_f.eof()) {
-		return false;
+		return Reason::FILE_ERROR;
 	}
-	return true;
+	return Reason::SUCCESS;
 }
 
-bool PositionFile::ParseFile(Player* player, string& msg) {
+Reason PositionFile::ParseFile(Player* player, string& msg) {
 	const char delim = ' ';
 	// counting the pieces [0]=rock, [1]=paper, [2]=scissors,
 	// [3]=flag, [4]=bonb, [5]=scissors
@@ -71,9 +75,9 @@ bool PositionFile::ParseFile(Player* player, string& msg) {
 
 	string line;
 	
-	while(!IsEOF() && ReadLine(line)) {
+	while(!IsEOF() && ReadLine(line) == Reason::SUCCESS) {
 		is_joker = false;
-		if (DEBUG) cout << line << endl;
+		if (DEBUG) cout << GetCurrentLineNumber() << ". " << line << endl;
 		vector<string> s_line = SplitLine(line, delim);
 		if (s_line.size() == 0) {
 			// empty line, continues
@@ -81,12 +85,12 @@ bool PositionFile::ParseFile(Player* player, string& msg) {
 		}
 		if (s_line.size() < 3) {
 			msg = MSG_INVALID_LINE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
 		piece_type = CharToPieceType(s_line[0][0]);
 		if (s_line[0].size() != 1 || piece_type == PieceType::NONE) {
 			msg = MSG_INVALID_LINE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
 		try {
 			x = stoi(s_line[1]) - 1;
@@ -94,7 +98,7 @@ bool PositionFile::ParseFile(Player* player, string& msg) {
 		} catch (...) {
 			// number conversion error
 			msg = MSG_INVALID_LINE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
 		--piece_count[int(piece_type)];
 		if (piece_type == PieceType::JOKER){
@@ -102,26 +106,27 @@ bool PositionFile::ParseFile(Player* player, string& msg) {
 			is_joker = true;
 			if (s_line.size() != 4 || s_line[3].size() != 1) {
 				msg = MSG_INVALID_LINE;
-				return false;
+				return Reason::LINE_ERROR;
 			}
 			piece_type = CharToPieceType(s_line[3][0]);
 		}
 		if (piece_count[int(piece_type)] < 0) {
 			msg = MSG_INVALID_FILE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
-		if (!_board.PlacePiece(player, player->GetType(), piece_type, x, y, msg, is_joker)) {
-			return false;
+		if (DEBUG) cout << "-> Placing new piece, player " << int(player->GetType()) << ", (" << x << "," << y << ")" << endl;
+		if (!_board.PlacePiece(player, piece_type, x, y, msg, is_joker)) {
+			return Reason::LINE_ERROR;
 		}
 	}
 	if (piece_count[int(PieceType::FLAG)] > 0) {
 		msg = MSG_NOT_ENOUGH_FLAGS;
-		return false;
+		return Reason::FILE_ERROR;
 	}
-	return true;
+	return Reason::SUCCESS;
 }
 
-bool MoveFile::NextMove(const Player* player, string& msg) {
+Reason MoveFile::NextMove(const Player* player, string& msg) {
 	// get a move from the file and parse it
 	const char delim = ' ';
 	const char* joker_str = "J:";
@@ -131,20 +136,20 @@ bool MoveFile::NextMove(const Player* player, string& msg) {
 	int joker_x, joker_y;
 	PieceType new_j_type;
 
-	if (!ReadLine(line)) {
+	if (ReadLine(line) == Reason::UNKNOWN_ERROR) {
 		msg = MSG_ERROR_READING_FILE;
-		return false;
+		return Reason::UNKNOWN_ERROR;
 	}
 	if (DEBUG) cout << "[" << line << "]" << endl;
 	vector<string> s_line = SplitLine(line, delim);
 	if (s_line.size() < 4) {
 		msg = MSG_INVALID_LINE;
-		return false;
+		return Reason::LINE_ERROR;
 	}
 	if (s_line.size() == 8) {
 		if (s_line[4].compare(joker_str) != 0) {
 			msg = MSG_INVALID_LINE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
 		is_j_change = true;
 	}
@@ -156,13 +161,12 @@ bool MoveFile::NextMove(const Player* player, string& msg) {
 	} catch (...) {
 		// number conversion error
 		msg = MSG_INVALID_LINE;
-		return false;
+		return Reason::LINE_ERROR;
 	}
 	if (is_j_change) {
 		if (s_line.size() != 8 || s_line[7].size() != 1) {
-			// number conversion error
 			msg = MSG_INVALID_LINE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
 		try {
 			joker_x = stoi(s_line[5]) - 1;
@@ -170,19 +174,19 @@ bool MoveFile::NextMove(const Player* player, string& msg) {
 		} catch (...) {
 			// number conversion error
 			msg = MSG_INVALID_LINE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
 		if (s_line.size() != 4) {
 			msg = MSG_INVALID_LINE;
-			return false;
+			return Reason::LINE_ERROR;
 		}
 		new_j_type = CharToPieceType(s_line[7][0]);
 	}
 	if (!_board->MovePiece(from_x, from_y, to_x, to_y, msg)) {
-		return false;
+		return Reason::LINE_ERROR;
 	}
 	if (is_j_change && !_board->ChangeJoker(joker_x, joker_y, new_j_type, msg)) {
-		return false;
+		return Reason::LINE_ERROR;
 	}
-	return true;
+	return Reason::SUCCESS;
 }
