@@ -121,7 +121,7 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 	}
 	if (piece_count[int(PieceType::FLAG)] > 0) {
 		msg = MSG_NOT_ENOUGH_FLAGS;
-		return Reason::FILE_ERROR;
+		return Reason::NO_FLAGS;
 	}
 	return Reason::SUCCESS;
 }

@@ -46,10 +46,11 @@ Piece& Piece::operator=(const Piece& p) {
  * @return ostream& The modified ostream
  */
 ostream& operator<<(ostream& output, const Piece& piece) {
+    PieceType type = piece._is_joker ? PieceType::JOKER : piece.GetPieceType();
     if (piece.GetPlayerType() == PlayerType::PLAYER_1) {
-        output <<  (char)toupper(PieceTypeToChar(piece.GetPieceType()));
+        output <<  (char)toupper(PieceTypeToChar(type));
     } else {
-        output <<  (char)tolower(PieceTypeToChar(piece.GetPieceType()));
+        output <<  (char)tolower(PieceTypeToChar(type));
     }
     return output;
 }
