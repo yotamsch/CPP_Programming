@@ -165,7 +165,7 @@ bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
 }
 
 /**
- * @brief Moves a piece from (x,y) to (new_x,new_y). Based on the rules of the game. Assumes the move is legal. Message is updated correctly.
+ * @brief Moves a piece from (x,y) to (new_x,new_y). Based on the rules of the game. Message is updated correctly.
  * 
  * @param x The origin X
  * @param y The origin Y
