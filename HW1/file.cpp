@@ -93,8 +93,8 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 			return Reason::LINE_ERROR;
 		}
 		try {
-			x = stoi(s_line[1]) - 1;
-			y = stoi(s_line[2]) - 1;
+			x = stoi(s_line[2]) - 1;
+			y = stoi(s_line[1]) - 1;
 		} catch (...) {
 			// number conversion error
 			msg = MSG_INVALID_LINE;
@@ -154,10 +154,10 @@ Reason MoveFile::NextMove(string& msg) {
 		is_j_change = true;
 	}
 	try {
-		from_x = stoi(s_line[0]) - 1;
-		from_y = stoi(s_line[1]) - 1;
-		to_x = stoi(s_line[2]) - 1;
-		to_y = stoi(s_line[3]) - 1;
+		from_x = stoi(s_line[1]) - 1;
+		from_y = stoi(s_line[0]) - 1;
+		to_x = stoi(s_line[3]) - 1;
+		to_y = stoi(s_line[2]) - 1;
 	} catch (...) {
 		// number conversion error
 		msg = MSG_INVALID_LINE;
