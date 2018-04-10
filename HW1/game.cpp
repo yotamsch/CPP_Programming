@@ -62,10 +62,10 @@ void OutputResult(const char* path, const string info, const Board& b) {
 }
 
 int main() {
-    const char* p1_posfile_path = "./testsTala/case8/player1.rps_board";
-    const char* p2_posfile_path = "./testsTala/case8/player2.rps_board";
-    const char* p1_movfile_path = "./testsTala/case8/player1.rps_moves";
-    const char* p2_movfile_path = "./testsTala/case8/player2.rps_moves";
+    const char* p1_posfile_path = "./testsTala/case14/player1.rps_board";
+    const char* p2_posfile_path = "./testsTala/case14/player2.rps_board";
+    const char* p1_movfile_path = "./testsTala/case14/player1.rps_moves";
+    const char* p2_movfile_path = "./testsTala/case14/player2.rps_moves";
     const char* outfile_path = "./rps.output";
 
     string msg; // will have output message from functions
@@ -125,6 +125,7 @@ int main() {
     }
 
     // Files loaded fine
+    // ? Maybe need to take care of reading error
     p1_reason = pos_p1.ParseFile(&p1, msg);
     if (p1_reason == Reason::NO_FLAGS) {
         // handle case: File error (not enough flags)
@@ -149,7 +150,7 @@ int main() {
     if (p1_reason != Reason::SUCCESS || p2_reason != Reason::SUCCESS) {
         if (p1_reason == p2_reason) {
             msg_reason = "player 1: line " + to_string(pos_p1.GetCurrentLineNumber());
-            msg += ", player 2: line " + to_string(pos_p2.GetCurrentLineNumber());
+            msg_reason += ", player 2: line " + to_string(pos_p2.GetCurrentLineNumber());
         }
         OutputResult(outfile_path, GenerateOutputResult(p1_reason, p2_reason, Reason::FILE_ERROR, msg_reason), b.Merge(pos_p1.GetBoard()).Merge(pos_p2.GetBoard()));
         return 0;
@@ -168,7 +169,6 @@ int main() {
 
     // Start parsing moves
     while ((!mov_p1.IsEOF() || !mov_p2.IsEOF()) && (p1_lose == Reason::SUCCESS && p2_lose == Reason::SUCCESS)) {
-        if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
         // -> Handle moves
         if (!mov_p1.IsEOF()) {
             p1_reason = mov_p1.NextMove(msg);
@@ -180,6 +180,7 @@ int main() {
             if (p1_reason == Reason::LINE_ERROR) {
                 // handle case: Incorrect line
                 msg_reason = "player 1 - line " + to_string(mov_p1.GetCurrentLineNumber());
+                if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
                 OutputResult(outfile_path, GenerateOutputResult(p1_reason,Reason::SUCCESS, Reason::LINE_ERROR, msg_reason), b);
                 return 0;
             }
@@ -194,15 +195,17 @@ int main() {
             if (p2_reason == Reason::LINE_ERROR) {
                 // handle case: Incorrect line
                 msg_reason = "player 2 - line " + to_string(mov_p2.GetCurrentLineNumber());
+                if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
                 OutputResult(outfile_path, GenerateOutputResult(Reason::SUCCESS,p2_reason, Reason::LINE_ERROR, msg_reason), b);
                 return 0;
             }
         }
         p1_lose = p1.IsLosing();
         p2_lose = p2.IsLosing();
-        // -> check win/lose after each move set
+        if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
     }
     bool is_finished = mov_p1.IsEOF() && mov_p2.IsEOF();
     OutputResult(outfile_path, GenerateOutputResult(p1_lose,p2_lose, Reason::SUCCESS, msg_reason, is_finished), b);
+    if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
     if (DEBUG) cout << "- Piece count=" << Piece::GetPieceCounter() << endl;
 }

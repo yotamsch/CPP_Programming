@@ -62,6 +62,7 @@ ostream& operator<<(ostream& output, const Piece& piece) {
 void Piece::NullifyPiece() {
     this->_piece_type = PieceType::NONE;
     this->_owner = nullptr;
+    this->_is_joker = false;
 }
 
 /**

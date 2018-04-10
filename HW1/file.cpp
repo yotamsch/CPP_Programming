@@ -32,11 +32,11 @@ Reason FileHandler::InitializeFile() {
 	}
 	string line;
 	if (_f.is_open()) {
-	_current_line = 0;
 		while (!_f.eof()) {
 			getline(_f, line);
 			if (TrimLine(line).size() > 0) {
 				_f.seekg(0, ios::beg);
+				_current_line = 0;
 				return Reason::SUCCESS;
 			}
 		}
@@ -58,9 +58,9 @@ Reason FileHandler::ReadLine(string& line) {
 	} catch (...) {
 		return Reason::UNKNOWN_ERROR;
 	}
-	if (_f.eof()) {
+	/*if (line.size() == 0 && _f.eof()) {
 		return Reason::FILE_ERROR;
-	}
+	}*/
 	return Reason::SUCCESS;
 }
 
@@ -75,8 +75,11 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 
 	string line;
 	
-	while(!IsEOF() && ReadLine(line) == Reason::SUCCESS) {
+	while(!IsEOF()) {
 		is_joker = false;
+		if (ReadLine(line) != Reason::SUCCESS ) {
+			return Reason::UNKNOWN_ERROR;
+		}
 		if (DEBUG) cout << GetCurrentLineNumber() << ". " << line << endl;
 		vector<string> s_line = SplitLine(line, delim);
 		if (s_line.size() == 0) {
@@ -141,7 +144,10 @@ Reason MoveFile::NextMove(string& msg) {
 		return Reason::UNKNOWN_ERROR;
 	}
 	if (DEBUG) cout << "[" << line << "]" << endl;
-	vector<string> s_line = SplitLine(line, delim);
+	vector<string> s_line = SplitLine(line, delim)
+	;
+	if (s_line.size() == 0) return Reason::SUCCESS;
+
 	if (s_line.size() < 4) {
 		msg = MSG_INVALID_LINE;
 		return Reason::LINE_ERROR;
@@ -169,14 +175,10 @@ Reason MoveFile::NextMove(string& msg) {
 			return Reason::LINE_ERROR;
 		}
 		try {
-			joker_x = stoi(s_line[5]) - 1;
-			joker_y = stoi(s_line[6]) - 1;
+			joker_x = stoi(s_line[6]) - 1;
+			joker_y = stoi(s_line[5]) - 1;
 		} catch (...) {
 			// number conversion error
-			msg = MSG_INVALID_LINE;
-			return Reason::LINE_ERROR;
-		}
-		if (s_line.size() != 4) {
 			msg = MSG_INVALID_LINE;
 			return Reason::LINE_ERROR;
 		}

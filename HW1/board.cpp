@@ -94,17 +94,17 @@ Board& Board::Merge(const Board& b) {
     assert(_n == b._n);
     for (int i=0;i<_n;++i) {
         for (int j=0;j<_m;++j) {
-            if (_board[i][j].GetPieceType() != b._board[i][j].GetPieceType()) {
+            if (_board[i][j] == b._board[i][j]) {
+                _board[i][j].RemovePieceFromPlayer();
+                b._board[i][j].RemovePieceFromPlayer();
+                _board[i][j].NullifyPiece();
+            } else {
                 if (_board[i][j] < b._board[i][j]) {
                     _board[i][j].RemovePieceFromPlayer();
                     _board[i][j] = b._board[i][j];
                 } else {
                     b._board[i][j].RemovePieceFromPlayer();
                 }
-            } else {
-                _board[i][j].RemovePieceFromPlayer();
-                b._board[i][j].RemovePieceFromPlayer();
-                _board[i][j].NullifyPiece();
             }
         }
     }
