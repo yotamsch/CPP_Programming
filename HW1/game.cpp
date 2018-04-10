@@ -62,10 +62,10 @@ void OutputResult(const char* path, const string info, const Board& b) {
 }
 
 int main() {
-    const char* p1_posfile_path = "./resaurces/ex1_simpletest/player1.rps_board";
-    const char* p2_posfile_path = "./resaurces/ex1_simpletest/player2.rps_board";
-    const char* p1_movfile_path = "./resaurces/ex1_simpletest/player1.rps_moves";
-    const char* p2_movfile_path = "./resaurces/ex1_simpletest/player2.rps_moves";
+    const char* p1_posfile_path = "./testsTala/case8/player1.rps_board";
+    const char* p2_posfile_path = "./testsTala/case8/player2.rps_board";
+    const char* p1_movfile_path = "./testsTala/case8/player1.rps_moves";
+    const char* p2_movfile_path = "./testsTala/case8/player2.rps_moves";
     const char* outfile_path = "./rps.output";
 
     string msg; // will have output message from functions

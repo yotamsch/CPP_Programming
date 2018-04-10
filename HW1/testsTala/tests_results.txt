@@ -1,0 +1,51 @@
+list of cases:
+general bug: joker do
+case1: all flags of the opponent are captured
+case2: all moving pieces of the opponent are eaten
+case3: a tie- both moves input files done without a winner
+case4: a tie- all flags are eaten by both players in position files
+case5: bad positioning input file for player 1 line 3
+case6: bad positioning input files for both players - player 1: line 3, player 2: line 3
+case7: bad moves input file for player 2 line 1 - with flags at same position
+case9: all flags of the opponent are captured with joker change
+case8: input file is missing or cannot be opened (all of them were missing)
+case10: bad moves input file for player 2 line 1
+case11: joker change, with player1 winning by eating the flag of player 2
+case12: input file is missing or cannot be opened (some of them were missing)
+case13: all moving pieces of the opponent are eaten && there is a joker who wants to be R at 1,1 in player1 while there is a R at 1,1 in player2
+case14: all moving pieces are at same position and same type for the two players, should be a tie and all pieces should be deleted except flags
+case15: bomb check
+Results:
+in cases 5,6,7 board output is not improtant(according to Amir in forum) because some file is incorrect
+
+-case 1 OK
+
+-case2 OK
+
+-case4 OK. same as case 7: flags are dead at initial state and game ends in a tie
+
+-case5 OK
+
+-case6 fails: should check both files and announce that both are
+ bad(instead it announces only about the first file it checks).
+
+-case7 fails: should check moves files first of all and because one of them is bad
+ should stop and announce player 1 as winner(instead it's making a move without
+ considering correctness of moves-files.  what should 
+ happen first: check validity of file or make a tie because of the initial state??
+
+-case8 fail: (no output file should be created) segmentation fault core dumped
+
+-case9 fail: doesn't recognize joker change as a correct one
+
+-case10 OK
+
+-case11 fail: whenever there's a joker that wants to change representation, it is caught as a bad move
+
+-case12 fail  segmentation fault core dumped same as case8
+
+-case13 fail: general note/error: a small letter j is printed as a player1 piece although it should be J
+ the wrong part is: a joker that sits in the same power position of his opponent should be deleted just like the opponent 
+
+-case14 semi fail: where the hell does this j come from!?? the rest is ok
+-case15: fail, bomb doesnt kill scissors
