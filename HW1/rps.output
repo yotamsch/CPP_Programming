@@ -1,13 +1,13 @@
-Winner: 1
-Reason: Bad Moves input file for player 2 - line 4
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
 
- p   P  F 
+F         
+Js        
+ f        
           
- r        
-   B      
           
-    f  P  
-p P   R   
-   b      
           
-     b  P 
+          
+          
+          
+          

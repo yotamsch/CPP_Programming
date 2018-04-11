@@ -1,6 +1,7 @@
 # Custom Ignores
 HW1/game
 HW1/ex1
+HW1/rps.output
 
 # Visual Studio Code
 .vscode

@@ -1,0 +1,64 @@
+Testing Results:
+
+case 1
+-----------
+Winner: 2
+Reason: All flags of the opponent are captured
+
+case 2
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+case 3
+-----------
+Winner: 0
+Reason: A tie - both Moves input files done without a winner
+
+case 5
+-----------
+Winner: 2
+Reason: Bad Positioning input file for player 1 - line 3
+
+case 6
+-----------
+Winner: 0
+Reason: Bad Positioning input file for both players - player 1: line 3, player 2: line 3
+
+case 7
+-----------
+Winner: 0
+Reason: A tie - all flags are eaten by both players in the position files
+
+case 9
+-----------
+Winner: 2
+Reason: All flags of the opponent are captured
+
+case 10
+-----------
+Winner: 1
+Reason: Bad Moves input file for player 2 - line 1
+
+case 11
+-----------
+Winner: 2
+Reason: Bad Moves input file for player 1 - line 2
+
+case 13
+-----------
+Winner: 2
+Reason: Bad Moves input file for player 1 - line 2
+
+case 14
+-----------
+Winner: 0
+Reason: A tie - all moving PIECEs of both players are eaten in the position files
+
+case 15
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+
+End Testing
