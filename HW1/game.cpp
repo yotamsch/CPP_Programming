@@ -139,6 +139,11 @@ int main(int argc, char** argv) {
     // Files loaded fine
     // ? Maybe need to take care of reading error
     p1_reason = pos_p1.ParseFile(&p1, msg);
+    if (p1_reason == Reason::UNKNOWN_ERROR) {
+        // error when reading from file, maybe file was deleted
+        cout << "[ERROR] Failed while reading position file for PLAYER 1." << endl << "Please fix the mentioned error(s) and retry." << endl;
+        return 1;
+    }
     if (p1_reason == Reason::NO_FLAGS) {
         // handle case: File error (not enough flags)
         cout << "[INFO] Not enough flags implemented in positioning file for PLAYER 1." << endl;
@@ -149,6 +154,11 @@ int main(int argc, char** argv) {
         msg_reason = "player 1 - line " + to_string(pos_p1.GetCurrentLineNumber());
     }
     p2_reason = pos_p2.ParseFile(&p2, msg);
+    if (p2_reason == Reason::UNKNOWN_ERROR) {
+        // error when reading file, mybe was deleted
+        cout << "[ERROR] Failed while reading position file for PLAYER 2." << endl << "Please fix the mentioned error(s) and retry." << endl;
+        return 1;
+    }
     if (p2_reason == Reason::NO_FLAGS) {
         // handle case: File error (not enough flags)
         cout << "[INFO] Not enough flags implemented in positioning file for PLAYER 2." << endl;
