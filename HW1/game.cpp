@@ -74,10 +74,10 @@ int main(int argc, char** argv) {
         p2_movfile_path = argv[4];
     }
     else {
-        p1_posfile_path = "./testsTala/case14/player1.rps_board";
-        p2_posfile_path = "./testsTala/case14/player2.rps_board";
-        p1_movfile_path = "./testsTala/case14/player1.rps_moves";
-        p2_movfile_path = "./testsTala/case14/player2.rps_moves";
+        p1_posfile_path = "./player1.rps_board";
+        p2_posfile_path = "./player2.rps_board";
+        p1_movfile_path = "./player1.rps_moves";
+        p2_movfile_path = "./player2.rps_moves";
     }
 
     string msg; // will have output message from functions
