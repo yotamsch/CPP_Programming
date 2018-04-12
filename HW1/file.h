@@ -28,7 +28,7 @@ class FileHandler {
 		// C'tor
 		FileHandler(const char* f_path) : _file_path(f_path), _current_line(0) {}
 		// D'tor
-		virtual ~FileHandler() { _f.close(); if (DEBUG) cout << "-> Freed File" << _file_path << endl; }
+		virtual ~FileHandler() { _f.close(); }
 		// Get
 		int GetCurrentLineNumber() { return _current_line; }
 		// Utility

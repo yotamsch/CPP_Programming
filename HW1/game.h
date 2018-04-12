@@ -9,8 +9,6 @@
 #define J 2
 #define F 1
 
-#define DEBUG 0
-
 // Output messages
 #define RSN_ALL_FLAGS_CAPTURED "All flags of the opponent are captured"
 #define RSN_ALL_PIECES_EATEN "All moving PIECEs of the opponent are eaten"

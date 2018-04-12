@@ -80,7 +80,6 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 		if (ReadLine(line) != Reason::SUCCESS ) {
 			return Reason::UNKNOWN_ERROR;
 		}
-		if (DEBUG) cout << GetCurrentLineNumber() << ". " << line << endl;
 		vector<string> s_line = SplitLine(line, delim);
 		if (s_line.size() == 0) {
 			// empty line, continues
@@ -117,7 +116,6 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 			msg = MSG_INVALID_FILE;
 			return Reason::LINE_ERROR;
 		}
-		if (DEBUG) cout << "-> Placing new piece, player " << int(player->GetType()) << ", (" << x << "," << y << ")" << endl;
 		if (!_board.PlacePiece(player, piece_type, x, y, msg, is_joker)) {
 			return Reason::LINE_ERROR;
 		}
@@ -143,7 +141,6 @@ Reason MoveFile::NextMove(string& msg) {
 		msg = MSG_ERROR_READING_FILE;
 		return Reason::UNKNOWN_ERROR;
 	}
-	if (DEBUG) cout << "[" << line << "]" << endl;
 	vector<string> s_line = SplitLine(line, delim)
 	;
 	if (s_line.size() == 0) return Reason::SUCCESS;

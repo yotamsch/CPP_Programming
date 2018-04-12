@@ -23,7 +23,6 @@ Board::Board(int n, int m) {
             _board[i] = new Piece[m];
             assert(_board[i]);
         }
-        if (DEBUG) cout << "-> Created new board, (" << n << "," << m << ")" << ", [0,0]=" << _board[0][0] << endl;
     }
 }
 
@@ -45,8 +44,6 @@ Board::~Board() {
         delete[] (_board[i]);
     }
     delete[] _board;
-    if (DEBUG) cout << "--> Freed _board" << endl;
-    if (DEBUG) cout << "- Piece count=" << Piece::GetPieceCounter() << endl;
 }
 
 /**
@@ -146,7 +143,6 @@ bool Board::PlacePiece(Player* owner, PieceType type, int x, int y, string& msg,
     }
     Piece p(type, is_joker, owner);
     _board[x][y] = p;
-    if (DEBUG) cout << "--> Piece initialized, " << _board[x][y] << endl;
     return true;
 }
 
@@ -181,7 +177,6 @@ bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
  * @param msg A message if any error occured, or the Move is illegal
  */
 bool Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
-    if (DEBUG) cout << "Moving (" << x << "," << y << "), to (" << new_x << "," << new_y << ")" << endl;
     if (!IsMoveLegal(x, y, new_x, new_y, msg)) {
         return false;
     }

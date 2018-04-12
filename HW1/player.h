@@ -17,7 +17,7 @@ class Player {
         Player();
         Player(PlayerType type) : _type(type), _number_of_flags(0), _number_of_pieces(0) {}
         // D'tor
-        ~Player() { if (DEBUG) cout << "-> Freed Player " << int(_type) << endl; }
+        ~Player() {}
         // Get
         PlayerType GetType() { return _type; }
         // Utilities

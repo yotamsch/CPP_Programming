@@ -180,12 +180,9 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    if (DEBUG) {cout << "Board 1" << endl; pos_p1.GetBoard().PrettyPrint();}
-    if (DEBUG) {cout << "Board 2" << endl; pos_p2.GetBoard().PrettyPrint();}
 
     // Get combined board 
     b.Merge(pos_p1.GetBoard()).Merge(pos_p2.GetBoard());
-    if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
 
     // -> Check if win/lose
     p1_lose = p1.IsLosing();
@@ -204,7 +201,6 @@ int main(int argc, char** argv) {
             if (p1_reason == Reason::LINE_ERROR) {
                 // handle case: Incorrect line
                 msg_reason = "player 1 - line " + to_string(mov_p1.GetCurrentLineNumber());
-                if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
                 OutputResult(outfile_path, GenerateOutputResult(p1_reason,Reason::SUCCESS, Reason::LINE_ERROR, msg_reason), b);
                 return 0;
             }
@@ -219,17 +215,14 @@ int main(int argc, char** argv) {
             if (p2_reason == Reason::LINE_ERROR) {
                 // handle case: Incorrect line
                 msg_reason = "player 2 - line " + to_string(mov_p2.GetCurrentLineNumber());
-                if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
                 OutputResult(outfile_path, GenerateOutputResult(Reason::SUCCESS,p2_reason, Reason::LINE_ERROR, msg_reason), b);
                 return 0;
             }
         }
         p1_lose = p1.IsLosing();
         p2_lose = p2.IsLosing();
-        if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
     }
     bool is_finished = mov_p1.IsEOF() && mov_p2.IsEOF();
     OutputResult(outfile_path, GenerateOutputResult(p1_lose,p2_lose, Reason::SUCCESS, msg_reason, is_finished), b);
-    if (DEBUG) {cout << "Board MAIN" << endl; b.PrettyPrint();}
-    if (DEBUG) cout << "- Piece count=" << Piece::GetPieceCounter() << endl;
+
 }
