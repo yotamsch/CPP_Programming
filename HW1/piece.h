@@ -15,7 +15,7 @@ class Piece {
         static int _piece_counter; // general piece counter for debugging
     public:
         // C'tors
-        Piece() : _piece_type(PieceType::NONE) { ++_piece_counter; }
+        Piece() : _is_joker(false), _piece_type(PieceType::NONE), _owner(nullptr) { ++_piece_counter; }
         Piece(PieceType type, bool is_joker, Player* owner);
 		Piece(const Piece& p) { *this = p; }
         // D'tor

@@ -16,7 +16,7 @@
 #define RSN_ALL_PIECES_EATEN "All moving PIECEs of the opponent are eaten"
 #define RSN_MOVE_FILES_NO_WINNER "A tie - both Moves input files done without a winner"
 #define RSN_POSITION_NO_FLAGS "A tie - all flags are eaten by both players in the position files"
-#define RSN_POSITION_NO_PIECES "A tie - all moving PIECEs of both players are eaten in the position files"
+#define RSN_POSITION_NO_PIECES "A tie - all moving PIECEs of both players are eaten"
 #define RSN_BAD_POSISION_FILE_SINGLE "Bad Positioning input file for "
 #define RSN_BAD_POSITION_FILE_DOUBLE "Bad Positioning input file for both players - "
 #define RSN_BAD_MOVE_FILE_SINGLE "Bad Moves input file for "

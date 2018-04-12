@@ -67,12 +67,14 @@ int main(int argc, char** argv) {
     const char* p1_movfile_path;
     const char* p2_movfile_path;
     const char* outfile_path = "./rps.output";
+    // TODO: REMOVE
     if (argc == 5) {
         p1_posfile_path = argv[1];
         p2_posfile_path = argv[2];
         p1_movfile_path = argv[3];
         p2_movfile_path = argv[4];
     }
+    // TODO: END REMOVE
     else {
         p1_posfile_path = "./player1.rps_board";
         p2_posfile_path = "./player2.rps_board";

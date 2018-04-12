@@ -5,60 +5,210 @@ case 1
 Winner: 2
 Reason: All flags of the opponent are captured
 
+  j       
+          
+ f  P     
+r         
+          
+ S        
+          
+          
+          
+          
 case 2
 -----------
 Winner: 2
 Reason: All moving PIECEs of the opponent are eaten
 
+          
+ r        
+  F       
+   f      
+          
+          
+          
+          
+          
+          
 case 3
 -----------
 Winner: 0
 Reason: A tie - both Moves input files done without a winner
 
+f         
+ R        
+  F       
+p         
+          
+          
+          
+          
+          
+          
 case 5
 -----------
 Winner: 2
 Reason: Bad Positioning input file for player 1 - line 3
 
+f         
+r  F      
+r         
+  P       
+          
+          
+          
+          
+          
+          
 case 6
 -----------
 Winner: 0
 Reason: Bad Positioning input file for both players - player 1: line 3, player 2: line 3
 
+   f      
+p  F      
+          
+  R       
+          
+          
+          
+          
+          
+          
 case 7
 -----------
 Winner: 0
 Reason: A tie - all flags are eaten by both players in the position files
 
+          
+rR        
+s         
+          
+          
+          
+          
+          
+          
+          
 case 9
 -----------
 Winner: 2
 Reason: All flags of the opponent are captured
 
+  j       
+          
+ f  P     
+r         
+          
+ S        
+          
+          
+          
+          
 case 10
 -----------
 Winner: 1
 Reason: Bad Moves input file for player 2 - line 1
 
+f         
+r         
+sR        
+F         
+          
+          
+          
+          
+          
+          
 case 11
 -----------
-Winner: 2
-Reason: Bad Moves input file for player 1 - line 2
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
 
+F         
+  R       
+J f       
+          
+          
+          
+          
+          
+          
+          
 case 13
 -----------
-Winner: 2
-Reason: Bad Moves input file for player 1 - line 2
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
 
+          
+ S        
+F J       
+f         
+          
+          
+          
+          
+          
+          
 case 14
 -----------
 Winner: 0
-Reason: A tie - all moving PIECEs of both players are eaten in the position files
+Reason: A tie - all moving PIECEs of both players are eaten
 
+F         
+ f        
+          
+          
+          
+          
+          
+          
+          
+          
 case 15
 -----------
 Winner: 2
 Reason: All moving PIECEs of the opponent are eaten
 
+F         
+Js        
+ f        
+          
+          
+          
+          
+          
+          
+          
+case 16
+-----------
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+          
+ fS       
+          
+          
+          
+          
+          
+          
+          
+case 17
+-----------
+Winner: 0
+Reason: A tie - both Moves input files done without a winner
+
+F         
+          
+ f        
+          
+          
+          
+          
+          
+          
+          
 
 End Testing
