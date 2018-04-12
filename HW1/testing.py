@@ -10,7 +10,7 @@ t_output = "./test_result.txt"
 f_o = open(t_output, "w")
 f_o.write("Testing Results:\n\n")
 
-for i in range(1,18):
+for i in range(1,21):
     s1 = "%scase%d%s" % (prefix, i, suffix_p1)
     s2 = "%scase%d%s" % (prefix, i, suffix_p2)
     s3 = "%scase%d%s" % (prefix, i, suffix_m1)

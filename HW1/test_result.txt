@@ -210,5 +210,50 @@ F
           
           
           
+case 18
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+ p        
+          
+r  f      
+          
+          
+          
+          
+          
+          
+case 19
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+          
+    s     
+  F       
+ jf       
+          
+          
+          
+          
+          
+          
+case 20
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+          
+    s     
+  F       
+  f       
+          
+          
+          
+          
+          
+          
 
 End Testing
