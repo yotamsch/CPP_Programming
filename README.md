@@ -7,8 +7,8 @@ Yotam
 - [X] Implementing basic class objects for game (player, board, piece)
 - [X] Implement file handling mechanism
 - [X] Implement main game flow and mechanics
-- [ ] Testing and cleaning code
+- [X] Testing and cleaning code
 
 Tala
-- [ ] Testing and cleaning code
+- [X] Testing and cleaning code
 
