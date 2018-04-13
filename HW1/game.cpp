@@ -61,26 +61,12 @@ void OutputResult(const char* path, const string info, const Board& b) {
 	}
 }
 
-int main(int argc, char** argv) {
-    const char* p1_posfile_path;
-    const char* p2_posfile_path;
-    const char* p1_movfile_path;
-    const char* p2_movfile_path;
+int main() {
     const char* outfile_path = "./rps.output";
-    // TODO: REMOVE
-    if (argc == 5) {
-        p1_posfile_path = argv[1];
-        p2_posfile_path = argv[2];
-        p1_movfile_path = argv[3];
-        p2_movfile_path = argv[4];
-    }
-    // TODO: END REMOVE
-    else {
-        p1_posfile_path = "./player1.rps_board";
-        p2_posfile_path = "./player2.rps_board";
-        p1_movfile_path = "./player1.rps_moves";
-        p2_movfile_path = "./player2.rps_moves";
-    }
+    const char* p1_posfile_path = "./player1.rps_board";
+    const char* p2_posfile_path = "./player2.rps_board";
+    const char* p1_movfile_path = "./player1.rps_moves";
+    const char* p2_movfile_path = "./player2.rps_moves";
 
     string msg_reason; // will have reason message
     Reason p1_reason, p2_reason;
@@ -148,7 +134,6 @@ int main(int argc, char** argv) {
     if (p1_reason == Reason::NO_FLAGS) {
         // handle case: File error (not enough flags)
         cout << "[INFO] Not enough flags implemented in positioning file for PLAYER 1." << endl;
-        // TODO: Decide what to do in this case, leave it or report it now?
     }
     if (p1_reason == Reason::LINE_ERROR) {
         // handle case: Incorrect line
@@ -163,7 +148,6 @@ int main(int argc, char** argv) {
     if (p2_reason == Reason::NO_FLAGS) {
         // handle case: File error (not enough flags)
         cout << "[INFO] Not enough flags implemented in positioning file for PLAYER 2." << endl;
-        // TODO: Decide what to do in this case, leave it or report it now?
     }
     if (p2_reason == Reason::LINE_ERROR) {
         // handle case: Incorrect line
@@ -223,5 +207,5 @@ int main(int argc, char** argv) {
     }
     bool is_finished = mov_p1.IsEOF() && mov_p2.IsEOF();
     OutputResult(outfile_path, GenerateOutputResult(p1_lose,p2_lose, Reason::SUCCESS, msg_reason, is_finished), b);
-
+    return 0;
 }
