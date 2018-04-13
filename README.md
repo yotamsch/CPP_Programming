@@ -12,3 +12,10 @@ Yotam
 Tala
 - [X] Testing and cleaning code
 
+## HW2 ()
+### Divided Work
+Yotam
+- [ ] ...
+
+Tala
+- [ ] ...
