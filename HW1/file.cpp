@@ -9,7 +9,7 @@
 
 using namespace std;
 
-string& TrimLine(string& s, const string& delmiters="\f\n\r\t\v") {
+string& TrimLine(string& s, const string& delmiters=" \f\n\r\t\v") {
 	return s.erase(s.find_last_not_of(delmiters) + 1).erase(0, s.find_first_not_of(delmiters));	
 }
 
@@ -18,7 +18,8 @@ vector<string> SplitLine(const string& s, const char delimiter) {
 	stringstream ss(s);
 	string word;
 	while (getline(ss, word, delimiter)) {
-		result.push_back(word);
+		if (word.size() > 0)
+			result.push_back(TrimLine(word));
 	}
 	return result;
 }
@@ -58,13 +59,10 @@ Reason FileHandler::ReadLine(string& line) {
 	} catch (...) {
 		return Reason::UNKNOWN_ERROR;
 	}
-	/*if (line.size() == 0 && _f.eof()) {
-		return Reason::FILE_ERROR;
-	}*/
 	return Reason::SUCCESS;
 }
 
-Reason PositionFile::ParseFile(Player* player, string& msg) {
+Reason PositionFile::ParseFile(Player* player) {
 	const char delim = ' ';
 	// counting the pieces [0]=rock, [1]=paper, [2]=scissors,
 	// [3]=flag, [4]=bonb, [5]=scissors
@@ -86,12 +84,10 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 			continue;
 		}
 		if (s_line.size() < 3) {
-			msg = MSG_INVALID_LINE;
 			return Reason::LINE_ERROR;
 		}
 		piece_type = CharToPieceType(s_line[0][0]);
 		if (s_line[0].size() != 1 || piece_type == PieceType::NONE) {
-			msg = MSG_INVALID_LINE;
 			return Reason::LINE_ERROR;
 		}
 		try {
@@ -99,7 +95,6 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 			y = stoi(s_line[1]) - 1;
 		} catch (...) {
 			// number conversion error
-			msg = MSG_INVALID_LINE;
 			return Reason::LINE_ERROR;
 		}
 		--piece_count[int(piece_type)];
@@ -107,27 +102,24 @@ Reason PositionFile::ParseFile(Player* player, string& msg) {
 			// joker piece
 			is_joker = true;
 			if (s_line.size() != 4 || s_line[3].size() != 1) {
-				msg = MSG_INVALID_LINE;
 				return Reason::LINE_ERROR;
 			}
 			piece_type = CharToPieceType(s_line[3][0]);
 		}
 		if (piece_count[int(piece_type)] < 0) {
-			msg = MSG_INVALID_FILE;
 			return Reason::LINE_ERROR;
 		}
-		if (!_board.PlacePiece(player, piece_type, x, y, msg, is_joker)) {
+		if (!_board.PlacePiece(player, piece_type, x, y, is_joker)) {
 			return Reason::LINE_ERROR;
 		}
 	}
 	if (piece_count[int(PieceType::FLAG)] > 0) {
-		msg = MSG_NOT_ENOUGH_FLAGS;
 		return Reason::NO_FLAGS;
 	}
 	return Reason::SUCCESS;
 }
 
-Reason MoveFile::NextMove(string& msg) {
+Reason MoveFile::NextMove() {
 	// get a move from the file and parse it
 	const char delim = ' ';
 	const char* joker_str = "J:";
@@ -138,20 +130,17 @@ Reason MoveFile::NextMove(string& msg) {
 	PieceType new_j_type;
 
 	if (ReadLine(line) == Reason::UNKNOWN_ERROR) {
-		msg = MSG_ERROR_READING_FILE;
 		return Reason::UNKNOWN_ERROR;
 	}
-	vector<string> s_line = SplitLine(line, delim)
-	;
+	vector<string> s_line = SplitLine(line, delim);
+
 	if (s_line.size() == 0) return Reason::SUCCESS;
 
 	if (s_line.size() < 4) {
-		msg = MSG_INVALID_LINE;
 		return Reason::LINE_ERROR;
 	}
-	if (s_line.size() == 8) {
+	if (s_line.size() >= 8) {
 		if (s_line[4].compare(joker_str) != 0) {
-			msg = MSG_INVALID_LINE;
 			return Reason::LINE_ERROR;
 		}
 		is_j_change = true;
@@ -163,12 +152,10 @@ Reason MoveFile::NextMove(string& msg) {
 		to_y = stoi(s_line[2]) - 1;
 	} catch (...) {
 		// number conversion error
-		msg = MSG_INVALID_LINE;
 		return Reason::LINE_ERROR;
 	}
 	if (is_j_change) {
 		if (s_line.size() != 8 || s_line[7].size() != 1) {
-			msg = MSG_INVALID_LINE;
 			return Reason::LINE_ERROR;
 		}
 		try {
@@ -176,15 +163,14 @@ Reason MoveFile::NextMove(string& msg) {
 			joker_y = stoi(s_line[5]) - 1;
 		} catch (...) {
 			// number conversion error
-			msg = MSG_INVALID_LINE;
 			return Reason::LINE_ERROR;
 		}
 		new_j_type = CharToPieceType(s_line[7][0]);
 	}
-	if (!_board->MovePiece(from_x, from_y, to_x, to_y, msg)) {
+	if (!_board->MovePiece(from_x, from_y, to_x, to_y)) {
 		return Reason::LINE_ERROR;
 	}
-	if (is_j_change && !_board->ChangeJoker(joker_x, joker_y, new_j_type, msg)) {
+	if (is_j_change && !_board->ChangeJoker(joker_x, joker_y, new_j_type)) {
 		return Reason::LINE_ERROR;
 	}
 	return Reason::SUCCESS;

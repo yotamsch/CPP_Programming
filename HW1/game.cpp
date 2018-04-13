@@ -82,7 +82,6 @@ int main(int argc, char** argv) {
         p2_movfile_path = "./player2.rps_moves";
     }
 
-    string msg; // will have output message from functions
     string msg_reason; // will have reason message
     Reason p1_reason, p2_reason;
     Reason p1_lose, p2_lose;
@@ -140,7 +139,7 @@ int main(int argc, char** argv) {
 
     // Files loaded fine
     // ? Maybe need to take care of reading error
-    p1_reason = pos_p1.ParseFile(&p1, msg);
+    p1_reason = pos_p1.ParseFile(&p1);
     if (p1_reason == Reason::UNKNOWN_ERROR) {
         // error when reading from file, maybe file was deleted
         cout << "[ERROR] Failed while reading position file for PLAYER 1." << endl << "Please fix the mentioned error(s) and retry." << endl;
@@ -155,7 +154,7 @@ int main(int argc, char** argv) {
         // handle case: Incorrect line
         msg_reason = "player 1 - line " + to_string(pos_p1.GetCurrentLineNumber());
     }
-    p2_reason = pos_p2.ParseFile(&p2, msg);
+    p2_reason = pos_p2.ParseFile(&p2);
     if (p2_reason == Reason::UNKNOWN_ERROR) {
         // error when reading file, mybe was deleted
         cout << "[ERROR] Failed while reading position file for PLAYER 2." << endl << "Please fix the mentioned error(s) and retry." << endl;
@@ -192,7 +191,7 @@ int main(int argc, char** argv) {
     while ((!mov_p1.IsEOF() || !mov_p2.IsEOF()) && (p1_lose == Reason::SUCCESS && p2_lose == Reason::SUCCESS)) {
         // -> Handle moves
         if (!mov_p1.IsEOF()) {
-            p1_reason = mov_p1.NextMove(msg);
+            p1_reason = mov_p1.NextMove();
             if (p1_reason == Reason::UNKNOWN_ERROR) {
                 // handle case: File error (while reading the file)
                 cout << "[ERROR] Failed while reading moves file for PLAYER 1." << endl << "Please fix the mentioned error(s) and retry." << endl;
@@ -206,7 +205,7 @@ int main(int argc, char** argv) {
             }
         }
         if (!mov_p2.IsEOF()) {
-            p2_reason = mov_p2.NextMove(msg);
+            p2_reason = mov_p2.NextMove();
             if (p2_reason == Reason::UNKNOWN_ERROR) {
                 // handle case: File error (while reading the file)
                 cout << "[ERROR] Failed while reading moves file for PLAYER 2." << endl << "Please fix the mentioned error(s) and retry." << endl;

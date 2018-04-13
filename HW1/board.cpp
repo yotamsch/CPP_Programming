@@ -123,18 +123,15 @@ Board& Board::Merge(const Board& b) {
  * @param type The piece type
  * @param x The x position on the board
  * @param y The y position on the board
- * @param msg Reference to the output message
  * @param is_joker Is the piece a joker piece
  * @return true If everything went fine and the piece has been inserted into the board.
- * @return false If an error occured, updating msg correctly
+ * @return false If an error occured
  */
-bool Board::PlacePiece(Player* owner, PieceType type, int x, int y, string& msg, bool is_joker) {
+bool Board::PlacePiece(Player* owner, PieceType type, int x, int y, bool is_joker) {
     if (!IsPositionValid(x, y)) {
-        msg = MSG_INVALID_POSITION;
         return false;
     }
     if (_board[x][y].IsInitiated()) {
-        msg = MSG_PIECE_ALREADY_IN_PLACE;
         return false;
     }
     if (is_joker && (type == PieceType::FLAG)) {
@@ -153,15 +150,13 @@ bool Board::PlacePiece(Player* owner, PieceType type, int x, int y, string& msg,
  * @param y The origin Y.
  * @param new_x The destination X.
  * @param new_y The destination Y.
- * @param msg The message will be updated into this.
  * @return true The move is legal.
  * @return false The move is illegal.
  */
-bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
+bool Board::IsMoveLegal(int x, int y, int new_x, int new_y) {
     Piece& origin_piece = _board[x][y];
     Piece& destination_piece = _board[new_x][new_y];
     if (!IsPositionValid(x, y) || !IsPositionValid(new_x, new_y) || !origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG || (abs(x - new_x) == 1 && abs(y - new_y) == 1) || abs(x-new_x) > 1 || abs(y - new_y) > 1) {
-        msg = MSG_ILLEGAL_MOVE;
         return false;
     }
     return true;
@@ -174,10 +169,9 @@ bool Board::IsMoveLegal(int x, int y, int new_x, int new_y, string& msg) {
  * @param y The origin Y
  * @param new_x The destination X
  * @param new_y The destination Y
- * @param msg A message if any error occured, or the Move is illegal
  */
-bool Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
-    if (!IsMoveLegal(x, y, new_x, new_y, msg)) {
+bool Board::MovePiece(int x, int y, int new_x, int new_y) {
+    if (!IsMoveLegal(x, y, new_x, new_y)) {
         return false;
     }
 
@@ -185,21 +179,17 @@ bool Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
     Piece& destination_piece = _board[new_x][new_y];
     Piece temp_p;
     if (origin_piece == destination_piece) {
-        msg = MSG_DEST_AND_ORIGIN_TIE;
         origin_piece.RemovePieceFromPlayer();
         destination_piece.RemovePieceFromPlayer();
     }
     else if (!destination_piece.IsInitiated()) {
-        msg = MSG_EMPTY_DEST_PIECE;
         temp_p = origin_piece;
     }
     else if (origin_piece > destination_piece) {
-        msg = MSG_DEST_PIECE_LOST;
         temp_p = origin_piece;
         destination_piece.RemovePieceFromPlayer();
     }
     else if (origin_piece < destination_piece) {
-        msg = MSG_ORIGIN_PIECE_LOST;
         temp_p = destination_piece;
         origin_piece.RemovePieceFromPlayer();
     }
@@ -211,14 +201,12 @@ bool Board::MovePiece(int x, int y, int new_x, int new_y, string& msg) {
     return true;
 }
 
-bool Board::ChangeJoker(int x, int y, PieceType new_type, string& msg) {
+bool Board::ChangeJoker(int x, int y, PieceType new_type) {
     if (!IsPositionValid(x,y)) {
-        msg = MSG_ILLEGAL_MOVE;
         return false;
     }
     Piece& piece = _board[x][y];
     if (!piece.IsJoker() || new_type == PieceType::FLAG) {
-        msg = MSG_ILLEGAL_MOVE;
         return false;
     }
     piece.SetType(new_type); // handles joker piece count

@@ -3,19 +3,10 @@
 
 #include "board.h"
 #include "piece.h"
+#include "game.h"
 #include <iostream>
 #include <fstream>
 #include <string>
-
-#define DIM_X 10
-#define DIM_Y 10
-
-#define MSG_INVALID_FILE "The file is not valid."
-#define MSG_INVALID_LINE "The line is invalid."
-#define MSG_INVALID_POSITIONING "The requested positioning is invalid."
-#define MSG_INVALID_MOVE "The requested move is invalid."
-#define MSG_NOT_ENOUGH_FLAGS "Flag cout is insufficient."
-#define MSG_ERROR_READING_FILE "Error while reading a file."
 
 using namespace std;
 
@@ -48,7 +39,7 @@ class PositionFile : public FileHandler {
 		// Get
 		Board& GetBoard() { return _board; }
 		// Utility
-		Reason ParseFile(Player* player, string& msg);
+		Reason ParseFile(Player* player);
 };
 
 class MoveFile : public FileHandler {
@@ -60,7 +51,7 @@ class MoveFile : public FileHandler {
 	// D'tor
 	~MoveFile() {}
 	// Utility
-	Reason NextMove(string& msg);
+	Reason NextMove();
 };
 
 #endif

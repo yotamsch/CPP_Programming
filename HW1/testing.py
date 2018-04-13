@@ -1,16 +1,20 @@
 import subprocess
 
-prefix = "./testsTala/"
+# The local folder in which the tests are in
+prefix = "./EX1_tests_1-5/"
+# NOTE: The tests are each in a subfolder named 'case#'
+#       where # is the test number.
+
 suffix_p1 = "/player1.rps_board"
 suffix_p2 = "/player2.rps_board"
 suffix_m1 = "/player1.rps_moves"
 suffix_m2 = "/player2.rps_moves"
 
-t_output = "./test_result.txt"
+t_output = "./LIRON_test_result.txt"
 f_o = open(t_output, "w")
 f_o.write("Testing Results:\n\n")
 
-for i in range(1,21):
+for i in range(1,6):
     s1 = "%scase%d%s" % (prefix, i, suffix_p1)
     s2 = "%scase%d%s" % (prefix, i, suffix_p2)
     s3 = "%scase%d%s" % (prefix, i, suffix_m1)

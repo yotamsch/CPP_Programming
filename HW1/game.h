@@ -1,6 +1,10 @@
 #ifndef _H_GAME
 #define _H_GAME
 
+// Board size
+#define DIM_X 10
+#define DIM_Y 10
+
 // How many pieces of each kind
 #define R 2
 #define P 5
@@ -18,8 +22,9 @@
 #define RSN_BAD_POSISION_FILE_SINGLE "Bad Positioning input file for "
 #define RSN_BAD_POSITION_FILE_DOUBLE "Bad Positioning input file for both players - "
 #define RSN_BAD_MOVE_FILE_SINGLE "Bad Moves input file for "
-//player %d - line %d
-//player 1: line %d, player 2: line %d
+// Additions made in the game itself:
+// 1) player %d - line %d
+// 2) player 1: line %d, player 2: line %d
 
 /**
  * @brief An enum representing the player type (player 1 or player 2)
