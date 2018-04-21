@@ -12,7 +12,7 @@ Yotam
 Tala
 - [X] Testing and cleaning code
 
-## HW2 ()
+## HW2 (https://docs.google.com/document/d/1CQ5URKNZS1NQd0P4pn-vvlcuN3gzF98DP65mZO9bkCc/)
 ### Divided Work
 Yotam
 - [ ] ...
