@@ -1,0 +1,2 @@
+
+#include "FightInfoRPS.h"
