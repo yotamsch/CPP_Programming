@@ -12,25 +12,25 @@
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        printMessageToScreen(ERROR, "No play type was entered. " + BAD_ARGS_MESSAGE)
+        printMessageToScreen(ERROR, "No play type was entered.");
+        printMessageToScreen(ERROR, BAD_ARGS_MESSAGE);
         return 1; // exit in case of error
     }
-    switch (argv[1]) {
-        case "auto-vs-auto":
+    if (argv[1] == "auto-vs-auto") {
             return PlayRPS(AUTO_VS_AUTO);
-            break;
-        case "file-vs-file":
-            return PlayRPS(FILE_VS_FILE);
-            break;
-        case "auto-vs-file":
-            return PlayRPS(AUTO_VS_FILE);
-            break;
-        case "file-vs-auto":
-            return PlayRPS(FILE_VS_AUTO);
-            break;
-        default:
-            printMessageToScreen(ERROR, "The game type was not entered correctly. " + BAD_ARGS_MESSAGE);
-            return 1;
-            break;
+    }
+    if (argv[1] == "file-vs-file") {
+        return PlayRPS(FILE_VS_FILE);
+        }
+    if (argv[1] == "auto-vs-file") {
+        return PlayRPS(AUTO_VS_FILE);
+    }
+    if (argv[1] == "file-vs-auto") {
+        return PlayRPS(FILE_VS_AUTO);
+    }
+    else {
+        printMessageToScreen(ERROR, "The game type was not entered correctly.");
+        printMessageToScreen(ERROR, BAD_ARGS_MESSAGE);
+        return 1;
     }
 }
