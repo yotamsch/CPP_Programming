@@ -12,7 +12,7 @@ $(EXEC): $(OBJS)
 Game.o: Game.cpp GameManagerRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c Game.cpp
 
-GameManagerRPS.o: GameManagerRPS.cpp GameManagerRPS.h PieceRPS.h PointRPS.h FightInfoRPS.h BoardRPS.h AutoPlayerAlgorithm.h FilePlayerAlgorithm.h
+GameManagerRPS.o: GameManagerRPS.cpp GameManagerRPS.h MoveRPS.h PieceRPS.h PointRPS.h FightInfoRPS.h BoardRPS.h AutoPlayerAlgorithm.h FilePlayerAlgorithm.h
 	$(COMP) $(CPP_COMP_FLAG) -c GameManagerRPS.cpp
 
 AutoPlayerAlgorithm.o: AutoPlayerAlgorithm.cpp AutoPlayerAlgorithm.h
@@ -30,7 +30,7 @@ FilePlayerAlgorithm.o: FilePlayerAlgorithm.cpp FilePlayerAlgorithm.h
 JokerChangeRPS.o: JokerChangeRPS.cpp JokerChangeRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c JokerChangeRPS.cpp
 
-MoveRPS.o: MoveRPS.cpp MoveRPS.h
+MoveRPS.o: MoveRPS.cpp MoveRPS.h PointRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c MoveRPS.cpp
 
 PieceRPS.o: PieceRPS.cpp PieceRPS.h

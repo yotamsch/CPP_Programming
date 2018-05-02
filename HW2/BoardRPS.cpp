@@ -131,7 +131,8 @@ bool BoardRPS::PlacePiece(int owner, PieceType type, int x, int y, bool is_joker
         // joker cannot be flag
         return false;
     }
-    PieceRPS p(type, is_joker, owner);
+    PointRPS currPosition(x,y);
+    PieceRPS p(type, is_joker, owner, currPosition);
     _board[x][y] = p;
     return true;
 }
@@ -194,8 +195,8 @@ bool BoardRPS::MovePiece(int x, int y, int new_x, int new_y) {
     return true;
 }
 
-bool BoardRPS::ChangeJoker(int x, int y, PieceType new_type) {
-    if (!IsPositionValid(x,y)) {
+bool BoardRPS::ChangeJoker(const Point& point, PieceType new_type) {
+ /*   if (!IsPositionValid(x,y)) {
         return false;
     }
     PieceRPS& piece = _board[x][y];
@@ -203,7 +204,7 @@ bool BoardRPS::ChangeJoker(int x, int y, PieceType new_type) {
         return false;
     }
     piece.SetType(new_type); // handles joker piece count
-    return true;
+ */   return true;
 }
 
 ostream& operator<<(ostream& output, const BoardRPS& rOtherBoard) {

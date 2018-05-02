@@ -4,20 +4,26 @@
 
 #include "PiecePosition.h"
 #include "GameManagerRPS.h"
+#include "PointRPS.h"
 class PieceRPS : public PiecePosition {
 private:
-    /*COPY OF HW1- piece.h*/
     bool _is_joker;
     PieceType _piece_type;
     int _owner;
-
     static int _piece_counter; // general piece counter for debugging
-    /*END OF COPY*/
+    PointRPS _currPosition;
+
 public:
-    /*COPY OF HW1- piece.h*/
     // C'tors
-    PieceRPS() : _is_joker(false), _piece_type(PieceType::NONE), _owner(-1) { ++_piece_counter; }
-    PieceRPS(PieceType type, bool is_joker, int owner);
+    PieceRPS() : _is_joker(false), _piece_type(PieceType::NONE), _owner(-1), _currPosition() {
+        ++_piece_counter;
+    }
+    PieceRPS(PieceType type, bool is_joker, int owner, const PointRPS& rCurrPosition)
+    : _is_joker(is_joker), _piece_type(type), _owner(owner), _currPosition(rCurrPosition){
+          //  _owner->IncrementPieceCount(_piece_type); NEEDS REPLACEMENT!!
+
+    }
+
     PieceRPS(const PieceRPS& p) { *this = p; }
 
     // D'tor
@@ -47,19 +53,15 @@ public:
     void RemovePieceFromPlayer();
     
 friend ostream& operator<<(ostream& output, const PieceRPS& piece);
-    /*END OF COPY*/
     
     // Other
     const Point& getPosition() const;
     char getPiece() const;
     char getJokerRep() const;
-    //added by Tala:
     void setPosition(const Point& rPoint);
 };
 
-/* COPY OF HW1- piece.h*/
 char PieceTypeToChar(PieceType type);
 PieceType CharToPieceType(char chr);
-/*END OF COPY*/
 
 #endif // !__H_PIECE_RPS

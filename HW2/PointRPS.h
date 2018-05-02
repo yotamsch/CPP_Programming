@@ -8,6 +8,11 @@ private:
     int _x, _y;
 public:
     PointRPS(int x, int y): _x(x), _y(y){}
+    PointRPS(const Point& point){
+        _x = point.getX();
+        _y = point.getY();
+    }
+    PointRPS(){}
     //? maybe should implement our copy c'tor
     // D'tor
     ~PointRPS();

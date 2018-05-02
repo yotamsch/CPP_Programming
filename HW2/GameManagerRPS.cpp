@@ -6,6 +6,8 @@
 #include "FightInfoRPS.h"
 #include "PointRPS.h"
 #include "PieceRPS.h"
+#include "MoveRPS.h"
+
 #include <memory>
 #include <map>
 #include <cassert>
@@ -67,14 +69,44 @@ int getWinnerOfAFight(PieceRPS& player1Piece, PieceRPS& player2Piece){
     }
 }
 
-/*
+void playCurrTurn(std::unique_ptr<PlayerAlgorithm> pCurrPlayer, std::unique_ptr<PlayerAlgorithm> pOppPlayer, BoardRPS& mergedBoard){
+    const Point& fromPosition = pCurrPlayer->getMove()->getFrom();
+    const Point& toPosition = pCurrPlayer->getMove()->getTo();
+    MoveRPS currMove(fromPosition, toPosition);
+    int oldX = fromPosition.getX();
+    int oldY = fromPosition.getY(); 
+    int newX = toPosition.getX();
+    int newY = toPosition.getY();
+    PieceRPS& movingPiece = mergedBoard.getBoard()[oldX][oldY];
+    PieceRPS& pieceAtDestination = mergedBoard.getBoard()[newX][newY];            
+    PlayerType movingPlayer = movingPiece.GetPlayerType();
+    if( mergedBoard.IsMoveLegal(oldX, oldY, newX, newY) ){
+        if( mergedBoard.isThereAFight(newX, newY) ){
+            FightInfoRPS fightInfo(toPosition, movingPiece.getPiece(), pieceAtDestination.getPiece(), getWinnerOfAFight(movingPiece, pieceAtDestination));
+            pCurrPlayer->notifyFightResult(fightInfo);
+            
+            unique_ptr<JokerChange> jokerChange = pCurrPlayer->getJokerChange();
+            char jokerNewRep = jokerChange->getJokerNewRep();
+            const Point& jokerChangePos = jokerChange->getJokerChangePosition();
+            mergedBoard.ChangeJoker(jokerChangePos, CharToPieceType(jokerNewRep));
+
+            pOppPlayer->notifyFightResult(fightInfo);
+        }
+        if(! mergedBoard.MovePiece(oldX, oldY, newX, newY)) {
+            //error couldn't make the move
+        }
+        pOppPlayer->notifyOnOpponentMove(currMove);
+    }
+    else{
+        //handle illegal move
+    }
+}
+
 // do no call this function with vCurrPlayer=1
 int getOppositePlayer(int vCurrPlayer){
     int opp = vCurrPlayer == PLAYER_1? PLAYER_2 : PLAYER_1;
     return opp; 
 }
-
-bool isLegalMove(Board& rBoard, std::unique_ptr<Move> pMove, int vCurrPlayer){}
 
 bool isAFight(Board& rBoard, std::unique_ptr<Move> pMove, int vCurrPlayer){
     const Point& destPoint = pMove->getTo();
@@ -85,20 +117,7 @@ bool isAFight(Board& rBoard, std::unique_ptr<Move> pMove, int vCurrPlayer){
     return false;
 }
 
-bool isInRange(int x, int y){
-    if (x>DIM_X || x<0 || y>DIM_Y || y<0){
-        return false;
-    }
-    return true;
-}
-
-//needs further implementing
-bool isValidChar(char c){
-    if(c=='F' || c=='R' || c=='P' || c=='S' || c=='B')return true;
-    return false;
-}
-*/
-
+// may convert this function to a member function of BoardRPS, will be handled
 BoardRPS& fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<unique_ptr<PiecePosition>>& positioningVec){
     for(std::vector<unique_ptr<PiecePosition>>::iterator itr = positioningVec.begin(); itr != positioningVec.end(); ++itr){
         const Point& point = (*(itr))->getPosition();
@@ -108,7 +127,7 @@ BoardRPS& fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<unique_ptr<Pi
         PieceType pieceType = CharToPieceType(pieceChar);
         char jokerRepChar = (*(itr))->getJokerRep();
         bool isJoker = jokerRepChar==NON_JOKER_FLAG? false : true;
-        rBoard.PlacePiece(vCurrPlayer, pieceType, x, y, isJoker);
+        rBoard.PlacePiece(vCurrPlayer, pieceType, x, y, isJoker); //should ensure this function puts the piece on the board correctly
     }
     return rBoard;
 }
@@ -165,44 +184,13 @@ int PlayRPS(int vGameStyle) {
     int thereIsAWinner = 0;
     while(turn < MAX_NUM_OF_MOVES && !thereIsAWinner){
         if(currentPlayer == PLAYER_1){
-            const Point& fromPosition = p1->getMove()->getFrom();
-            int oldX = fromPosition.getX();
-            int oldY = fromPosition.getY(); 
-            const Point& toPosition = p1->getMove()->getTo();
-            int newX = toPosition.getX();
-            int newY = toPosition.getY(); 
-            PieceRPS& movingPiece = mergedBoard.getBoard()[oldX][oldY];
-            PieceRPS& pieceAtDestination = mergedBoard.getBoard()[newX][newY];            
-            PlayerType movingPlayer = movingPiece.GetPlayerType();
-            if( mergedBoard.IsMoveLegal(oldX, oldY, newX, newY) ){
-                if( mergedBoard.isThereAFight(newX, newY) ){
-                    FightInfoRPS fightInfo(toPosition, movingPiece.getPiece(), pieceAtDestination.getPiece(), getWinnerOfAFight(movingPiece, pieceAtDestination));
-                    p1->notifyFightResult(fightInfo);
-                }
-                if(! mergedBoard.MovePiece(oldX, oldY, newX, newY)) {
-                    //error couldn't make the move
-                }
-            }
-            else{
-                //handle illegal move
-            }
-/*
-            p1->notifyFightResult( ); //needs completing
-            p1->getJokerChange();
-            p2->notifyOnOpponentMove( );//needs completing
-            p2->notifyFightResult( );//needs completing
-*/        }
-    /*    else{
-            p2->getMove();
-            p2->notifyFightResult( );//needs completing
-            p2->getJokerChange();
-            p1->notifyOnOpponentMove();//needs completing
-            p1->notifyFightResult( );//needs completing
+            playCurrTurn(std::move(p1), std::move(p2), mergedBoard);
+        }
+        else{
+            playCurrTurn(std::move(p2), std::move(p1), mergedBoard);
         }
         currentPlayer = getOppositePlayer(currentPlayer);
-        */
         turn++;
     }
-
     return 1;
 }

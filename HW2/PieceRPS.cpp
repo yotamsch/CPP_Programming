@@ -4,14 +4,6 @@
 
 int PieceRPS::_piece_counter = 0;
 
-PieceRPS::PieceRPS(PieceType type, bool is_joker, int owner) { 
-    _piece_type = type; 
-    _is_joker = is_joker;
-    _owner = owner;
-    ++_piece_counter; 
-  //  _owner->IncrementPieceCount(_piece_type); NEEDS REPLACEMENT!!
-}
-
 /**
  * @brief Overloading on the lower than (<) operator. According to the rules of the game. Returns true only if the left side is lower "in strength" than the right side.
  * 
@@ -83,10 +75,15 @@ bool PieceRPS::SetType(PieceType type) {
 }
 
 // Other
-const Point& PieceRPS::getPosition() const{}
-char PieceRPS::getPiece() const{}
-char PieceRPS::getJokerRep() const{}
-//added by Tala:
+const Point& PieceRPS::getPosition() const{
+    return _currPosition;
+}
+char PieceRPS::getPiece() const{
+    return PieceTypeToChar(_piece_type);
+}
+char PieceRPS::getJokerRep() const{
+}
+//added by Tala: not sure why i wanted this anymore
 void PieceRPS::setPosition(const Point& rPoint){}
 
 

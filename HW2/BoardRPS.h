@@ -40,7 +40,7 @@ public:
     bool IsMoveLegal(int x, int y, int new_x, int new_y);
     bool PlacePiece(int owner, PieceType type, int x, int y, bool is_joker=false);
     bool MovePiece(int x, int y, int new_x, int new_y);
-    bool ChangeJoker(int x, int y, PieceType new_type);
+    bool ChangeJoker(const Point& point, PieceType new_type);
     BoardRPS& Merge(const BoardRPS& b);
     bool isThereAFight(int vNewX, int vNewY);
     void PrettyPrint();
