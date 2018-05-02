@@ -65,4 +65,9 @@
  השחקן לא רואה את הלוח של היריב אבל הוא מקבל ממנהל המשחק באמצעות הפונקציות שהוגדרו בתרגיל את המידע לגבי שחקנים של היריב ומיקומם בלוח בתחילת המשחק (אבל לא מיהם הכלים!),
  איזה קרבות נוהלו בשלב הצבת הכלים - ותוצאותיהם. בהמשך כל מהלך של היריב מדווח לשחקן וכן כל תוצאה של קרב - כפי שמתואר בתרגיל.
 
+
+my question to be discussed with Yotam: i want to make a board out of each player's getInitialPositions() .
+ i'm having a trouble deciding whether to check validity of positioning or not, because if the file player positioned badly such as R -2 1 where does this piece go when the file is processed?
+how will the board be represented at this stage?
+
  
