@@ -9,7 +9,7 @@
 <!-- ======================================================================== -->
 
 <metadata>
-<m key="abiword.date_last_changed">Wed May  2 15:15:32 2018
+<m key="abiword.date_last_changed">Thu May  3 21:25:34 2018
 </m>
 <m key="abiword.generator">AbiWord</m>
 <m key="dc.creator">tala</m>
@@ -19,21 +19,21 @@
 </metadata>
 <rdf>
 </rdf>
-<history version="6" edit-time="336" last-saved="1525263332" uid="7c452bda-4b8f-11e8-80cf-c9278b1cc2a5">
+<history version="7" edit-time="365" last-saved="1525371934" uid="7c452bda-4b8f-11e8-80cf-c9278b1cc2a5">
 <version id="3" started="1524994097" uid="dd172076-4b8f-11e8-80cf-c9278b1cc2a5" auto="0" top-xid="3"/>
 <version id="5" started="1525261962" uid="9f3026b4-4dff-11e8-90f4-9c65e690d9d0" auto="0" top-xid="5"/>
 <version id="6" started="1525263332" uid="82cd16e6-4e02-11e8-8574-c3e748f1a421" auto="0" top-xid="6"/>
+<version id="7" started="1525371934" uid="5e5cfb52-4eff-11e8-840f-b989fba60f51" auto="0" top-xid="6"/>
 </history>
 <styles>
-<s type="P" name="Normal" followedby="Current Settings" props="font-family:Times New Roman; margin-top:0pt; color:000000; margin-left:0pt; widows:2; font-style:normal; text-indent:0in; text-position:normal; margin-right:0pt; text-decoration:none; bgcolor:transparent; line-height:1.0; font-size:12pt; margin-bottom:0pt; font-variant:normal; font-weight:normal; text-align:left; font-stretch:normal"/>
+<s type="P" name="Normal" followedby="Current Settings" props="font-weight:normal; font-family:Times New Roman; margin-top:0pt; color:000000; margin-left:0pt; text-align:left; widows:2; font-style:normal; text-indent:0in; text-position:normal; font-variant:normal; bgcolor:transparent; line-height:1.0; text-decoration:none; margin-bottom:0pt; margin-right:0pt; font-size:12pt; font-stretch:normal"/>
 </styles>
 <pagesize pagetype="Letter" orientation="portrait" width="8.500000" height="11.000000" units="in" page-scale="1.000000"/>
 <section xid="2" props="page-margin-footer:0.5in; page-margin-header:0.5in">
 <p style="Normal" xid="3">hw2 advanced cpp<c></c></p>
 <p style="Normal" xid="1"><c></c>things that i need to take care of:</p>
 <p style="Normal" xid="4"><c></c><c></c></p>
-<p style="Normal" xid="5">1. find an alternative implementation for the “owner” player of piece, i replaced the pointer to a player which was ok in hw1, with an int because we cannot handle an object of type playerAlgorithm.. files to be taken care of: PieceRPS.h, <c></c><c props="font-family:Times New Roman; font-size:12pt; color:000000; text-decoration:none; text-position:normal; font-weight:normal; font-style:normal; lang:en-US">PieceRPS.</c>cpp</p>
-<p style="Normal" xid="5">2. joker change: function in boardRPS is still wrong a bit</p>
-<p style="Normal" xid="6">3. we need to decide: should we check winning by adding a member function and fields for BoardRPS for each player ? such as: _number_of_pieces_player1 ? or should we implement this for each player? but then there’s copy and paste because file and auto algorithm do not inherit such methods.. </p>
+<p style="Normal" xid="5">1. find an alternative implementation for the “owner” player of piece, i replaced the pointer to a player which was ok in hw1, with an int because we cannot handle an object of type playerAlgorithm.. files to be taken care of: PieceRPS.h, <c></c><c props="font-family:Times New Roman; text-decoration:none; color:000000; font-size:12pt; text-position:normal; font-weight:normal; font-style:normal; lang:en-US">PieceRPS.</c>cpp</p>
+<p style="Normal" xid="6"></p>
 </section>
 </abiword>

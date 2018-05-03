@@ -12,12 +12,13 @@ int PieceRPS::_piece_counter = 0;
  * @return false Otherwise
  */
 bool PieceRPS::operator<(const PieceRPS& p) {
+    //? i think we should check _piece_type == PieceType::NONE && p._piece_type != PieceType::NONE instead of (_piece_type == PieceType::NONE )
     if (_piece_type == PieceType::NONE || p._piece_type == PieceType::BOMB || (p._piece_type == PieceType::ROCK && _piece_type == PieceType::SCISSORS) || (p._piece_type == PieceType::SCISSORS && _piece_type == PieceType::PAPER) || (p._piece_type == PieceType::PAPER && _piece_type == PieceType::ROCK) || (_piece_type == PieceType::FLAG && p._piece_type != PieceType::NONE)) {
         return true;
     }
     return false;
 }
-
+//TODO check if we still need owner
 PieceRPS& PieceRPS::operator=(const PieceRPS& p) {
     if (this != &p) {
         this->_is_joker = p._is_joker;
@@ -44,6 +45,7 @@ ostream& operator<<(ostream& output, const PieceRPS& piece) {
     return output;
 }
 
+
 /**
  * @brief Clears a piece content and nullifies the piece (empty piece).
  * 
@@ -61,14 +63,14 @@ void PieceRPS::NullifyPiece() {
 void PieceRPS::RemovePieceFromPlayer() {
     if (this->_piece_type == PieceType::NONE)
         return;
-   // this->_owner->DecrementPieceCount(this->_piece_type); NEEDS REPLACEMENT!!
+    scoreChecker::DecrementPieceCount(_owner, _piece_type);
 }
-
+//TODO check if we still need to hold a counter for every piece per player
 bool PieceRPS::SetType(PieceType type) { 
     if (_is_joker) {
-      //  _owner->DecrementPieceCount(_piece_type); NEEDS REPLACEMENT!!
+        scoreChecker::DecrementPieceCount(_owner, _piece_type);
         _piece_type = type; 
-    //    _owner->IncrementPieceCount(_piece_type); NEEDS REPLACEMENT!!
+        scoreChecker::IncrementPieceCount(_owner, _piece_type);
         return true;
     } 
     return false; 
@@ -82,10 +84,9 @@ char PieceRPS::getPiece() const{
     return PieceTypeToChar(_piece_type);
 }
 char PieceRPS::getJokerRep() const{
+    if(!_is_joker) return '#';
+    return PieceTypeToChar(_piece_type);
 }
-//added by Tala: not sure why i wanted this anymore
-void PieceRPS::setPosition(const Point& rPoint){}
-
 
 /**
  * @brief Converts the recieved type to a representing char

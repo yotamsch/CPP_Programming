@@ -14,6 +14,8 @@
 #define ERROR "[ERROR]"
 #define DIM_X 10
 #define DIM_Y 10
+
+
 using namespace std;
 
 /**
@@ -32,26 +34,7 @@ using namespace std;
  */
 int PlayRPS(int vGameStyle);
 
-/**
- * @brief performs all fights on the initial board
- * 
- * @param initPositionP1 
- * @param initPositionP2 
- * @param fightsInfo1 - a vector of pointers to FightInfo containing all the fights that
- *  took place on the initial board, to be filled for player1
- * @param fightsInfo2 - a vector of pointers to FightInfo containing all the fights that
- *  took place on the initial board, to be filled for player2
- * @param board - reference to Board to be filled, has representation of the board after
- *  all the fights that took place on the initial board 
- */
-/*void performAllInitialFights(std::vector<unique_ptr<PiecePosition>>& rInitPositionP1,
-                             std::vector<unique_ptr<PiecePosition>>& rInitPositionP2,
-                             std::vector<unique_ptr<FightInfo>>& rFightsInfo1,
-                             std::vector<unique_ptr<FightInfo>>& rFightsInfo2,
-                             Board& rBoard);
-*/
 
-/*COPY FROM HW1- game.h*/
 
 /**
  * @brief An enum representing the player type (player 1 or player 2)
@@ -64,5 +47,35 @@ enum class PlayerType {NONE=-1, PLAYER_1=1, PLAYER_2};
  * 
  */
 enum class PieceType {NONE=-1, ROCK=0, PAPER, SCISSORS, FLAG, BOMB, JOKER};
-/*end of copy*/
+
+class scoreChecker{
+   public:
+        static int player1_num_of_pieces, player1_num_of_flags, player2_num_of_pieces, player2_num_of_flags;
+
+    static void DecrementPieceCount(int player ,PieceType type){
+        if(type == PieceType::FLAG){
+            if(player == 1) {player1_num_of_flags--;}
+            else {player2_num_of_flags--;}
+        }
+        else if(type != PieceType::BOMB){
+            if(player == 1){player1_num_of_pieces--;}
+            else{player2_num_of_pieces--;}
+        } 
+    }
+    //TODO check if i need this function, most probably not
+    static void IncrementPieceCount(int player, PieceType type){
+        if(type == PieceType::FLAG) return;
+        if(player == 1) player1_num_of_pieces++;
+        else if(player ==2) player2_num_of_pieces++;
+    }
+    static int getWinner(){
+        if(player1_num_of_flags==0 || player1_num_of_pieces==0){
+            return 2;
+        }
+        if(player2_num_of_flags==0 || player2_num_of_pieces==0){
+            return 1;
+        }
+        return 0;
+    }
+};
 #endif // !__H_GAME_MANAGER_RPS

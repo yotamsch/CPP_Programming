@@ -18,6 +18,11 @@
 #define MAX_NUM_OF_MOVES 100
 #define NON_JOKER_FLAG '#'
 
+int scoreChecker::player1_num_of_flags = 0;
+int scoreChecker::player2_num_of_flags = 0;
+int scoreChecker::player1_num_of_pieces = 0;
+int scoreChecker::player2_num_of_pieces = 0;
+
 void informAboutInitialFights(BoardRPS& rBoard1, BoardRPS& rBoard2, std::vector<unique_ptr<FightInfo>>& rFightsInfoVec){
     assert(rBoard1.GetDimentionY() == rBoard2.GetDimentionY());
     assert(rBoard1.GetDimentionX() == rBoard2.GetDimentionX());
@@ -127,13 +132,12 @@ BoardRPS& fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<unique_ptr<Pi
         PieceType pieceType = CharToPieceType(pieceChar);
         char jokerRepChar = (*(itr))->getJokerRep();
         bool isJoker = jokerRepChar==NON_JOKER_FLAG? false : true;
-        rBoard.PlacePiece(vCurrPlayer, pieceType, x, y, isJoker); //should ensure this function puts the piece on the board correctly
+        rBoard.PlacePiece(vCurrPlayer, pieceType, x, y, isJoker); //TODO: should ensure this function puts the piece on the board correctly
     }
     return rBoard;
 }
 
 int PlayRPS(int vGameStyle) {
-    vGameStyle++;
   //  const char* outfile_path = "./rps.output";
     const char* p1_posfile_path = "./player1.rps_board";
     const char* p2_posfile_path = "./player2.rps_board";
@@ -177,11 +181,11 @@ int PlayRPS(int vGameStyle) {
     /*perform all initial fights*/
     mergedBoard = mergedBoard.Merge(board1).Merge(board2); //performs all initial fights
 
-    p1->notifyOnInitialBoard(mergedBoard,fightsInfoVec);
-    p2->notifyOnInitialBoard(mergedBoard,fightsInfoVec);
+    p1->notifyOnInitialBoard(mergedBoard, fightsInfoVec);
+    p2->notifyOnInitialBoard(mergedBoard, fightsInfoVec);
     int currentPlayer = PLAYER_1;
     int turn = 0;
-    int thereIsAWinner = 0;
+    int thereIsAWinner = scoreChecker::getWinner();
     while(turn < MAX_NUM_OF_MOVES && !thereIsAWinner){
         if(currentPlayer == PLAYER_1){
             playCurrTurn(std::move(p1), std::move(p2), mergedBoard);
