@@ -153,10 +153,10 @@ bool Board::PlacePiece(Player* owner, PieceType type, int x, int y, bool is_joke
  * @return true The move is legal.
  * @return false The move is illegal.
  */
-bool Board::IsMoveLegal(int x, int y, int new_x, int new_y) {
+bool Board::IsMoveLegal(PlayerType player_type, int x, int y, int new_x, int new_y) {
     Piece& origin_piece = _board[x][y];
     Piece& destination_piece = _board[new_x][new_y];
-    if (!IsPositionValid(x, y) || !IsPositionValid(new_x, new_y) || !origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG || (abs(x - new_x) == 1 && abs(y - new_y) == 1) || abs(x-new_x) > 1 || abs(y - new_y) > 1) {
+    if (!IsPositionValid(x, y) || !IsPositionValid(new_x, new_y) || !origin_piece.IsInitiated() || player_type != origin_piece.GetPlayerType() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG || (abs(x - new_x) == 1 && abs(y - new_y) == 1) || abs(x-new_x) > 1 || abs(y - new_y) > 1) {
         return false;
     }
     return true;
@@ -170,8 +170,8 @@ bool Board::IsMoveLegal(int x, int y, int new_x, int new_y) {
  * @param new_x The destination X
  * @param new_y The destination Y
  */
-bool Board::MovePiece(int x, int y, int new_x, int new_y) {
-    if (!IsMoveLegal(x, y, new_x, new_y)) {
+bool Board::MovePiece(PlayerType p_type, int x, int y, int new_x, int new_y) {
+    if (!IsMoveLegal(p_type, x, y, new_x, new_y)) {
         return false;
     }
 
@@ -201,12 +201,12 @@ bool Board::MovePiece(int x, int y, int new_x, int new_y) {
     return true;
 }
 
-bool Board::ChangeJoker(int x, int y, PieceType new_type) {
+bool Board::ChangeJoker(PlayerType p_type, int x, int y, PieceType new_type) {
     if (!IsPositionValid(x,y)) {
         return false;
     }
     Piece& piece = _board[x][y];
-    if (!piece.IsJoker() || new_type == PieceType::FLAG) {
+    if (piece.GetPlayerType() == p_type || !piece.IsJoker() || new_type == PieceType::FLAG || new_type == PieceType::JOKER) {
         return false;
     }
     piece.SetType(new_type); // handles joker piece count

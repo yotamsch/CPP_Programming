@@ -119,7 +119,7 @@ Reason PositionFile::ParseFile(Player* player) {
 	return Reason::SUCCESS;
 }
 
-Reason MoveFile::NextMove() {
+Reason MoveFile::NextMove(Player* player) {
 	// get a move from the file and parse it
 	const char delim = ' ';
 	const char* joker_str = "J:";
@@ -167,10 +167,10 @@ Reason MoveFile::NextMove() {
 		}
 		new_j_type = CharToPieceType(s_line[7][0]);
 	}
-	if (!_board->MovePiece(from_x, from_y, to_x, to_y)) {
+	if (!_board->MovePiece(player->GetType(), from_x, from_y, to_x, to_y)) {
 		return Reason::LINE_ERROR;
 	}
-	if (is_j_change && !_board->ChangeJoker(joker_x, joker_y, new_j_type)) {
+	if (is_j_change && !_board->ChangeJoker(player->GetType(), joker_x, joker_y, new_j_type)) {
 		return Reason::LINE_ERROR;
 	}
 	return Reason::SUCCESS;

@@ -51,7 +51,7 @@ class MoveFile : public FileHandler {
 	// D'tor
 	~MoveFile() {}
 	// Utility
-	Reason NextMove();
+	Reason NextMove(Player* player);
 };
 
 #endif

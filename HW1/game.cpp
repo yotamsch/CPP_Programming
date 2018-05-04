@@ -24,9 +24,10 @@ string GenerateOutputResult(Reason p1_r, Reason p2_r, Reason g_r, const string& 
 
     if (is_finished && p1_r == p2_r) {
         // tie at end
-        // ? only SUCCESS ??
         winner = 0;
-        msg_reason = RSN_MOVE_FILES_NO_WINNER;
+        if (p1_r == Reason::NO_FLAGS) msg_reason = RSN_POSITION_NO_FLAGS;
+        // else := SUCCESS
+        else msg_reason = RSN_MOVE_FILES_NO_WINNER;
     }
     else {
         // only one player won
@@ -124,7 +125,6 @@ int main() {
     }
 
     // Files loaded fine
-    // ? Maybe need to take care of reading error
     p1_reason = pos_p1.ParseFile(&p1);
     if (p1_reason == Reason::UNKNOWN_ERROR) {
         // error when reading from file, maybe file was deleted
@@ -175,7 +175,7 @@ int main() {
     while ((!mov_p1.IsEOF() || !mov_p2.IsEOF()) && (p1_lose == Reason::SUCCESS && p2_lose == Reason::SUCCESS)) {
         // -> Handle moves
         if (!mov_p1.IsEOF()) {
-            p1_reason = mov_p1.NextMove();
+            p1_reason = mov_p1.NextMove(&p1);
             if (p1_reason == Reason::UNKNOWN_ERROR) {
                 // handle case: File error (while reading the file)
                 cout << "[ERROR] Failed while reading moves file for PLAYER 1." << endl << "Please fix the mentioned error(s) and retry." << endl;
@@ -189,7 +189,7 @@ int main() {
             }
         }
         if (!mov_p2.IsEOF()) {
-            p2_reason = mov_p2.NextMove();
+            p2_reason = mov_p2.NextMove(&p2);
             if (p2_reason == Reason::UNKNOWN_ERROR) {
                 // handle case: File error (while reading the file)
                 cout << "[ERROR] Failed while reading moves file for PLAYER 2." << endl << "Please fix the mentioned error(s) and retry." << endl;

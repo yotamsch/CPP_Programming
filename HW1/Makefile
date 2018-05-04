@@ -1,4 +1,4 @@
-COMP = g++-5.3.0
+COMP = g++
 OBJS = game.o file.o board.o piece.o player.o
 # The executabel filename DON'T CHANGE
 EXEC = ex1

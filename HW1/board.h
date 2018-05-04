@@ -33,10 +33,10 @@ class Board {
         // Utility
         Board& operator=(const Board& b);
         bool IsPositionValid(int x, int y) { return (x >= 0 && x < _n) && (y >= 0 && y < _m); }
-        bool IsMoveLegal(int x, int y, int new_x, int new_y);
+        bool IsMoveLegal(PlayerType player_type, int x, int y, int new_x, int new_y);
         bool PlacePiece(Player* owner, PieceType type, int x, int y, bool is_joker=false);
-        bool MovePiece(int x, int y, int new_x, int new_y);
-        bool ChangeJoker(int x, int y, PieceType new_type);
+        bool MovePiece(PlayerType player_type, int x, int y, int new_x, int new_y);
+        bool ChangeJoker(PlayerType player_type, int x, int y, PieceType new_type);
         Board& Merge(const Board& b);
         void PrettyPrint();
     
