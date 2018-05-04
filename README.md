@@ -15,7 +15,12 @@ Tala
 ## HW2 (https://docs.google.com/document/d/1CQ5URKNZS1NQd0P4pn-vvlcuN3gzF98DP65mZO9bkCc/)
 ### Divided Work
 Yotam
-- [ ] ...
+- [ ] Go over existing code and suggest fixes
+- [ ] Complete AutoPlayerAlgorithm
+- [ ] Testing
 
 Tala
-- [ ] ...
+- [ ] Copy code we can still use from HW1
+- [ ] Write the GameManager
+- [ ] Complete FilePlayerAlgorithm
+- [ ] Testing
