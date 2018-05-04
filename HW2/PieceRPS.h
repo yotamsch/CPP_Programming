@@ -58,7 +58,6 @@ friend ostream& operator<<(ostream& output, const PieceRPS& piece);
     const Point& getPosition() const;
     char getPiece() const;
     char getJokerRep() const;
-    void setPosition(const Point& rPoint);
 };
 
 char PieceTypeToChar(PieceType type);

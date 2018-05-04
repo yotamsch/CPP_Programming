@@ -33,11 +33,6 @@ BoardRPS::BoardRPS(const BoardRPS& b) {
  */
 BoardRPS::~BoardRPS() {
     //? make sure that there's no need to delete anything
-    /*for (int i=0; i < _n; ++i) {
-        delete[] (_board[i]);
-    }
-    delete[] _board;
-    */
 }
 
 
@@ -127,7 +122,7 @@ bool BoardRPS::PlacePiece(int owner, PieceType type, int x, int y, bool is_joker
     if (_board[x][y].IsInitiated()) {
         return false;
     }
-    if (is_joker && (type == PieceType::FLAG)) {
+    if (is_joker && (type == PieceType::FLAG || type == PieceType::JOKER)) {
         // joker cannot be flag
         return false;
     }
@@ -196,15 +191,16 @@ bool BoardRPS::MovePiece(int x, int y, int new_x, int new_y) {
 }
 
 bool BoardRPS::ChangeJoker(const Point& point, PieceType new_type) {
- /*   if (!IsPositionValid(x,y)) {
+    int x = point.getX(), y=point.getY();
+    if (!IsPositionValid(x,y)) {
         return false;
     }
     PieceRPS& piece = _board[x][y];
-    if (!piece.IsJoker() || new_type == PieceType::FLAG) {
+    if (!piece.IsJoker() || new_type == PieceType::FLAG || new_type == PieceType::JOKER) {
         return false;
     }
     piece.SetType(new_type); // handles joker piece count
- */   return true;
+    return true;
 }
 
 ostream& operator<<(ostream& output, const BoardRPS& rOtherBoard) {

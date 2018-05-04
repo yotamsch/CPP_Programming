@@ -12,7 +12,7 @@ public:
         _x = point.getX();
         _y = point.getY();
     }
-    PointRPS(){}
+    PointRPS(): _x(0), _y(0){}
     //? maybe should implement our copy c'tor
     // D'tor
     ~PointRPS();
