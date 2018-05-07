@@ -22,36 +22,42 @@ public:
         , _position(position) // the point (x,y)
     {
     }
-    // vopy c'tor
-    PieceRPS(const PieceRPS& p) { *this = p; }
-    // * PieceRPS() : _is_joker(false), _piece_type(PieceType::NONE), _player(-1),
+    // copy c'tor
+    PieceRPS(const PieceRPS& other) { *this = other; }
+    // no need for move constructor
+    PieceRPS(PieceRPS&& other) = delete;
 
     // d'tor
     ~PieceRPS() {}
 
     // getters
+    // get the player [currently enum]
+    // TODO: maybe change to 'int _player'
     int getPlayer() const { return this->_player; }
+    // get the piece type [currently enum]
     PieceType getPieceType() const { return _piece_type; }
 
     // setters
+    // set the type for joker pieces
     void setType(PieceType type);
 
     // utility
     bool isJoker() { return _is_joker; }
+    // overloading the copy assignment operator '='
     PieceRPS& operator=(const PieceRPS& p);
+    // no need for equivalance operator
+    // TODO: maybe implement anyway
     bool operator==(const PieceRPS& p) const = delete;
     bool operator>(const PieceRPS& p) const;
     bool operator<(const PieceRPS& p) const;
-    // * bool operator==(const PieceRPS& p) const;
-    // * bool isInitiated() { return _piece_type != PieceType::NONE ? true : false;
-    // * void NullifyPiece();
-    // * void RemovePieceFromPlayer();
 
     // interface defined functions
     const Point& getPosition() const;
     char getPiece() const;
     char getJokerRep() const;
 
+public:
+    // overloading the '<<' operator for printing piece
     friend std::ostream& operator<<(std::ostream& output, const PieceRPS& piece);
 };
 

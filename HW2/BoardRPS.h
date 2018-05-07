@@ -3,50 +3,85 @@
 #define __H_BOARD_RPS
 
 #include "Board.h"
+#include "FightInfoRPS.h"
+#include "GameUtilitiesRPS.h"
 #include "PieceRPS.h"
-#include "GameManagerRPS.h" //included this just to get the enum types, maybe should be changed
-/*COPIED FROM HW1- board.h*/
-#define MSG_ILLEGAL_MOVE "The attempted move is illegal."
-#define MSG_EMPTY_DEST_PIECE "The destination has no piece."
-#define MSG_ORIGIN_PIECE_LOST "The origin piece lost and was eaten."
-#define MSG_DEST_PIECE_LOST "The destination piece lost and was eaten."
-#define MSG_DEST_AND_ORIGIN_TIE "Both origin and destination are tied (both eaten)."
-#define MSG_PIECE_ALREADY_IN_PLACE "Another piece exists in the requested place."
-#define MSG_INVALID_POSITION "The requested position is invalid."
-/*end of copy*/
+#include "MoveRPS.h"
+#include "JokerChangeRPS.h"
+#include <iostream>
+#include <memory>
+#include <vector>
 
 class BoardRPS : public Board {
 private:
-    /*COPIED FROM HW1- board.h*/
-    int _n;
-    int _m;
-    std::vector<std::vector<PieceRPS>> _board;
+    int _n; // rows
+    int _m; // columns
+    // the board vector is of size : rows * columns
+    std::vector<std::unique_ptr<PieceRPS>> _board;
+
 public:
-    // C'tor
-    BoardRPS(int n, int m);
-    BoardRPS(const BoardRPS& b);
+    // basic c'tors
+    BoardRPS(int n, int m)
+        : _n(n) // the number of rows
+        , _m(m) // the number of columns
+        , _board(_n * _m) // initialize the board vector
+    {
+    }
+    // no need for copy c'tor
+    BoardRPS(const BoardRPS& other) = delete;
+    // move c'tor
+    // TODO: maybe move c'tor not needed
+    BoardRPS(BoardRPS&& other)
+        : _n(other._n) // the number of rows
+        , _m(other._m) // the number of columns
+    {
+        std::swap(this->_board, other._board);
+    }
 
-    // D'tor
-    ~BoardRPS();
-    // Other
+    // d'tor
+    ~BoardRPS() {}
+
+    // getters
+    // TODO: not sure if they are in use, maybe not needed
+    int getN() const { return _n; }
+    int getM() const { return _m; }
+    // TODO: not sure this getter is needed
+    const std::vector<std::unique_ptr<PieceRPS>>& getBoard() const { return _board; }
+
+    // utility
+    // move assignment
+    // TODO: maybe move assignment not needed
+    BoardRPS& operator=(BoardRPS&& b);
+    // place a piece into the board
+    bool placePiece(std::unique_ptr<PieceRPS>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo);
+    // move an existing piece on the board 'from' -> 'to'
+    bool movePiece(int player, const std::unique_ptr<MoveRPS>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo);
+    // change an existing joker's representation
+    bool changeJoker(int player, const std::unique_ptr<JokerChangeRPS>& rpJokerChange);
+    // print the board nicely
+    // TODO: remove method before submission
+    void prettyPrint();
+
+    // interface defined functions
+    // get the player number (id/type) of the piece in the position
     int getPlayer(const Point& pos) const;
-    int GetDimentionX() { return _n; }
-    int GetDimentionY() { return _m; }
-    std::vector<std::vector<PieceRPS>>& getBoard(){return _board;}
 
-    // Utility
-    BoardRPS& operator=(const BoardRPS& b);
-    bool IsPositionValid(int x, int y) { return (x >= 0 && x < _n) && (y >= 0 && y < _m); }
-    bool IsMoveLegal(int x, int y, int new_x, int new_y);
-    bool PlacePiece(int owner, PieceType type, int x, int y, bool is_joker=false);
-    bool MovePiece(int x, int y, int new_x, int new_y);
-    bool ChangeJoker(const Point& point, PieceType new_type);
-    BoardRPS& Merge(const BoardRPS& b);
-    bool isThereAFight(int vNewX, int vNewY);
-    void PrettyPrint();
+private:
+    // checks if the point position is valid
+    bool isPositionValid(int x, int y);
+    // checks if the point position is valid for (x,y) and (new_x,new_y)
+    // also checks if the position is 'movable-valid'
+    bool isPositionValid(int x, int y, int new_x, int new_y);
+    // checks if a certain move is legal for the player
+    bool isMoveLegal(int player, int x, int y, int new_x, int new_y);
+    
+    // calculates the correct vector position
+    // TODO: maybe rename to something else
+    int p(int x, int y) const { return y * _m + x; }
 
-friend ostream& operator<<(ostream& output, const BoardRPS& b);
-
+public:
+    // friend method, overloading '<<' for printing the board
+    friend std::ostream& operator<<(std::ostream& output, const BoardRPS& b);
 };
 
 #endif // !__H_BOARD_RPS

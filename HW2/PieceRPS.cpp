@@ -31,27 +31,6 @@ PieceRPS& PieceRPS::operator=(const PieceRPS& p)
     return *this;
 }
 
-// /**
-//  * @brief Clears a piece content and nullifies the piece (empty piece).
-//  *
-//  */
-// void PieceRPS::nullifyPiece()
-// {
-//     this->_piece_type = PieceType::NONE;
-//     this->_owner = -1;
-//     this->_is_joker = false;
-// }
-
-// /**
-//  * @brief Removed the piece from the owning player.
-//  *
-//  */
-// void PieceRPS::RemovePieceFromPlayer() {
-//     if (this->_piece_type == PieceType::NONE)
-//         return;
-//     scoreChecker::DecrementPieceCount(_owner, _piece_type);
-// }
-
 void PieceRPS::setType(PieceType type)
 {
     if (_is_joker) {
@@ -59,7 +38,6 @@ void PieceRPS::setType(PieceType type)
     }
 }
 
-// Other
 const Point& PieceRPS::getPosition() const
 {
     return _position;
