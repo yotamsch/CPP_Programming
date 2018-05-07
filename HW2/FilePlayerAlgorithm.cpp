@@ -164,10 +164,10 @@ Reason FilePlayerAlgorithm::ParseMoveFile(int player) {
     PointRPS pointFrom(from_x, from_y);
     PointRPS pointTo(to_x, to_y);
     
-    _nextMoveP1 = std::make_unique(pointFrom, pointTo);
-
+    _nextMoveP1 = std::make_unique<MoveRPS>(pointFrom, pointTo);
+/*
 	if (is_j_change && !_board->ChangeJoker(player->GetType(), joker_x, joker_y, new_j_type)) {
 		return Reason::LINE_ERROR;
-	}
+	}*/
 	return Reason::SUCCESS;
 }

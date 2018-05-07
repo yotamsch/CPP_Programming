@@ -4,6 +4,7 @@
 #include "PlayerAlgorithm.h"
 #include "GameManagerRPS.h"
 #include "GameUtilitiesRPS.h"
+#include "MoveRPS.h"
 #include <string>
 #include <fstream>
 
