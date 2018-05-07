@@ -1,107 +1,40 @@
 #include "BoardRPS.h"
 #include <cassert>
-#include <iostream>
 #include <cmath>
+#include <iostream>
 #include <memory>
 
-using namespace std;
-
-/**
- * @brief Construct a new BoardRPS:: BoardRPS object
- * 
- * @param n The number of rows in the board
- * @param m The number of colums in the board
- */
-BoardRPS::BoardRPS(int n, int m) {
-    _n = n;
-    _m = m;
-    _board.resize(n, std::vector<PieceRPS>(m, PieceRPS()));
+bool BoardRPS::isPositionValid(int x, int y)
+{
+    return (x >= 0 && x < this->_m) && (y >= 0 && y < this->_n);
 }
 
-/**
- * @brief Construct a new BoardRPS:: BoardRPS object (Copy C'tor)
- * 
- * @param b The board to copy from
- */
-BoardRPS::BoardRPS(const BoardRPS& b) {
-    *this = b;
-}
-
-/**
- * @brief Destroy the BoardRPS:: BoardRPS object
- * 
- */
-BoardRPS::~BoardRPS() {
-    //? make sure that there's no need to delete anything
-}
-
-
-int BoardRPS::getPlayer(const Point& pos) const{}
-
-/**
- * @brief Overloading on the assignment (=) operator.
- * 
- * @param b The assignment variable
- * @return BoardRPS& Reference to the object for reassignment
- */
-BoardRPS& BoardRPS::operator=(const BoardRPS& rOtherBoard) {
-    cout << this << ", " << (*this) << endl;
-    if (this != &rOtherBoard) {
-        _n = rOtherBoard._n;
-        _m = rOtherBoard._m;
-        for(int i = 0; i < _n; i++){
-            for(int j = 0; j< _m; j++){
-                _board[i][j] = rOtherBoard._board[i][j];
-            }
-        }
+bool BoardRPS::isPositionValid(int x, int y, int new_x, int new_y)
+{
+    if (!isPositionValid(x, y) || !isPositionValid(new_x, new_y)) {
+        return false;
     }
+    if ((abs(x - new_x) == 1 && abs(y - new_y) == 1) || (abs(x - new_x) > 1 || abs(y - new_y) > 1)) {
+        return false;
+    }
+    return true;
+}
+
+int BoardRPS::getPlayer(const Point& pos) const
+{
+    if (_board[p(pos.getX(), pos.getY())] != nullptr)
+        return _board[p(pos.getX(), pos.getY())]->getPlayer();
+    // return 0 if empty
+    return 0;
+}
+
+BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
+{
+    this->_n = rrOther._n;
+    this->_m = rrOther._m;
+    std::swap(this->_board, rrOther._board);
     return *this;
 }
-
-/**
- * @brief Merges a second board to the current board based on the rules of the game.
- * 
- * @param b The board to merge into the calling board.
- * @return Board& the current board as reference type.
- */
-BoardRPS& BoardRPS::Merge(const BoardRPS& b) {
-    assert(_m == b._m);
-    assert(_n == b._n);
-    for (int i=0;i<_n;++i) {
-        for (int j=0;j<_m;++j) {
-            if (_board[i][j].GetPieceType() == b._board[i][j].GetPieceType()) {
-                _board[i][j].RemovePieceFromPlayer();
-                PieceRPS oppPiece = b._board[i][j];
-                oppPiece.RemovePieceFromPlayer();     
-               // b._board[i][j].RemovePieceFromPlayer();
-                _board[i][j].NullifyPiece();
-            } else if (_board[i][j].GetPieceType() == PieceType::NONE) {
-                _board[i][j] = b._board[i][j];
-            } 
-            else {
-                if (_board[i][j] < b._board[i][j]) {
-                    _board[i][j].RemovePieceFromPlayer();
-                    _board[i][j] = b._board[i][j];
-                } else {
-                    PieceRPS oppPiece = b._board[i][j];
-                    oppPiece.RemovePieceFromPlayer();
-                }
-                if (b._board[i][j].GetPieceType() != PieceType::NONE && _board[i][j].GetPieceType() == PieceType::BOMB) {
-                    _board[i][j].RemovePieceFromPlayer();
-                    _board[i][j].NullifyPiece();
-                }
-            }
-        }
-    }
-    return *this;
-}
-
-
-bool BoardRPS::isThereAFight(int vNewX, int vNewY){
-    PieceRPS pieceAtDestination = _board[vNewX][vNewX];
-    return pieceAtDestination.IsInitiated();
-}
-
 
 /**
  * @brief The function creates and places a new piece on the board. 
@@ -115,20 +48,45 @@ bool BoardRPS::isThereAFight(int vNewX, int vNewY){
  * @return true If everything went fine and the piece has been inserted into the board.
  * @return false If an error occured
  */
-bool BoardRPS::PlacePiece(int owner, PieceType type, int x, int y, bool is_joker) {
-    if (!IsPositionValid(x, y)) {
-        return false;
-    }
-    if (_board[x][y].IsInitiated()) {
+bool BoardRPS::placePiece(std::unique_ptr<PieceRPS>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo)
+{
+    // get needed information
+    const int player = rpPiece->getPlayer();
+    const PieceType type = rpPiece->getPieceType();
+    const int x = rpPiece->getPosition().getX();
+    const int y = rpPiece->getPosition().getY();
+    const bool is_joker = rpPiece->isJoker();
+
+    // initialize just to be sure
+    rpFightInfo = nullptr;
+    if (!isPositionValid(x, y)) {
         return false;
     }
     if (is_joker && (type == PieceType::FLAG || type == PieceType::JOKER)) {
-        // joker cannot be flag
+        // joker cannot act like flag or joker
         return false;
     }
-    PointRPS currPosition(x,y);
-    PieceRPS p(type, is_joker, owner, currPosition);
-    _board[x][y] = p;
+    if (this->_board[p(x, y)] != nullptr) {
+        if (this->_board[p(x, y)]->getPlayer() == player) {
+            // can't position two pieces for same player on board
+            return false;
+        }
+        // a fight exists
+        rpFightInfo = std::make_unique<FightInfoRPS>(*this->_board[p(x, y)], *rpPiece);
+        if (rpFightInfo->getWinner() == this->_board[p(x, y)]->getPlayer()) {
+            // existing player won
+            rpPiece = nullptr;
+            return true;
+        }
+        if (rpFightInfo->getWinner() == 0) {
+            // both lose : remove existing piece
+            this->_board[p(x, y)] = nullptr;
+            rpPiece = nullptr;
+            return true;
+        }
+    }
+    // no fight or 'this' player won
+    this->_board[p(x, y)] = std::move(rpPiece);
     return true;
 }
 
@@ -142,10 +100,16 @@ bool BoardRPS::PlacePiece(int owner, PieceType type, int x, int y, bool is_joker
  * @return true The move is legal.
  * @return false The move is illegal.
  */
-bool BoardRPS::IsMoveLegal(int x, int y, int new_x, int new_y) {
-    PieceRPS& origin_piece = _board[x][y];
-    PieceRPS& destination_piece = _board[new_x][new_y];
-    if (!IsPositionValid(x, y) || !IsPositionValid(new_x, new_y) || !origin_piece.IsInitiated() || origin_piece.GetPlayerType() == destination_piece.GetPlayerType() || origin_piece.GetPieceType() == PieceType::BOMB || origin_piece.GetPieceType() == PieceType::FLAG || (abs(x - new_x) == 1 && abs(y - new_y) == 1) || abs(x-new_x) > 1 || abs(y - new_y) > 1) {
+bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
+{
+    // TODO: verify all conditions are met
+    if (!isPositionValid(x, y, new_x, new_y) || this->_board[p(x, y)] == nullptr || this->_board[p(x, y)]->getPlayer() != player) {
+        return false;
+    }
+    if (this->_board[p(x, y)]->getPieceType() == PieceType::BOMB || this->_board[p(x, y)]->getPieceType() == PieceType::FLAG) {
+        return false;
+    }
+    if (this->_board[p(new_x, new_y)] != nullptr && this->_board[p(x, y)]->getPlayer() == this->_board[p(new_x, new_y)]->getPlayer()) {
         return false;
     }
     return true;
@@ -159,56 +123,69 @@ bool BoardRPS::IsMoveLegal(int x, int y, int new_x, int new_y) {
  * @param new_x The destination X
  * @param new_y The destination Y
  */
-bool BoardRPS::MovePiece(int x, int y, int new_x, int new_y) {
-    if (!IsMoveLegal(x, y, new_x, new_y)) {
+bool BoardRPS::movePiece(int player, const std::unique_ptr<MoveRPS>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo)
+{
+    // initialize parameters
+    const int x = rpMove->getFrom().getX();
+    const int y = rpMove->getFrom().getY();
+    const int new_x = rpMove->getTo().getX();
+    const int new_y = rpMove->getTo().getY();
+
+    int winner = 0;
+    if (!isMoveLegal(player, x, y, new_x, new_y)) {
         return false;
     }
-
-    PieceRPS& origin_piece = _board[x][y];
-    PieceRPS& destination_piece = _board[new_x][new_y];
-    PieceRPS temp_p;
-    if (origin_piece == destination_piece) {
-        origin_piece.RemovePieceFromPlayer();
-        destination_piece.RemovePieceFromPlayer();
-    }
-    else if (!destination_piece.IsInitiated()) {
-        temp_p = origin_piece;
-    }
-    else if (origin_piece > destination_piece) {
-        temp_p = origin_piece;
-        destination_piece.RemovePieceFromPlayer();
-    }
-    else if (origin_piece < destination_piece) {
-        temp_p = destination_piece;
-        origin_piece.RemovePieceFromPlayer();
-    }
-    destination_piece = temp_p;
-    origin_piece.NullifyPiece();
-    if (destination_piece.GetPieceType() == PieceType::BOMB) {
-        destination_piece.NullifyPiece();
-    }
-    return true;
-}
-
-bool BoardRPS::ChangeJoker(const Point& point, PieceType new_type) {
-    int x = point.getX(), y=point.getY();
-    if (!IsPositionValid(x,y)) {
-        return false;
-    }
-    PieceRPS& piece = _board[x][y];
-    if (!piece.IsJoker() || new_type == PieceType::FLAG || new_type == PieceType::JOKER) {
-        return false;
-    }
-    piece.SetType(new_type); // handles joker piece count
-    return true;
-}
-
-ostream& operator<<(ostream& output, const BoardRPS& rOtherBoard) {
-    for (int i=0; i<rOtherBoard._n; ++i) {
-        for (int j=0; j<rOtherBoard._m;++j) {
-            output  << rOtherBoard._board[i][j];
+    if (this->_board[p(new_x, new_y)] == nullptr) {
+        // no fight can move freely
+        rpFightInfo = nullptr;
+    } else {
+        // there is a fight
+        rpFightInfo = std::make_unique<FightInfoRPS>(*(this->_board[p(new_x, new_y)]), *(this->_board[p(x, y)]));
+        if (rpFightInfo->getWinner() == this->_board[p(new_x, new_y)]->getPlayer()) {
+            // destination piece won : empty 'origin' piece
+            this->_board[p(x, y)] = nullptr;
+            return true;
         }
-        output << endl;
+        if (rpFightInfo->getWinner() == 0) {
+            // both lose : empty existing pieces
+            this->_board[p(x, y)] = nullptr;
+            this->_board[p(new_x, new_y)] = nullptr;
+            return true;
+        }
+    }
+    // 'origin' piece won
+    this->_board[p(new_x, new_y)] = std::move(this->_board[p(x, y)]);
+    // TODO: check if following line is needed
+    this->_board[p(x, y)] = nullptr;
+    return true;
+}
+
+bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChangeRPS>& rpJokerChange)
+{
+    const int x = rpJokerChange->getJokerChangePosition().getX();
+    const int y = rpJokerChange->getJokerChangePosition().getY();
+    const PieceType new_type = CharToPieceType(rpJokerChange->getJokerNewRep());
+
+    if (!isPositionValid(x, y) || this->_board[p(x, y)] == nullptr) {
+        // position is not valid or piece does not exist
+        return false;
+    }
+    if (this->_board[p(x, y)]->getPlayer() != player || !this->_board[p(x, y)]->isJoker() || new_type == PieceType::FLAG || new_type == PieceType::JOKER) {
+        // the attempted joker change is not accepted
+        return false;
+    }
+    // can change the piece type of the joker
+    this->_board[p(x, y)]->setType(new_type);
+    return true;
+}
+
+std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)
+{
+    for (int y = 0; y < rBoard._n; ++y) {
+        for (int x = 0; x < rBoard._m; ++x) {
+            output << *(rBoard._board[rBoard.p(x,y)]);
+        }
+        output << std::endl;
     }
     return output;
 }
@@ -218,32 +195,34 @@ ostream& operator<<(ostream& output, const BoardRPS& rOtherBoard) {
  * 
  * @param columns An integer
  */
-void printLineOfDashes(int columns) {
-    cout << "\t";
-    for (int i=0; i< (columns*4 - 1); ++i) {
-        cout << "-";
+void printLineOfDashes(int columns)
+{
+    std::cout << "\t";
+    for (int i = 0; i < (columns * 4 - 1); ++i) {
+        std::cout << "-";
     }
-    cout << endl;
+    std::cout << std::endl;
 }
 
 /**
  * @brief Prints the board.
  * 
  */
-void BoardRPS::PrettyPrint() {
-    if (_n == 0 && _m == 0) {
-        cout << "[...]" << endl;
+void BoardRPS::prettyPrint()
+{
+    if (this->_n == 0 && this->_m == 0) {
+        std::cout << "[...]" << std::endl;
         return;
     }
     printLineOfDashes(_m);
-    for (int i=0; i<_n; ++i) {
-        cout << i+1 << "\t";
-        for (int j=0; j<_m;++j) {
-            if (j%2 == 1) cout << " ";
-            cout << "[" << _board[i][j] << "]";
-            if (j%2 == 1) cout << " ";
+    for (int y = 0; y < _n; ++y) {
+        std::cout << y + 1 << "\t";
+        for (int x = 0; x < _m; ++x) {
+            if (x % 2 == 1) std::cout << " ";
+            std::cout << "[" << *(this->_board[p(x,y)]) << "]";
+            if (x % 2 == 1) std::cout << " ";
         }
-        cout << endl;
+        std::cout << std::endl;
         printLineOfDashes(_m);
     }
 }

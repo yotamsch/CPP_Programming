@@ -49,6 +49,7 @@
 // things from GameManagerRPS.h
 // ? maybe some not needed
 #define NO_WINNER 0
+#define NUM_OF_PLAYERS 2
 #define MAX_NUM_OF_MOVES 100
 #define NON_JOKER_FLAG '#'
 
