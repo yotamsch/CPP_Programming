@@ -52,6 +52,14 @@
 #define MAX_NUM_OF_MOVES 100
 #define NON_JOKER_FLAG '#'
 
+// How many pieces of each kind
+#define R 2
+#define P 5
+#define S 1
+#define B 2
+#define J 2
+#define F 1
+
 /**
  * @brief An enum representing the player type (player 1 or player 2).
  * 
@@ -111,5 +119,14 @@ char PieceTypeToChar(PieceType type);
 PieceType CharToPieceType(char chr);
 
 PieceType getRandomJokerPieceType();
+
+
+/**
+ * @brief An enum representing the returned reason of gameplay functions
+ * 
+ */
+enum class Reason {UNKNOWN_ERROR=-1, SUCCESS=0, FILE_ERROR, LINE_ERROR, NO_FLAGS, NO_PIECES};
+
+
 
 #endif // !__H_GAME_UTILITIES_RPS

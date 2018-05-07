@@ -153,15 +153,15 @@ int PlayRPS(int vGameStyle) {
             p2 = std::make_unique<AutoPlayerAlgorithm>();
             break;
         case 2:
-            p1 = std::make_unique<FilePlayerAlgorithm>(p1_posfile_path, p1_movfile_path);
-            p2 = std::make_unique<FilePlayerAlgorithm>(p2_posfile_path, p2_movfile_path);
+            p1 = std::make_unique<FilePlayerAlgorithm>(p1_posfile_path, p1_movfile_path, PLAYER_1);
+            p2 = std::make_unique<FilePlayerAlgorithm>(p2_posfile_path, p2_movfile_path, PLAYER_2);
             break;
         case 3:
             p1 = std::make_unique<AutoPlayerAlgorithm>();
-            p2 = std::make_unique<FilePlayerAlgorithm>(p2_posfile_path, p2_movfile_path);
+            p2 = std::make_unique<FilePlayerAlgorithm>(p2_posfile_path, p2_movfile_path, PLAYER_2);
             break;
         case 4:     
-            p1 = std::make_unique<FilePlayerAlgorithm>(p1_posfile_path, p1_movfile_path);
+            p1 = std::make_unique<FilePlayerAlgorithm>(p1_posfile_path, p1_movfile_path, PLAYER_1);
             p2 = std::make_unique<AutoPlayerAlgorithm>();
             break;
     }
