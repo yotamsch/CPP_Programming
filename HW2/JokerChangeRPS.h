@@ -10,7 +10,7 @@ private:
     char _newRep;
 public:
     //C'tor
-    JokerChangeRPS(const Point& rChangePosition, char newRep): _changePosition(rChangePosition), _newRep(newRep) {
+    JokerChangeRPS(const PointRPS& rChangePosition, char newRep): _changePosition(rChangePosition), _newRep(newRep) {
         
     }
     // D'tor

@@ -48,14 +48,14 @@ BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
  * @return true If everything went fine and the piece has been inserted into the board.
  * @return false If an error occured
  */
-bool BoardRPS::placePiece(std::unique_ptr<PieceRPS>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo)
+bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo)
 {
     // get needed information
-    const int player = rpPiece->getPlayer();
-    const PieceType type = rpPiece->getPieceType();
+    char typeInChar = rpPiece->getPiece();
+    PieceType type = CharToPieceType(typeInChar);
     const int x = rpPiece->getPosition().getX();
     const int y = rpPiece->getPosition().getY();
-    const bool is_joker = rpPiece->isJoker();
+    bool is_joker = rpPiece->getJokerRep() == NON_JOKER_FLAG ? false : true;
 
     // initialize just to be sure
     rpFightInfo = nullptr;
@@ -90,6 +90,8 @@ bool BoardRPS::placePiece(std::unique_ptr<PieceRPS>& rpPiece, std::unique_ptr<Fi
     return true;
 }
 
+
+
 /**
  * @brief Checks if a certain move is legal. If not updates a message correctly.
  * 
@@ -123,7 +125,7 @@ bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
  * @param new_x The destination X
  * @param new_y The destination Y
  */
-bool BoardRPS::movePiece(int player, const std::unique_ptr<MoveRPS>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo)
+bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo)
 {
     // initialize parameters
     const int x = rpMove->getFrom().getX();
@@ -160,7 +162,8 @@ bool BoardRPS::movePiece(int player, const std::unique_ptr<MoveRPS>& rpMove, std
     return true;
 }
 
-bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChangeRPS>& rpJokerChange)
+
+bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChange>& rpJokerChange)
 {
     const int x = rpJokerChange->getJokerChangePosition().getX();
     const int y = rpJokerChange->getJokerChangePosition().getY();

@@ -53,11 +53,12 @@ public:
     // TODO: maybe move assignment not needed
     BoardRPS& operator=(BoardRPS&& b);
     // place a piece into the board
-    bool placePiece(std::unique_ptr<PieceRPS>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo);
+    bool placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo);
+   
     // move an existing piece on the board 'from' -> 'to'
-    bool movePiece(int player, const std::unique_ptr<MoveRPS>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo);
-    // change an existing joker's representation
-    bool changeJoker(int player, const std::unique_ptr<JokerChangeRPS>& rpJokerChange);
+    bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo);
+   // change an existing joker's representation
+    bool changeJoker(int player, const std::unique_ptr<JokerChange>& rpJokerChange);
     // print the board nicely
     // TODO: remove method before submission
     void prettyPrint();
