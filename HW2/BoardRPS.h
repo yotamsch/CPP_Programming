@@ -5,9 +5,9 @@
 #include "Board.h"
 #include "FightInfoRPS.h"
 #include "GameUtilitiesRPS.h"
-#include "PieceRPS.h"
-#include "MoveRPS.h"
 #include "JokerChangeRPS.h"
+#include "MoveRPS.h"
+#include "PieceRPS.h"
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -52,12 +52,13 @@ public:
     // move assignment
     // TODO: maybe move assignment not needed
     BoardRPS& operator=(BoardRPS&& b);
+    // gets a reference to the pointer of the piece at position (nullptr if no piece)
+    const std::unique_ptr<PieceRPS> const& getPieceAt(const Point& point);
     // place a piece into the board
-    bool placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo);
-   
+    bool placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfo>& rpFightInfo);
     // move an existing piece on the board 'from' -> 'to'
-    bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo);
-   // change an existing joker's representation
+    bool movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfo>& rpFightInfo);
+    // change an existing joker's representation
     bool changeJoker(int player, const std::unique_ptr<JokerChange>& rpJokerChange);
     // print the board nicely
     // TODO: remove method before submission
@@ -75,7 +76,7 @@ private:
     bool isPositionValid(int x, int y, int new_x, int new_y);
     // checks if a certain move is legal for the player
     bool isMoveLegal(int player, int x, int y, int new_x, int new_y);
-    
+
     // calculates the correct vector position
     // TODO: maybe rename to something else
     int p(int x, int y) const { return y * _m + x; }

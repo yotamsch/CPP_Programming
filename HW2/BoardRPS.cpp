@@ -28,6 +28,11 @@ int BoardRPS::getPlayer(const Point& pos) const
     return 0;
 }
 
+const std::unique_ptr<PieceRPS> const& BoardRPS::getPieceAt(const Point& point) {
+    return this->_board[p(point.getX(),point.getY())];
+}
+
+
 BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
 {
     this->_n = rrOther._n;
@@ -48,14 +53,22 @@ BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
  * @return true If everything went fine and the piece has been inserted into the board.
  * @return false If an error occured
  */
-bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfoRPS>& rpFightInfo)
+bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfo>& rpFightInfo)
 {
     // get needed information
-    char typeInChar = rpPiece->getPiece();
-    PieceType type = CharToPieceType(typeInChar);
+    bool is_joker = false;
     const int x = rpPiece->getPosition().getX();
     const int y = rpPiece->getPosition().getY();
-    bool is_joker = rpPiece->getJokerRep() == NON_JOKER_FLAG ? false : true;
+    // TODO: maybe want to stop uding conversion function
+    PieceType type = CharToPieceType(rpPiece->getPiece());
+    if (type == PieceType::JOKER) {
+        is_joker = true;
+        type = CharToPieceType(rpPiece->getJokerRep());
+    }
+
+    // generate 'current piece'
+    // TODO: maybe there is a way around this
+    std::unique_ptr<PieceRPS> rpCurrPiece = std::make_unique<PieceRPS>(player, is_joker, type, PointRPS(x, y));
 
     // initialize just to be sure
     rpFightInfo = nullptr;
@@ -72,7 +85,7 @@ bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, s
             return false;
         }
         // a fight exists
-        rpFightInfo = std::make_unique<FightInfoRPS>(*this->_board[p(x, y)], *rpPiece);
+        rpFightInfo = std::make_unique<FightInfoRPS>(*this->_board[p(x, y)], *rpCurrPiece);
         if (rpFightInfo->getWinner() == this->_board[p(x, y)]->getPlayer()) {
             // existing player won
             rpPiece = nullptr;
@@ -86,11 +99,9 @@ bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, s
         }
     }
     // no fight or 'this' player won
-    this->_board[p(x, y)] = std::move(rpPiece);
+    this->_board[p(x, y)] = std::move(rpCurrPiece);
     return true;
 }
-
-
 
 /**
  * @brief Checks if a certain move is legal. If not updates a message correctly.
@@ -125,7 +136,7 @@ bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
  * @param new_x The destination X
  * @param new_y The destination Y
  */
-bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfoRPS>& rpFightInfo)
+bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfo>& rpFightInfo)
 {
     // initialize parameters
     const int x = rpMove->getFrom().getX();
@@ -162,7 +173,6 @@ bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::u
     return true;
 }
 
-
 bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChange>& rpJokerChange)
 {
     const int x = rpJokerChange->getJokerChangePosition().getX();
@@ -186,7 +196,7 @@ std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)
 {
     for (int y = 0; y < rBoard._n; ++y) {
         for (int x = 0; x < rBoard._m; ++x) {
-            output << *(rBoard._board[rBoard.p(x,y)]);
+            output << *(rBoard._board[rBoard.p(x, y)]);
         }
         output << std::endl;
     }
@@ -221,9 +231,11 @@ void BoardRPS::prettyPrint()
     for (int y = 0; y < _n; ++y) {
         std::cout << y + 1 << "\t";
         for (int x = 0; x < _m; ++x) {
-            if (x % 2 == 1) std::cout << " ";
-            std::cout << "[" << *(this->_board[p(x,y)]) << "]";
-            if (x % 2 == 1) std::cout << " ";
+            if (x % 2 == 1)
+                std::cout << " ";
+            std::cout << "[" << *(this->_board[p(x, y)]) << "]";
+            if (x % 2 == 1)
+                std::cout << " ";
         }
         std::cout << std::endl;
         printLineOfDashes(_m);
