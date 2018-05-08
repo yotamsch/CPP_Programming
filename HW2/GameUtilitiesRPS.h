@@ -126,7 +126,7 @@ PieceType getRandomJokerPieceType();
  * @brief An enum representing the returned reason of gameplay functions
  * 
  */
-enum class Reason {UNKNOWN_ERROR=-1, SUCCESS=0, FILE_ERROR, LINE_ERROR, NO_FLAGS, NO_PIECES};
+enum class Reason {UNKNOWN_ERROR=-1, SUCCESS=0, FILE_ERROR, LINE_ERROR, NO_FLAGS, NO_PIECES, BAD_MOVE_ERROR, POSITION_FILE_ERROR};
 
 
 

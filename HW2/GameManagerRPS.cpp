@@ -3,10 +3,10 @@
 #include "FilePlayerAlgorithm.h"
 #include "AutoPlayerAlgorithm.h"
 #include "BoardRPS.h"
-#include "FightInfoRPS.h"
 #include "PointRPS.h"
 #include "PieceRPS.h"
 #include "MoveRPS.h"
+#include "ScoreManager.h"
 
 #include <memory>
 #include <map>
@@ -18,94 +18,35 @@
 #define MAX_NUM_OF_MOVES 100
 #define NON_JOKER_FLAG '#'
 
-int scoreChecker::player1_num_of_flags = 0;
-int scoreChecker::player2_num_of_flags = 0;
-int scoreChecker::player1_num_of_pieces = 0;
-int scoreChecker::player2_num_of_pieces = 0;
 
-void informAboutInitialFights(BoardRPS& rBoard1, BoardRPS& rBoard2, std::vector<unique_ptr<FightInfo>>& rFightsInfoVec){
-    assert(rBoard1.GetDimentionY() == rBoard2.GetDimentionY());
-    assert(rBoard1.GetDimentionX() == rBoard2.GetDimentionX());
-    const std::vector<std::vector<PieceRPS>>& rMyBoardVec1 = rBoard1.getBoard();
-    const std::vector<std::vector<PieceRPS>>& rMyBoardVec2 = rBoard2.getBoard();
-    char charOfPlayer1;
-    char charOfPlayer2;
-    int winner;
-    for (int i=0; i<rBoard1.GetDimentionX(); ++i) {
-        for (int j=0; j<rBoard1.GetDimentionY(); ++j) {
-            if(rMyBoardVec1[i][j].GetPieceType() == PieceType::NONE || rMyBoardVec2[i][j].GetPieceType() == PieceType::NONE){
-                continue; //no fight in this case
-            }
-            if(rMyBoardVec1[i][j].GetPieceType() == rMyBoardVec2[i][j].GetPieceType()){
-                    winner = 0;
-            }
-            else {
-                if (rMyBoardVec1[i][j].GetPieceType() <  rMyBoardVec2[i][j].GetPieceType()) {
-                    winner = PLAYER_2;
-                } else {
-                    winner = PLAYER_1;
-                }
-                if (rMyBoardVec2[i][j].GetPieceType() != PieceType::NONE && rMyBoardVec1[i][j].GetPieceType() == PieceType::BOMB) {
-                    winner = 0;
-                }
-                if (rMyBoardVec1[i][j].GetPieceType() != PieceType::NONE && rMyBoardVec2[i][j].GetPieceType() == PieceType::BOMB) {
-                    winner = 0;
-                }
-            }
-            charOfPlayer1 = PieceTypeToChar(rMyBoardVec1[i][j].GetPieceType());
-            charOfPlayer2 = PieceTypeToChar(rMyBoardVec2[i][j].GetPieceType());
-            PointRPS fightPosition(i,j);//maybe should pass a unique ptr to this instead of reference
-            std::unique_ptr<FightInfoRPS> fightInfoPtr =
-                 std::make_unique<FightInfoRPS>(fightPosition, charOfPlayer1, charOfPlayer2, winner);
-            rFightsInfoVec.push_back(std::move(fightInfoPtr));
-        }
+void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurrPlayer, std::unique_ptr<PlayerAlgorithm>& rpOppPlayer, BoardRPS& myBoard, ScoreManager& rScoreManager){
+    unique_ptr<Move> currMove = std::move(rpCurrPlayer->getMove());
+    if(currMove == nullptr){
+        //reached end of file for file-player. Go on normally with other player
+        //according to suggestion in the course forum
+        return;
     }
+    unique_ptr<FightInfo> fightInfo;
+    bool resultOfMoving = myBoard.movePiece(currPlayerNumber,currMove, fightInfo);
+     
+    if(resultOfMoving == false){
+        //announce loser
+        rScoreManager.DismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
+        return;
+    }
+    if(fightInfo!=nullptr){
+        //there was a fight
+        rpCurrPlayer->notifyFightResult(*fightInfo);
+        rpOppPlayer->notifyFightResult(*fightInfo);
+        rScoreManager.notifyFight(*fightInfo);
+    }
+    unique_ptr<JokerChange> jokerChange = rpCurrPlayer->getJokerChange();
+    //jokerChange->getJokerChangePosition()
+    myBoard.changeJoker(currPlayerNumber, jokerChange);
+    rScoreManager.notifyJokerChange(*jokerChange, ' ', currPlayerNumber); //TODO : edit parameters 
+    rpOppPlayer->notifyOnOpponentMove(*currMove);
 }
 
-int getWinnerOfAFight(PieceRPS& player1Piece, PieceRPS& player2Piece){
-    if(player1Piece > player2Piece){
-        return PLAYER_1;
-    }
-    else if(player1Piece <  player2Piece){
-        return PLAYER_2;
-    }
-    else{
-        return NO_WINNER;
-    }
-}
-
-void playCurrTurn(std::unique_ptr<PlayerAlgorithm> pCurrPlayer, std::unique_ptr<PlayerAlgorithm> pOppPlayer, BoardRPS& mergedBoard){
-    const Point& fromPosition = pCurrPlayer->getMove()->getFrom();
-    const Point& toPosition = pCurrPlayer->getMove()->getTo();
-    MoveRPS currMove(fromPosition, toPosition);
-    int oldX = fromPosition.getX();
-    int oldY = fromPosition.getY(); 
-    int newX = toPosition.getX();
-    int newY = toPosition.getY();
-    PieceRPS& movingPiece = mergedBoard.getBoard()[oldX][oldY];
-    PieceRPS& pieceAtDestination = mergedBoard.getBoard()[newX][newY];            
-    PlayerType movingPlayer = movingPiece.GetPlayerType();
-    if( mergedBoard.IsMoveLegal(oldX, oldY, newX, newY) ){
-        if( mergedBoard.isThereAFight(newX, newY) ){
-            FightInfoRPS fightInfo(toPosition, movingPiece.getPiece(), pieceAtDestination.getPiece(), getWinnerOfAFight(movingPiece, pieceAtDestination));
-            pCurrPlayer->notifyFightResult(fightInfo);
-            
-            unique_ptr<JokerChange> jokerChange = pCurrPlayer->getJokerChange();
-            char jokerNewRep = jokerChange->getJokerNewRep();
-            const Point& jokerChangePos = jokerChange->getJokerChangePosition();
-            mergedBoard.ChangeJoker(jokerChangePos, CharToPieceType(jokerNewRep));
-
-            pOppPlayer->notifyFightResult(fightInfo);
-        }
-        if(! mergedBoard.MovePiece(oldX, oldY, newX, newY)) {
-            //error couldn't make the move
-        }
-        pOppPlayer->notifyOnOpponentMove(currMove);
-    }
-    else{
-        //handle illegal move
-    }
-}
 
 // do no call this function with vCurrPlayer=1
 int getOppositePlayer(int vCurrPlayer){
@@ -113,28 +54,23 @@ int getOppositePlayer(int vCurrPlayer){
     return opp; 
 }
 
-bool isAFight(Board& rBoard, std::unique_ptr<Move> pMove, int vCurrPlayer){
-    const Point& destPoint = pMove->getTo();
-    int playerAtDest = rBoard.getPlayer(destPoint);
-    if(getOppositePlayer(vCurrPlayer) == playerAtDest){
-        return true;
+//assume we have scoreManager as a parameter
+void fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<unique_ptr<PiecePosition>>& positioningVec, std::vector<std::unique_ptr<FightInfo>>& rpFightInfoVec, ScoreManager& rScoreManager){
+    bool resultOfPositioning;
+    for(int i=0; i<positioningVec.size(); i++){
+        std::unique_ptr<FightInfo> thisFightInfo;
+        rScoreManager.increaseNumOfPieces(vCurrPlayer, positioningVec[i]->getPiece());
+        resultOfPositioning = rBoard.placePiece(vCurrPlayer, positioningVec[i], thisFightInfo);
+        if(resultOfPositioning == false){
+            //announce vCurrPlayer as losing
+            rScoreManager.DismissPlayer(vCurrPlayer, Reason::POSITION_FILE_ERROR);
+            return;
+        }
+        if(thisFightInfo != nullptr) {
+            rScoreManager.notifyFight(*thisFightInfo);
+            rpFightInfoVec.push_back(move(thisFightInfo));
+        }
     }
-    return false;
-}
-
-// may convert this function to a member function of BoardRPS, will be handled
-BoardRPS& fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<unique_ptr<PiecePosition>>& positioningVec){
-    for(std::vector<unique_ptr<PiecePosition>>::iterator itr = positioningVec.begin(); itr != positioningVec.end(); ++itr){
-        const Point& point = (*(itr))->getPosition();
-        int x = point.getX();
-        int y = point.getY();
-        char pieceChar = (*(itr))->getPiece();
-        PieceType pieceType = CharToPieceType(pieceChar);
-        char jokerRepChar = (*(itr))->getJokerRep();
-        bool isJoker = jokerRepChar==NON_JOKER_FLAG? false : true;
-        rBoard.PlacePiece(vCurrPlayer, pieceType, x, y, isJoker); //TODO: should ensure this function puts the piece on the board correctly
-    }
-    return rBoard;
 }
 
 int PlayRPS(int vGameStyle) {
@@ -170,31 +106,28 @@ int PlayRPS(int vGameStyle) {
     std::vector<unique_ptr<PiecePosition>> initPositionP1, initPositionP2;
     p1->getInitialPositions(PLAYER_1, initPositionP1);
     p2->getInitialPositions(PLAYER_2, initPositionP2);
-
-    BoardRPS board1(DIM_X, DIM_Y);
-    BoardRPS board2(DIM_X, DIM_Y);
-    BoardRPS mergedBoard(DIM_X, DIM_Y);
-    board1 = fillBoard(board1, PLAYER_1, initPositionP1);
-    board2 = fillBoard(board2, PLAYER_2, initPositionP2);
     std::vector<std::unique_ptr<FightInfo>> fightsInfoVec;
-    informAboutInitialFights(board1, board2, fightsInfoVec); //fills fightsInfoVec correctly
-    /*perform all initial fights*/
-    mergedBoard = mergedBoard.Merge(board1).Merge(board2); //performs all initial fights
+    ScoreManager scoreManager;
+    BoardRPS myBoard(DIM_X, DIM_Y);
+    fillBoard(myBoard, PLAYER_1, initPositionP1, fightsInfoVec, scoreManager);
+    fillBoard(myBoard, PLAYER_2, initPositionP2, fightsInfoVec, scoreManager);
 
-    p1->notifyOnInitialBoard(mergedBoard, fightsInfoVec);
-    p2->notifyOnInitialBoard(mergedBoard, fightsInfoVec);
+    p1->notifyOnInitialBoard(myBoard, fightsInfoVec);
+    p2->notifyOnInitialBoard(myBoard, fightsInfoVec);
+
     int currentPlayer = PLAYER_1;
     int turn = 0;
-    int thereIsAWinner = scoreChecker::getWinner();
-    while(turn < MAX_NUM_OF_MOVES && !thereIsAWinner){
+    while(turn < MAX_NUM_OF_MOVES && !scoreManager.isGameOver()){
         if(currentPlayer == PLAYER_1){
-            playCurrTurn(std::move(p1), std::move(p2), mergedBoard);
+            playCurrTurn(PLAYER_1, p1, p2, myBoard, scoreManager);
         }
         else{
-            playCurrTurn(std::move(p2), std::move(p1), mergedBoard);
+            playCurrTurn(PLAYER_2, p2, p1, myBoard, scoreManager);
         }
         currentPlayer = getOppositePlayer(currentPlayer);
-        turn++;
+        turn++;   
     }
+    int winner = scoreManager.getWinner();
+    const char* reason = scoreManager.getReasonOfFinalResult();
     return 1;
 }

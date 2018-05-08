@@ -4,22 +4,82 @@
 #include <sstream>
 FilePlayerAlgorithm::~FilePlayerAlgorithm(){}
 
-void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill){
-    if(player==1){
-        for(std::vector<unique_ptr<PiecePosition>>::iterator itr = _initialPositionsP1.begin(); itr != _initialPositionsP1.end(); ++itr){
-            vectorToFill.push_back(move(*itr)); //(*itr) is a unique ptr to a PiecePosition
-        }
-    }
-    if(player==2){
-        for(std::vector<unique_ptr<PiecePosition>>::iterator itr = _initialPositionsP2.begin(); itr != _initialPositionsP2.end(); ++itr){
-            vectorToFill.push_back(move(*itr)); //(*itr) is a unique ptr to a PiecePosition
-        }
-    }
+void FilePlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill){    
+	for(std::vector<unique_ptr<PiecePosition>>::iterator itr = _initialPositions.begin(); itr != _initialPositions.end(); ++itr){
+		vectorToFill.push_back(move(*itr)); //(*itr) is a unique ptr to a PiecePosition
+	}
+}
+/**
+ * returns null if moves file of this player ended while the other player still has some moves(if he's a file), or is a auto-player.
+ * returns a bad move if there was a bad line in moves file
+ * returns a Move otherwise
+ */
+unique_ptr<Move> FilePlayerAlgorithm::getMove(){
+	PointRPS badPointFrom(-1,-1);
+	PointRPS badPointTo(-2,-2);
+	unique_ptr<MoveRPS> badMove = std::make_unique<MoveRPS>(badPointFrom, badPointTo);
+	if(InitializeFile(_movesFilePath)!=Reason::SUCCESS){
+		//error in opening file
+		return std::move(badMove);
+	}
+	if(ParseMove(_current_player) != Reason::SUCCESS){
+		// a bad move in moves-file
+		return std::move(badMove);
+	}
+	//if reached here then it's a success:
+	if(IsEOF){
+		_jokerChange = nullptr; // same comment below
+		return nullptr;// http://moodle.tau.ac.il/mod/forum/discuss.php?d=60137 by the course convention, game should go on with the other player
+	}
+	return std::move(_nextMove); 
 }
 
-unique_ptr<Move> FilePlayerAlgorithm::getMove(){}
-unique_ptr<JokerChange> FilePlayerAlgorithm::getJokerChange(){}
+unique_ptr<JokerChange> FilePlayerAlgorithm::getJokerChange(){
+	return std::move(_jokerChange);
+}
 
+/**
+ * handles line error and file error the same: inserts a bad piece in pieces vector so that 
+ * game manager knows there is something wrong with this player
+ * */
+
+void FilePlayerAlgorithm::ManageParsePositionFile(){
+	std::unique_ptr<PieceRPS> badPiece = make_unique<PieceRPS>(this->_current_player, false, PieceType::PAPER, PointRPS(-1,-1));
+	if(InitializeFile(_positionFilePath) != Reason::SUCCESS){
+		//failed to open or find file
+		(this->_initialPositions).push_back(move(badPiece));
+		return;
+	}
+	if(ParsePositionFile(_current_player) != Reason::SUCCESS){
+		//there is a line error
+		(this->_initialPositions).push_back(move(badPiece));
+	}
+}
+
+
+
+Reason FilePlayerAlgorithm::InitializeFile(const char* filePath) { 
+	try {
+		_f.open(_positionFilePath); 
+	}
+	catch (...) {
+		return Reason::UNKNOWN_ERROR;
+	}
+	string line;
+	if (_f.is_open()) {
+		while (!_f.eof()) {
+			getline(_f, line);
+			if (TrimLine(line).size() > 0) {
+				_f.seekg(0, ios::beg);
+				_current_line = 0;
+				return Reason::SUCCESS;
+			}
+		}
+	} else {
+		return Reason::UNKNOWN_ERROR;
+	}
+	return Reason::FILE_ERROR;
+}
 
 string& TrimLine(string& s, const string& delmiters=" \f\n\r\t\v") {
 	return s.erase(s.find_last_not_of(delmiters) + 1).erase(0, s.find_first_not_of(delmiters));	
@@ -102,8 +162,7 @@ Reason FilePlayerAlgorithm::ParsePositionFile(int player) {
 		}
         PointRPS currPosition(x,y);
         unique_ptr<PieceRPS> pCurrPiece = std::make_unique<PieceRPS>(player, is_joker, piece_type, currPosition);
-        if(player==1)_initialPositionsP1.push_back(std::move(pCurrPiece));
-        if(player==2)_initialPositionsP2.push_back(std::move(pCurrPiece));
+		_initialPositions.push_back(std::move(pCurrPiece));
 	}
 	if (piece_count[int(PieceType::FLAG)-1] > 0) { //added -1 because Yotam changed the enum's indexing
 		return Reason::NO_FLAGS;
@@ -113,7 +172,7 @@ Reason FilePlayerAlgorithm::ParsePositionFile(int player) {
 
 
 
-Reason FilePlayerAlgorithm::ParseMoveFile(int player) {
+Reason FilePlayerAlgorithm::ParseMove(int player) {
 	// get a move from the file and parse it
 	const char delim = ' ';
 	const char* joker_str = "J:";
@@ -160,14 +219,16 @@ Reason FilePlayerAlgorithm::ParseMoveFile(int player) {
 			return Reason::LINE_ERROR;
 		}
 		new_j_type = CharToPieceType(s_line[7][0]);
+
+		PointRPS pointToChangeJoker(joker_x, joker_y);
+		_jokerChange = std::make_unique<JokerChangeRPS>(pointToChangeJoker, new_j_type);
+	}
+	else{ //no joker change
+		_jokerChange = nullptr;
 	}
     PointRPS pointFrom(from_x, from_y);
     PointRPS pointTo(to_x, to_y);
-    
-    _nextMoveP1 = std::make_unique<MoveRPS>(pointFrom, pointTo);
-/*
-	if (is_j_change && !_board->ChangeJoker(player->GetType(), joker_x, joker_y, new_j_type)) {
-		return Reason::LINE_ERROR;
-	}*/
+	_nextMove = std::make_unique<MoveRPS>(pointFrom, pointTo);
 	return Reason::SUCCESS;
 }
+

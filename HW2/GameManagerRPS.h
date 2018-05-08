@@ -47,35 +47,4 @@ enum class PlayerType {NONE=-1, PLAYER_1=1, PLAYER_2};
  * 
  */
 enum class PieceType {NONE=-1, ROCK=0, PAPER, SCISSORS, FLAG, BOMB, JOKER};
-
-class scoreChecker{
-   public:
-        static int player1_num_of_pieces, player1_num_of_flags, player2_num_of_pieces, player2_num_of_flags;
-
-    static void DecrementPieceCount(int player ,PieceType type){
-        if(type == PieceType::FLAG){
-            if(player == 1) {player1_num_of_flags--;}
-            else {player2_num_of_flags--;}
-        }
-        else if(type != PieceType::BOMB){
-            if(player == 1){player1_num_of_pieces--;}
-            else{player2_num_of_pieces--;}
-        } 
-    }
-    //TODO check if i need this function, most probably not
-    static void IncrementPieceCount(int player, PieceType type){
-        if(type == PieceType::FLAG) return;
-        if(player == 1) player1_num_of_pieces++;
-        else if(player ==2) player2_num_of_pieces++;
-    }
-    static int getWinner(){
-        if(player1_num_of_flags==0 || player1_num_of_pieces==0){
-            return 2;
-        }
-        if(player2_num_of_flags==0 || player2_num_of_pieces==0){
-            return 1;
-        }
-        return 0;
-    }
-};
 #endif // !__H_GAME_MANAGER_RPS

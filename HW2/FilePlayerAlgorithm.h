@@ -5,6 +5,7 @@
 #include "GameManagerRPS.h"
 #include "GameUtilitiesRPS.h"
 #include "MoveRPS.h"
+#include "JokerChangeRPS.h"
 #include <string>
 #include <fstream>
 
@@ -13,28 +14,29 @@ using namespace std;
 
 class FilePlayerAlgorithm : public PlayerAlgorithm {
 private:
-	unique_ptr<MoveRPS> _nextMoveP1;
-	unique_ptr<MoveRPS> _nextMoveP2;
-	vector<unique_ptr<PiecePosition>> _initialPositionsP1;
-	vector<unique_ptr<PiecePosition>> _initialPositionsP2;
-	const char* _file_path;
+	unique_ptr<MoveRPS> _nextMove;
+	unique_ptr<JokerChange> _jokerChange;
+	vector<unique_ptr<PiecePosition>> _initialPositions;
+	const char* _positionFilePath;
+	const char* _movesFilePath;
 	ifstream _f;
 	int _current_line;
+	int _current_player;
 public:
 	// C'tor
-	FilePlayerAlgorithm(const char* rPositionFileName, const char* rMoveFileName, int player){
-		ParsePositionFile(player);
+	FilePlayerAlgorithm(const char* positionFileName, const char* moveFileName, int player)
+	: _positionFilePath(positionFileName)
+	, _movesFilePath(moveFileName) 
+	, _current_line(0)
+	, _current_player(player)
+	{
+		ManageParsePositionFile();
 	}
     // D'tor
     ~FilePlayerAlgorithm();
     // Other
 	void setInitialPosition(int player, vector<unique_ptr<PiecePosition>>& initPosVec){
-		if(player==1){
-			_initialPositionsP1 = initPosVec;
-		}
-		if(player==2){
-			_initialPositionsP2 = initPosVec;
-		}
+		_initialPositions = initPosVec;
 	}
 
     void getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill);
@@ -43,12 +45,13 @@ public:
 	void notifyFightResult(const FightInfo& fightInfo){/*remains empty*/}
 	unique_ptr<Move> getMove();
 	unique_ptr<JokerChange> getJokerChange();
-
+	void ManageParsePositionFile();
 	Reason ParsePositionFile(int player);
+	Reason ParseMove(int player);
 	int GetCurrentLineNumber() { return _current_line; }
 	bool IsEOF() { return _f.eof(); }
 	Reason ReadLine(string& line);
-	Reason ParseMoveFile(int player);
+	Reason InitializeFile(const char* filePath);
 friend ostream& operator<<(ostream& output, const PlayerAlgorithm& p);
 };
 
