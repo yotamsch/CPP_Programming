@@ -3,7 +3,7 @@
 #include "GameUtilitiesRPS.h"
 class ScoreManager{
 private:
-    int _numOfPiecesPlayer1, _numOfPiecesPlayer2;
+    int _numOfMovingPiecesPlayer1, _numOfMovingPiecesPlayer2;
     int _numOfFlagsPlayer1, _numOfFlagsPlayer2;
     bool _isBadPositioningP1, _isBadPositioningP2;
     bool _isBadMoveP1, _isBadMoveP2;
@@ -11,11 +11,17 @@ private:
 
 public:
     ScoreManager()
-    :_numOfPiecesPlayer1(0)
-    ,_numOfPiecesPlayer2(0)
+    :_numOfMovingPiecesPlayer1(0)
+    ,_numOfMovingPiecesPlayer2(0)
     ,_numOfFlagsPlayer1(0)
-    ,_numOfFlagsPlayer2(0){
-    }
+    ,_numOfFlagsPlayer2(0)
+    ,_isBadPositioningP1(false)
+    ,_isBadPositioningP2(false)
+    ,_isBadMoveP1(false)
+    ,_isBadMoveP2(false)
+    ,_reasonOfFinalResult("")
+    {}
+
     void notifyFight(const FightInfo& rFightInfo);
     void notifyJokerChange(const JokerChange& rJokerChange, char jokerPreviousRep, int player);
     void DismissPlayer(int player, Reason reason);
@@ -27,4 +33,6 @@ public:
     bool isGameOver();
     int getWinner();
     const char* getReasonOfFinalResult();
+    void setBadPosition(int player);
+    void setBadMove(int player);
 };

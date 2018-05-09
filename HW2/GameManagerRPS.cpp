@@ -14,9 +14,7 @@
 
 #define PLAYER_1 1
 #define PLAYER_2 2
-#define NO_WINNER 0
-#define MAX_NUM_OF_MOVES 100
-#define NON_JOKER_FLAG '#'
+
 
 
 void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurrPlayer, std::unique_ptr<PlayerAlgorithm>& rpOppPlayer, BoardRPS& myBoard, ScoreManager& rScoreManager){
@@ -42,8 +40,9 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
     }
     unique_ptr<JokerChange> jokerChange = rpCurrPlayer->getJokerChange();
     //jokerChange->getJokerChangePosition()
+    char jokerPrevChar = myBoard.getPieceAt(jokerChange->getJokerChangePosition)->getJokerRep();
     myBoard.changeJoker(currPlayerNumber, jokerChange);
-    rScoreManager.notifyJokerChange(*jokerChange, ' ', currPlayerNumber); //TODO : edit parameters 
+    rScoreManager.notifyJokerChange(*jokerChange, jokerPrevChar, currPlayerNumber); 
     rpOppPlayer->notifyOnOpponentMove(*currMove);
 }
 
@@ -117,6 +116,8 @@ int PlayRPS(int vGameStyle) {
 
     int currentPlayer = PLAYER_1;
     int turn = 0;
+    int winner;
+    const char* reason;
     while(turn < MAX_NUM_OF_MOVES && !scoreManager.isGameOver()){
         if(currentPlayer == PLAYER_1){
             playCurrTurn(PLAYER_1, p1, p2, myBoard, scoreManager);
@@ -127,7 +128,14 @@ int PlayRPS(int vGameStyle) {
         currentPlayer = getOppositePlayer(currentPlayer);
         turn++;   
     }
-    int winner = scoreManager.getWinner();
-    const char* reason = scoreManager.getReasonOfFinalResult();
+    //if reached max number of turns without a result
+    if(turn >= MAX_NUM_OF_MOVES && !scoreManager.isGameOver()){
+        winner = NO_WINNER;
+        reason = RSN_MOVE_FILES_NO_WINNER;
+    }
+    else{ //game is indeed over with a result
+        winner = scoreManager.getWinner();
+        reason = scoreManager.getReasonOfFinalResult();
+    }
     return 1;
 }

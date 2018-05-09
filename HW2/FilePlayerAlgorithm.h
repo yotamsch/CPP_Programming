@@ -22,6 +22,7 @@ private:
 	ifstream _f;
 	int _current_line;
 	int _current_player;
+	bool isThisTheFirstMove;
 public:
 	// C'tor
 	FilePlayerAlgorithm(const char* positionFileName, const char* moveFileName, int player)
@@ -29,6 +30,7 @@ public:
 	, _movesFilePath(moveFileName) 
 	, _current_line(0)
 	, _current_player(player)
+	, isThisTheFirstMove(true)
 	{
 		ManageParsePositionFile();
 	}

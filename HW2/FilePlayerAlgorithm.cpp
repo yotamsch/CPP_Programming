@@ -18,9 +18,13 @@ unique_ptr<Move> FilePlayerAlgorithm::getMove(){
 	PointRPS badPointFrom(-1,-1);
 	PointRPS badPointTo(-2,-2);
 	unique_ptr<MoveRPS> badMove = std::make_unique<MoveRPS>(badPointFrom, badPointTo);
-	if(InitializeFile(_movesFilePath)!=Reason::SUCCESS){
-		//error in opening file
-		return std::move(badMove);
+	
+	if(isThisTheFirstMove){
+		if(InitializeFile(_movesFilePath)!=Reason::SUCCESS){
+			//error in opening file
+			return std::move(badMove);
+		}
+		isThisTheFirstMove = false;
 	}
 	if(ParseMove(_current_player) != Reason::SUCCESS){
 		// a bad move in moves-file
@@ -42,7 +46,6 @@ unique_ptr<JokerChange> FilePlayerAlgorithm::getJokerChange(){
  * handles line error and file error the same: inserts a bad piece in pieces vector so that 
  * game manager knows there is something wrong with this player
  * */
-
 void FilePlayerAlgorithm::ManageParsePositionFile(){
 	std::unique_ptr<PieceRPS> badPiece = make_unique<PieceRPS>(this->_current_player, false, PieceType::PAPER, PointRPS(-1,-1));
 	if(InitializeFile(_positionFilePath) != Reason::SUCCESS){
