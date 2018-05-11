@@ -10,15 +10,11 @@
  */
 bool PieceRPS::operator<(const PieceRPS& p) const
 {
-    if (p._piece_type != PieceType::NONE && this->_piece_type == PieceType::NONE || (p._piece_type == PieceType::ROCK && this->_piece_type == PieceType::SCISSORS) || (p._piece_type == PieceType::SCISSORS && this->_piece_type == PieceType::PAPER) || (p._piece_type == PieceType::PAPER && this->_piece_type == PieceType::ROCK) || (p._piece_type != PieceType::NONE && this->_piece_type == PieceType::FLAG) || p._piece_type == PieceType::BOMB) {
+    if ((p._piece_type == ROCK_CHR && this->_piece_type == SCISSORS_CHR) || (p._piece_type == SCISSORS_CHR && this->_piece_type == PAPER_CHR) || (p._piece_type == PAPER_CHR && this->_piece_type == ROCK_CHR) || 
+        (p._piece_type == BOMB_CHR && this->_piece_type != BOMB_CHR)) {
         return true;
     }
     return false;
-}
-
-bool PieceRPS::operator>(const PieceRPS& p) const
-{
-    return (*this) < p || this->_piece_type == p._piece_type ? false : true;
 }
 
 PieceRPS& PieceRPS::operator=(const PieceRPS& p)
@@ -31,7 +27,7 @@ PieceRPS& PieceRPS::operator=(const PieceRPS& p)
     return *this;
 }
 
-void PieceRPS::setType(PieceType type)
+void PieceRPS::setType(char type)
 {
     if (_is_joker) {
         _piece_type = type;
@@ -45,14 +41,14 @@ const Point& PieceRPS::getPosition() const
 
 char PieceRPS::getPiece() const
 {
-    return this->_is_joker ? PieceTypeToChar(PieceType::JOKER) : PieceTypeToChar(_piece_type);
+    return this->_is_joker ? JOKER_CHR : _piece_type;
 }
 
 char PieceRPS::getJokerRep() const
 {
     if (!_is_joker)
-        return NON_JOKER_FLAG;
-    return PieceTypeToChar(_piece_type);
+        return NON_JOKER_CHR;
+    return _piece_type;
 }
 
 /**
@@ -64,12 +60,11 @@ char PieceRPS::getJokerRep() const
  */
 std::ostream& operator<<(std::ostream& output, const PieceRPS& piece)
 {
-    PieceType type = piece._is_joker ? PieceType::JOKER : piece.getPieceType();
-    // TODO: concider moving to MACRO only, not enum (of player type)
-    if (piece.getPlayer() == (int)PlayerType::PLAYER_1) {
-        output << (char)toupper(PieceTypeToChar(type));
+    char type = piece.getPiece();
+    if (piece.getPlayer() == PLAYER_1) {
+        output << (char)toupper(type);
     } else {
-        output << (char)tolower(PieceTypeToChar(type));
+        output << (char)tolower(type);
     }
     return output;
 }

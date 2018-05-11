@@ -8,14 +8,14 @@
 
 class PieceRPS : public PiecePosition {
 private:
-    int _player;
-    bool _is_joker;
-    PieceType _piece_type;
-    PointRPS _position;
+    int _player; // the id of the owning player
+    bool _is_joker; // true iff this is a joker piece
+    char _piece_type; // the piece char or joker representation
+    PointRPS _position; // the location of the piece
 
 public:
     // basic c'tors
-    PieceRPS(int player, bool is_joker, PieceType type, const PointRPS& position)
+    PieceRPS(int player, bool is_joker, char type, const PointRPS& position)
         : _player(player) // 1 : player 1 | 2 : player 2
         , _is_joker(is_joker) // true iff this is joker piece
         , _piece_type(type) // the type R, P, S, B, F (no J)
@@ -32,14 +32,11 @@ public:
 
     // getters
     // get the player [currently enum]
-    // TODO: maybe change to 'int _player'
     int getPlayer() const { return this->_player; }
-    // get the piece type [currently enum]
-    PieceType getPieceType() const { return _piece_type; }
 
     // setters
     // set the type for joker pieces
-    void setType(PieceType type);
+    void setType(char type);
 
     // utility
     bool isJoker() { return _is_joker; }
@@ -48,7 +45,7 @@ public:
     // no need for equivalance operator
     // TODO: maybe implement anyway
     bool operator==(const PieceRPS& p) const = delete;
-    bool operator>(const PieceRPS& p) const;
+    bool operator>(const PieceRPS& p) const = delete;
     bool operator<(const PieceRPS& p) const;
 
     // interface defined functions

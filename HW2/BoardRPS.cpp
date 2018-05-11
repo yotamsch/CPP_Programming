@@ -28,10 +28,10 @@ int BoardRPS::getPlayer(const Point& pos) const
     return 0;
 }
 
-const std::unique_ptr<PieceRPS> const& BoardRPS::getPieceAt(const Point& point) {
-    return this->_board[p(point.getX(),point.getY())];
+const std::unique_ptr<PieceRPS>& BoardRPS::getPieceAt(const Point& point)
+{
+    return this->_board[p(point.getX(), point.getY())];
 }
-
 
 BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
 {
@@ -56,18 +56,16 @@ BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
 bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfo>& rpFightInfo)
 {
     // get needed information
-    bool is_joker = false;
     const int x = rpPiece->getPosition().getX();
     const int y = rpPiece->getPosition().getY();
-    // TODO: maybe want to stop uding conversion function
-    PieceType type = CharToPieceType(rpPiece->getPiece());
-    if (type == PieceType::JOKER) {
+    bool is_joker = false;
+    char type = rpPiece->getPiece();
+    if (type == JOKER_CHR) {
         is_joker = true;
-        type = CharToPieceType(rpPiece->getJokerRep());
+        type = rpPiece->getJokerRep();
     }
 
     // generate 'current piece'
-    // TODO: maybe there is a way around this
     std::unique_ptr<PieceRPS> rpCurrPiece = std::make_unique<PieceRPS>(player, is_joker, type, PointRPS(x, y));
 
     // initialize just to be sure
@@ -75,7 +73,7 @@ bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, s
     if (!isPositionValid(x, y)) {
         return false;
     }
-    if (is_joker && (type == PieceType::FLAG || type == PieceType::JOKER)) {
+    if (is_joker && (type == FLAG_CHR || type == JOKER_CHR)) {
         // joker cannot act like flag or joker
         return false;
     }
@@ -119,7 +117,7 @@ bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
     if (!isPositionValid(x, y, new_x, new_y) || this->_board[p(x, y)] == nullptr || this->_board[p(x, y)]->getPlayer() != player) {
         return false;
     }
-    if (this->_board[p(x, y)]->getPieceType() == PieceType::BOMB || this->_board[p(x, y)]->getPieceType() == PieceType::FLAG) {
+    if (this->_board[p(x, y)]->getPiece() == BOMB_CHR || this->_board[p(x, y)]->getPiece() == FLAG_CHR) {
         return false;
     }
     if (this->_board[p(new_x, new_y)] != nullptr && this->_board[p(x, y)]->getPlayer() == this->_board[p(new_x, new_y)]->getPlayer()) {
@@ -168,7 +166,7 @@ bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::u
     }
     // 'origin' piece won
     this->_board[p(new_x, new_y)] = std::move(this->_board[p(x, y)]);
-    // TODO: check if following line is needed
+    // place nullptr in origin (just in case)
     this->_board[p(x, y)] = nullptr;
     return true;
 }
@@ -177,13 +175,13 @@ bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChange>& rpJok
 {
     const int x = rpJokerChange->getJokerChangePosition().getX();
     const int y = rpJokerChange->getJokerChangePosition().getY();
-    const PieceType new_type = CharToPieceType(rpJokerChange->getJokerNewRep());
+    const char new_type = rpJokerChange->getJokerNewRep();
 
     if (!isPositionValid(x, y) || this->_board[p(x, y)] == nullptr) {
         // position is not valid or piece does not exist
         return false;
     }
-    if (this->_board[p(x, y)]->getPlayer() != player || !this->_board[p(x, y)]->isJoker() || new_type == PieceType::FLAG || new_type == PieceType::JOKER) {
+    if (this->_board[p(x, y)]->getPlayer() != player || !this->_board[p(x, y)]->isJoker() || new_type == FLAG_CHR || new_type == JOKER_CHR) {
         // the attempted joker change is not accepted
         return false;
     }
@@ -196,7 +194,11 @@ std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)
 {
     for (int y = 0; y < rBoard._n; ++y) {
         for (int x = 0; x < rBoard._m; ++x) {
-            output << *(rBoard._board[rBoard.p(x, y)]);
+            if (rBoard._board[rBoard.p(x, y)] == nullptr) {
+                output << ' ';
+            } else {
+                output << *(rBoard._board[rBoard.p(x, y)]);
+            }
         }
         output << std::endl;
     }

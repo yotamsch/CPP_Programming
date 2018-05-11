@@ -19,11 +19,6 @@ public:
     // gets the right values from both pieces and decides on the winner
     // assumes that (rPieceA->position == rPieceB->position)
     FightInfoRPS(PieceRPS& rPieceA, PieceRPS& rPieceB);
-    
-    //TODO: maybe should add a move constructor
-    FightInfoRPS& operator=(FightInfoRPS&& rValuefightInfo){
-        //TODO: implement!!
-    }
 
     // d'tor
     ~FightInfoRPS() {}

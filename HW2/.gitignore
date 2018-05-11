@@ -1,2 +1,5 @@
 # Custome ignores
 ex2
+.project
+*.rps*
+*.output

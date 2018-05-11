@@ -53,7 +53,7 @@ public:
     // TODO: maybe move assignment not needed
     BoardRPS& operator=(BoardRPS&& b);
     // gets a reference to the pointer of the piece at position (nullptr if no piece)
-    const std::unique_ptr<PieceRPS> const& getPieceAt(const Point& point);
+    const std::unique_ptr<PieceRPS>& getPieceAt(const Point& point);
     // place a piece into the board
     bool placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfo>& rpFightInfo);
     // move an existing piece on the board 'from' -> 'to'
