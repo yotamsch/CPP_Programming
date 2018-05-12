@@ -88,13 +88,13 @@ void fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
     }
 }
 
-int PlayRPS(int vGameStyle)
+int PlayRPS(int vGameStyle, const char* outfile_path = "./rps.output", const char* p1_posfile_path = "./player1.rps_board", const char* p2_posfile_path = "./player2.rps_board", const char* p1_movfile_path = "./player1.rps_moves", const char* p2_movfile_path = "./player2.rps_moves")
 {
-    const char* outfile_path = "./rps.output";
+    /*const char* outfile_path = "./rps.output";
     const char* p1_posfile_path = "./player1.rps_board";
     const char* p2_posfile_path = "./player2.rps_board";
     const char* p1_movfile_path = "./player1.rps_moves";
-    const char* p2_movfile_path = "./player2.rps_moves";
+    const char* p2_movfile_path = "./player2.rps_moves";*/
 
     std::unique_ptr<PlayerAlgorithm> p1;
     std::unique_ptr<PlayerAlgorithm> p2;
