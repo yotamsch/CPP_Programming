@@ -66,7 +66,7 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
 }
 
 // assume we have scoreManager as a parameter
-void fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<PiecePosition>>& positioningVec, std::vector<std::unique_ptr<FightInfo>>& rpFightInfoVec, ScoreManager& rScoreManager)
+bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<PiecePosition>>& positioningVec, std::vector<std::unique_ptr<FightInfo>>& rpFightInfoVec, ScoreManager& rScoreManager)
 {
     bool resultOfPositioning;
     char currPiece;
@@ -78,7 +78,7 @@ void fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
         if (resultOfPositioning == false) {
             // announce vCurrPlayer as losing
             rScoreManager.dismissPlayer(vCurrPlayer, Reason::POSITION_FILE_ERROR);
-            return;
+            return false;
         }
         rScoreManager.increaseNumOfPieces(vCurrPlayer, currPiece);
         if (thisFightInfo != nullptr) {
@@ -86,9 +86,11 @@ void fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
             rpFightInfoVec.push_back(std::move(thisFightInfo));
         }
     }
+    return true;
 }
 
-int PlayRPS(int vGameStyle, const char* outfile_path = "./rps.output", const char* p1_posfile_path = "./player1.rps_board", const char* p2_posfile_path = "./player2.rps_board", const char* p1_movfile_path = "./player1.rps_moves", const char* p2_movfile_path = "./player2.rps_moves")
+// TODO maybe get rid of the possibility of 'args'
+int PlayRPS(int vGameStyle, const char* outfile_path /*= "./rps.output"*/, const char* p1_posfile_path /*= "./player1.rps_board"*/, const char* p2_posfile_path /*= "./player2.rps_board"*/, const char* p1_movfile_path /*= "./player1.rps_moves"*/, const char* p2_movfile_path /*= "./player2.rps_moves"*/)
 {
     /*const char* outfile_path = "./rps.output";
     const char* p1_posfile_path = "./player1.rps_board";
@@ -101,9 +103,8 @@ int PlayRPS(int vGameStyle, const char* outfile_path = "./rps.output", const cha
     std::vector<std::unique_ptr<PiecePosition>> initPositionP1;
     std::vector<std::unique_ptr<PiecePosition>> initPositionP2;
     std::vector<std::unique_ptr<FightInfo>> fightsInfoVec;
-    int currentPlayer;
-    int turn;
-    int winner;
+    bool fillRes1, fillRes2;
+    int currentPlayer, turn, winner;
     const char* reason;
 
     switch (vGameStyle) {
@@ -134,8 +135,15 @@ int PlayRPS(int vGameStyle, const char* outfile_path = "./rps.output", const cha
     // TODO maybe create a unique_ptr of BoardRPS
     BoardRPS myBoard(DIM_X, DIM_Y);
 
-    fillBoard(myBoard, PLAYER_1, initPositionP1, fightsInfoVec, scoreManager);
-    fillBoard(myBoard, PLAYER_2, initPositionP2, fightsInfoVec, scoreManager);
+    fillRes1 = fillBoard(myBoard, PLAYER_1, initPositionP1, fightsInfoVec, scoreManager);
+    fillRes2 = fillBoard(myBoard, PLAYER_2, initPositionP2, fightsInfoVec, scoreManager);
+    // if any of the players had bad positioning
+    if (!fillRes1 || !fillRes2) {
+        myBoard.clearBoard();
+        winner = scoreManager.getWinner();
+        reason = scoreManager.getReasonOfFinalResult();
+        return outputGameResult(outfile_path, myBoard, winner, reason);
+    }
 
     // notify when game board was fully created
     p1->notifyOnInitialBoard(myBoard, fightsInfoVec);

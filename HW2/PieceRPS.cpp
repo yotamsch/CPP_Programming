@@ -11,7 +11,8 @@
 bool PieceRPS::operator<(const PieceRPS& p) const
 {
     if ((p._piece_type == ROCK_CHR && this->_piece_type == SCISSORS_CHR) || (p._piece_type == SCISSORS_CHR && this->_piece_type == PAPER_CHR) || (p._piece_type == PAPER_CHR && this->_piece_type == ROCK_CHR) || 
-        (p._piece_type == BOMB_CHR && this->_piece_type != BOMB_CHR)) {
+        (p._piece_type == BOMB_CHR && this->_piece_type != BOMB_CHR) ||
+        (p._piece_type != FLAG_CHR && this->_piece_type == FLAG_CHR)) {
         return true;
     }
     return false;

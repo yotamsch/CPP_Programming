@@ -52,6 +52,8 @@ public:
     // move assignment
     // TODO: maybe move assignment not needed
     BoardRPS& operator=(BoardRPS&& b);
+    // clears the board of pieces
+    void clearBoard();
     // gets a reference to the pointer of the piece at position (nullptr if no piece)
     const std::unique_ptr<PieceRPS>& getPieceAt(const Point& point);
     // place a piece into the board

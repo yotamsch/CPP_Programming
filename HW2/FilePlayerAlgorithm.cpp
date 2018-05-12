@@ -190,7 +190,7 @@ bool FilePlayerAlgorithm::parseMove(std::unique_ptr<Move>& rpMove)
             return false;
         }
         new_j_type = s_line[7][0];
-        if (new_j_type != ROCK_CHR || new_j_type != PAPER_CHR || new_j_type != SCISSORS_CHR || new_j_type != BOMB_CHR) {
+        if (new_j_type != ROCK_CHR && new_j_type != PAPER_CHR && new_j_type != SCISSORS_CHR && new_j_type != BOMB_CHR) {
             return false;
         }
         // create and place the joker change move

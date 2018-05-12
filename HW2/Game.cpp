@@ -36,14 +36,16 @@ int main(int argc, char** argv)
 
     if (!ava.compare(argv[1])) {
         gameResult = PlayRPS(AUTO_VS_AUTO);
-    }
-    else if (!fvf.compare(argv[1])) {
-        gameResult = PlayRPS(FILE_VS_FILE);
-    }
-    else if (!avf.compare(argv[1])) {
+    } else if (!fvf.compare(argv[1])) {
+        // TODO maybe get rid of the possibility of 'args'
+        if (argc >= 7) {
+            gameResult = PlayRPS(FILE_VS_FILE, argv[2], argv[3], argv[4], argv[5], argv[6]);
+        } else {
+            gameResult = PlayRPS(FILE_VS_FILE);
+        }
+    } else if (!avf.compare(argv[1])) {
         gameResult = PlayRPS(AUTO_VS_FILE);
-    }
-    else if (!fva.compare(argv[1])) {
+    } else if (!fva.compare(argv[1])) {
         gameResult = PlayRPS(FILE_VS_AUTO);
     } else {
         printMessageToScreen(ERROR, "The game type was not entered correctly.", BAD_ARGS_MESSAGE);

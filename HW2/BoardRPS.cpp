@@ -20,12 +20,11 @@ bool BoardRPS::isPositionValid(int x, int y, int new_x, int new_y)
     return true;
 }
 
-int BoardRPS::getPlayer(const Point& pos) const
+void BoardRPS::clearBoard()
 {
-    if (_board[p(pos.getX(), pos.getY())] != nullptr)
-        return _board[p(pos.getX(), pos.getY())]->getPlayer();
-    // return 0 if empty
-    return 0;
+    for (int i = 0; i < this->_board.size(); ++i) {
+        this->_board[i] = nullptr;
+    }
 }
 
 const std::unique_ptr<PieceRPS>& BoardRPS::getPieceAt(const Point& point)
@@ -188,6 +187,14 @@ bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChange>& rpJok
     // can change the piece type of the joker
     this->_board[p(x, y)]->setType(new_type);
     return true;
+}
+
+int BoardRPS::getPlayer(const Point& pos) const
+{
+    if (_board[p(pos.getX(), pos.getY())] != nullptr)
+        return _board[p(pos.getX(), pos.getY())]->getPlayer();
+    // return 0 if empty
+    return 0;
 }
 
 std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)

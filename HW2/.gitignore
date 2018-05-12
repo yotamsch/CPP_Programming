@@ -3,3 +3,4 @@ ex2
 .project
 *.rps*
 *.output
+*tests
