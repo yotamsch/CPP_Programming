@@ -1,0 +1,658 @@
+
+test_ 0
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+p         
+ s        
+  r       
+          
+    Ff    
+          
+          
+          
+          
+          
+
+test_ 1
+-----------
+Winner: 1
+Reason: All flags of the opponent are captured
+
+ p        
+ p        
+ pSF      
+          
+          
+          
+          
+          
+          
+          
+
+test_ 2
+-----------
+Winner: 0
+Reason: A tie - both Moves input files done without a winner
+
+ p        
+pSp       
+ pfF      
+          
+          
+          
+          
+          
+          
+          
+
+test_ 3
+-----------
+Winner: 0
+Reason: A tie - both Moves input files done without a winner
+
+  S       
+p         
+ pfF      
+          
+          
+          
+          
+          
+          
+          
+
+test_ 4
+-----------
+Winner: 0
+Reason: A tie - all flags are eaten by both players in the position files
+
+S         
+ s        
+          
+          
+          
+          
+          
+          
+          
+          
+
+test_ 5
+-----------
+Winner: 1
+Reason: All flags of the opponent are captured
+
+ R        
+          
+    j     
+          
+    pb    
+     J    
+ FB       
+          
+          
+          
+
+test_ 6
+-----------
+Winner: 0
+Reason: A tie - all moving PIECEs of both players are eaten
+
+          
+          
+          
+          
+          
+          
+          
+          
+       f  
+         F
+
+test_ 7
+-----------
+Winner: 2
+Reason: All flags of the opponent are captured
+
+Rp        
+p    P    
+  P       
+    Sr P  
+  Rp      
+    Ps    
+       r  
+p      BJ 
+bp     j  
+fb     J  
+
+test_ 8
+-----------
+Winner: 0
+Reason: A tie - all flags are eaten by both players in the position files
+
+         S
+          
+          
+    s     
+          
+          
+          
+          
+          
+          
+
+test_ 9
+-----------
+Winner: 2
+Reason: Bad move input for opponent
+
+Rp        
+p    P    
+  P       
+    Sr P  
+  Rp      
+    Ps    
+     P r  
+p     jB  
+bp     FJ 
+fb     J  
+
+test_ 10
+-----------
+Winner: 1
+Reason: Bad positioning input for opponent
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+
+test_ 11
+-----------
+Winner: 1
+Reason: Bad positioning input for opponent
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+
+test_ 12
+-----------
+Winner: 2
+Reason: Bad move input for opponent
+
+ p        
+p    P    
+  P       
+    Sr P  
+  Rp      
+    Ps    
+     P r  
+p         
+bp     FJ 
+fb     J  
+
+test_ 13
+-----------
+Winner: 2
+Reason: Bad move input for opponent
+
+ p        
+p    P    
+  P       
+    Sr P  
+  Rp      
+    Ps    
+     P r  
+p         
+bp   jBFJ 
+fb     J  
+
+test_ 14
+-----------
+Winner: 0
+Reason: Bad positioning input for both players
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+
+test_ 15
+-----------
+Winner: 1
+Reason: Bad move input for opponent
+
+Rp        
+p    P    
+  P       
+    Sr P  
+  Rp      
+    Ps    
+       r  
+p    PjB  
+bp   jBFJ 
+fb     J  
+
+test_ 16
+-----------
+Winner: 2
+Reason: Bad positioning input for opponent
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+
+test_ 17
+-----------
+Winner: 1
+Reason: Bad move input for opponent
+
+S         
+ F        
+  s       
+f         
+          
+          
+          
+          
+          
+          
+
+test_ 18
+-----------
+Winner: 1
+Reason: Bad move input for opponent
+
+Sj        
+ F        
+  s       
+f         
+          
+          
+          
+          
+          
+          
+
+test_ 19
+-----------
+Winner: 1
+Reason: Bad positioning input for opponent
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+
+test_ 20
+-----------
+Winner: 1
+Reason: Bad move input for opponent
+
+Sj        
+ F        
+          
+f s       
+          
+          
+          
+          
+          
+          
+
+test_ 21
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+  j       
+ F        
+  s       
+f         
+          
+          
+          
+          
+          
+          
+
+test_ 22
+-----------
+Winner: 1
+Reason: Bad move input for opponent
+
+ bR       
+ F        
+  s       
+f         
+          
+          
+          
+          
+          
+          
+
+case 2
+-----------
+Winner: 2
+Reason: All flags of the opponent are captured
+
+  j       
+          
+ f  P     
+r         
+          
+ S        
+          
+          
+          
+          
+
+case 3
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+          
+ r        
+  F       
+   f      
+          
+          
+          
+          
+          
+          
+
+case 4
+-----------
+Winner: 0
+Reason: A tie - both Moves input files done without a winner
+
+f         
+ R        
+  F       
+p         
+          
+          
+          
+          
+          
+          
+
+case 5
+-----------
+Winner: 2
+Reason: Bad positioning input for opponent
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+
+case 6
+-----------
+Winner: 0
+Reason: Bad positioning input for both players
+
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+
+case 7
+-----------
+Winner: 0
+Reason: A tie - all flags are eaten by both players in the position files
+
+          
+rR        
+s         
+          
+          
+          
+          
+          
+          
+          
+
+case 8
+-----------
+Winner: 1
+Reason: Bad move input for opponent
+
+f         
+Sr F      
+          
+   P      
+          
+          
+          
+          
+          
+          
+
+case 9
+-----------
+Winner: 2
+Reason: All flags of the opponent are captured
+
+  j       
+          
+ f  P     
+r         
+          
+ S        
+          
+          
+          
+          
+
+case 10
+-----------
+Winner: 1
+Reason: Bad move input for opponent
+
+f         
+r         
+sR        
+F         
+          
+          
+          
+          
+          
+          
+
+case 11
+-----------
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+  R       
+J f       
+          
+          
+          
+          
+          
+          
+          
+
+case 13
+-----------
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
+
+J         
+ S        
+F J       
+f         
+          
+          
+          
+          
+          
+          
+
+case 14
+-----------
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+ f        
+J         
+R         
+          
+          
+          
+          
+          
+          
+
+case 15
+-----------
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+J         
+ f        
+          
+          
+          
+          
+          
+          
+          
+
+case 16
+-----------
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+J         
+ fS       
+          
+          
+          
+          
+          
+          
+          
+
+case 17
+-----------
+Winner: 1
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+J         
+ f        
+          
+          
+          
+          
+          
+          
+          
+
+case 18
+-----------
+Winner: 2
+Reason: All moving PIECEs of the opponent are eaten
+
+F         
+ p        
+          
+r  f      
+          
+          
+          
+          
+          
+          
+
+case 19
+-----------
+Winner: 0
+Reason: A tie - both Moves input files done without a winner
+
+          
+j   s     
+J F       
+  f       
+          
+          
+          
+          
+          
+          
+
+case 20
+-----------
+Winner: 0
+Reason: A tie - both Moves input files done without a winner
+
+          
+j   s     
+J F       
+  f       
+          
+          
+          
+          
+          
+          
+
+- End -

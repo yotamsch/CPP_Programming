@@ -62,12 +62,27 @@ void OutputResult(const char* path, const string info, const Board& b) {
 	}
 }
 
-int main() {
-    const char* outfile_path = "./rps.output";
-    const char* p1_posfile_path = "./player1.rps_board";
-    const char* p2_posfile_path = "./player2.rps_board";
-    const char* p1_movfile_path = "./player1.rps_moves";
-    const char* p2_movfile_path = "./player2.rps_moves";
+int main(int argc, char** argv) {
+    const char* outfile_path;
+    const char* p1_posfile_path;
+    const char* p2_posfile_path;
+    const char* p1_movfile_path;
+    const char* p2_movfile_path;
+
+    if (argc >= 6) {
+        outfile_path = argv[1];
+        p1_posfile_path = argv[2];
+        p2_posfile_path = argv[3];
+        p1_movfile_path = argv[4];
+        p2_movfile_path = argv[5];
+    }
+    else {
+        outfile_path = "./rps.output";
+        p1_posfile_path = "./player1.rps_board";
+        p2_posfile_path = "./player2.rps_board";
+        p1_movfile_path = "./player1.rps_moves";
+        p2_movfile_path = "./player2.rps_moves";
+    }
 
     string msg_reason; // will have reason message
     Reason p1_reason, p2_reason;

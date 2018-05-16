@@ -6,12 +6,12 @@ FightInfoRPS::FightInfoRPS(PieceRPS& rPieceA, PieceRPS& rPieceB)
     , _winner(0) // initialize - no winner
 {
     // position was set based on rPieceA (should be equal to rPieceB)
-    this->_pieceChar[0] = rPieceA.getPlayer() == PLAYER_1 ? rPieceA.getPiece() : rPieceB.getPiece();
-    this->_pieceChar[1] = rPieceA.getPlayer() == PLAYER_1 ? rPieceB.getPiece() : rPieceA.getPiece();
+    this->_pieceChar[0] = getActualPiece(rPieceA.getPlayer() == PLAYER_1 ? rPieceA : rPieceB);
+    this->_pieceChar[1] = getActualPiece(rPieceA.getPlayer() == PLAYER_1 ? rPieceB : rPieceA);
 
     // find winner if both pieces are different and no one is BOMB
     // norice that if one is bomb then 'both lose'
-    if (rPieceA.getPiece() != rPieceB.getPiece() && rPieceA.getPiece() != BOMB_CHR && rPieceB.getPiece() != BOMB_CHR) {
+    if (this->_pieceChar[0] != this->_pieceChar[1] && this->_pieceChar[0] != BOMB_CHR && this->_pieceChar[1] != BOMB_CHR) {
         this->_winner = rPieceA < rPieceB ? rPieceB.getPlayer() : rPieceA.getPlayer();
     }
 
@@ -34,4 +34,11 @@ char FightInfoRPS::getPiece(int player) const
 int FightInfoRPS::getWinner() const
 {
     return _winner;
+}
+
+char FightInfoRPS::getActualPiece(PieceRPS& p) {
+    if (p.isJoker()) {
+        return p.getJokerRep();
+    }
+    return p.getPiece();
 }

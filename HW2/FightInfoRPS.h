@@ -30,6 +30,9 @@ public:
     char getPiece(int player) const; // R, P, S, B or F (but NOT J)
     // get the winner of the fight
     int getWinner() const;
+
+private:
+    char getActualPiece (PieceRPS& p);
 };
 
 #endif // !__H_FIGHT_INFO_RPS

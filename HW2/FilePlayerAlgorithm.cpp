@@ -83,8 +83,8 @@ bool FilePlayerAlgorithm::parsePositions(int player, std::vector<std::unique_ptr
     // where amount is a reverse counter (limit -> 0)
     std::map<char, int> piece_count = { { ROCK_CHR, ROCK_LIMIT }, { PAPER_CHR, PAPER_LIMIT }, { SCISSORS_CHR, SCISSORS_LIMIT }, { FLAG_CHR, FLAG_LIMIT }, { BOMB_CHR, BOMB_LIMIT }, { JOKER_CHR, JOKER_LIMIT } };
 
-    // while not in the end of the file
-    while (!_f_pos.eof()) {
+    // while file is open and not in the end of the file
+    while (_f_pos.is_open() && !_f_pos.eof()) {
         is_joker = false;
         if (!readLine(this->_f_pos, line)) {
             return false;

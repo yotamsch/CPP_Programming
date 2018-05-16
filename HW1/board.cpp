@@ -206,7 +206,7 @@ bool Board::ChangeJoker(PlayerType p_type, int x, int y, PieceType new_type) {
         return false;
     }
     Piece& piece = _board[x][y];
-    if (piece.GetPlayerType() == p_type || !piece.IsJoker() || new_type == PieceType::FLAG || new_type == PieceType::JOKER) {
+    if (piece.GetPlayerType() != p_type || !piece.IsJoker() || new_type == PieceType::FLAG || new_type == PieceType::JOKER) {
         return false;
     }
     piece.SetType(new_type); // handles joker piece count

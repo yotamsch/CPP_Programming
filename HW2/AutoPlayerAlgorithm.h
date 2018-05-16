@@ -18,11 +18,16 @@ class AutoPlayerAlgorithm : public PlayerAlgorithm {
 private:
     // data structures
     struct piece {
-        int _M_player;
-        bool _M_isJoker;
-        char _M_piece;
+        int _M_player = 0;
+        bool _M_isJoker = false;
+        char _M_piece = '\0';
+    };
+    struct move {
+        int _M_from = -1;
+        int _M_to = -1;
     };
 
+// TODO maybe convert to std::vector<std::unique_ptr<...>>
 private:
     // the player identifier
     int _player;
@@ -31,6 +36,12 @@ private:
     // will have the positions of the player pieces on the board
     // needs to update regularly
     std::set<int> _playerPieces;
+    std::set<int> _oppPieces;
+    // the pieces which are thought to be flags
+    std::set<int> _playerFlags;
+    std::set<int> _oppFlags;
+    // will have the move history of the opponent
+    std::vector<move> _oppMoveHistory;
 
 public:
     // basic c'tor
@@ -62,8 +73,24 @@ public:
 private:
     int getPositionNotSelectedYet() const;
     void positionPiecesOfType(int vLimit, char vType, std::vector<unique_ptr<PiecePosition>>& vectorToFill);
-    void removePlayerPiece(int pos);
+    void removePiece(int pos);
     void editPieceInPosition(int vPos, int vPlayer, char vType = '\0', bool vIsJoker = false);
+
+    // attempting to locate flags, and update flag statistics
+    void updateEnemyFlagsStat(int vPos);
+    // is the proposed move legal
+    bool isMovePossible(int vOriginPos, int vDestPos);
+    // get integers of the possible moves of a piece at position
+    void getPossibleMovesForPiece(int vPos, std::vector<int>& rMoves);
+    // is a piece at position in danger
+    bool isPieceInDanger(int vPos);
+    // will the origin piece win the fight against the destination piece
+    bool willWinFight(int vOriginPos, int vDestPos);
+    // get the L2 distance from the given piece to the pieces of the opponent (other player)
+    float calcL2Distance(int vPlayer, int vPos);
+    // calculate the "score" for a board representation
+    float calcPlayerBoardScore(int vPlayer, std::vector<piece>& rBoard);
+
     // get the x dimention parameter from a unified position
     static int getXDim(int vPos);
     // get the y dimention parameter from a unified position
@@ -71,7 +98,7 @@ private:
     // get the unified position parameter
     static int getPos(int vX, int vY);
     // get a random possible joker representation
-    static char getRandomJokerPieceType();
+    static char getRandomJokerRep();
     // get a random position on the board by the boarrd dimensions
     static int getRandomPos();
 };

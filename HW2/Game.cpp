@@ -15,7 +15,8 @@
 // Prints a message to the screen with the desired label type
 void printMessageToScreen(const std::string&& rrType, const std::string&& rrMsg, const std::string&& rrInfo = "")
 {
-    std::cout << rrType << " " << rrMsg << " " << rrInfo << std::endl;
+    std::cout << rrType << " " << rrMsg << std::endl;
+    if (rrInfo.compare("")) std::cout << "\t" << rrInfo << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -28,10 +29,10 @@ int main(int argc, char** argv)
 
     if (argc < 2) {
         printMessageToScreen(ERROR, "No play type was entered.", BAD_ARGS_MESSAGE);
-        // printMessageToScreen(INFO, BAD_ARGS_MESSAGE);
         return 1; // exit in case of error
     }
 
+    // TODO maybve remove before submission
     printMessageToScreen(INFO, argv[1]);
 
     if (!ava.compare(argv[1])) {
@@ -48,8 +49,7 @@ int main(int argc, char** argv)
     } else if (!fva.compare(argv[1])) {
         gameResult = PlayRPS(FILE_VS_AUTO);
     } else {
-        printMessageToScreen(ERROR, "The game type was not entered correctly.", BAD_ARGS_MESSAGE);
-        // printMessageToScreen(INFO, BAD_ARGS_MESSAGE);
+        printMessageToScreen(ERROR, "The play type was not entered correctly.", BAD_ARGS_MESSAGE);
         return 1;
     }
     if (gameResult != 0) {

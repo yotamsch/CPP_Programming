@@ -48,6 +48,8 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
         rScoreManager.dismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
         return;
     }
+    // notify the opponent on a move
+    rpOppPlayer->notifyOnOpponentMove(*currMove);
     if (fightInfo != nullptr) {
         // there was a fight
         rpCurrPlayer->notifyFightResult(*fightInfo);
@@ -61,8 +63,6 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
         myBoard.changeJoker(currPlayerNumber, jokerChange);
         rScoreManager.notifyJokerChange(*jokerChange, jokerPrevChar, currPlayerNumber);
     }
-    // notify the opponent on a move
-    rpOppPlayer->notifyOnOpponentMove(*currMove);
 }
 
 // assume we have scoreManager as a parameter
@@ -73,7 +73,7 @@ bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
     std::unique_ptr<FightInfo> thisFightInfo;
 
     for (int i = 0; i < positioningVec.size(); i++) {
-        currPiece = positioningVec[i]->getPiece();
+        currPiece = positioningVec[i]->getPiece() == JOKER_CHR ? positioningVec[i]->getJokerRep() : positioningVec[i]->getPiece();
         resultOfPositioning = rBoard.placePiece(vCurrPlayer, positioningVec[i], thisFightInfo);
         if (resultOfPositioning == false) {
             // announce vCurrPlayer as losing

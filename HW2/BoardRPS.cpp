@@ -116,7 +116,7 @@ bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
     if (!isPositionValid(x, y, new_x, new_y) || this->_board[p(x, y)] == nullptr || this->_board[p(x, y)]->getPlayer() != player) {
         return false;
     }
-    if (this->_board[p(x, y)]->getPiece() == BOMB_CHR || this->_board[p(x, y)]->getPiece() == FLAG_CHR) {
+    if (this->_board[p(x, y)]->getPiece() == BOMB_CHR || this->_board[p(x, y)]->getPiece() == FLAG_CHR || this->_board[p(x,y)]->getJokerRep() == BOMB_CHR) {
         return false;
     }
     if (this->_board[p(new_x, new_y)] != nullptr && this->_board[p(x, y)]->getPlayer() == this->_board[p(new_x, new_y)]->getPlayer()) {
@@ -242,7 +242,8 @@ void BoardRPS::prettyPrint()
         for (int x = 0; x < _m; ++x) {
             if (x % 2 == 1)
                 std::cout << " ";
-            std::cout << "[" << *(this->_board[p(x, y)]) << "]";
+            if (this->_board[p(x, y)] != nullptr) std::cout << "[" << *(this->_board[p(x, y)]) << "]";
+            else std::cout << "[ ]";
             if (x % 2 == 1)
                 std::cout << " ";
         }

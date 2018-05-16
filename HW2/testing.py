@@ -19,7 +19,7 @@ t_exp = "%s/expected.txt" % (prefix)
 f_res = open(t_res, "w")
 f_exp = open(t_exp, "w")
 
-for i in range(0,16):
+for i in range(0,23):
     s1 = "%s/test_%d/%s" % (prefix, i, suffix_p1)
     s2 = "%s/test_%d/%s" % (prefix, i, suffix_p2)
     s3 = "%s/test_%d/%s" % (prefix, i, suffix_m1)
@@ -38,6 +38,31 @@ for i in range(0,16):
     f_exp.write("\ntest_ %d\n-----------\n" % i)
     f_res.writelines(lines_out)
     f_exp.writelines(lines_expected)
+
+### TALA ###
+for i in range(2,21):
+    if i==12:
+        # why?
+        continue
+    s1 = "%s/case%d/%s" % (prefix, i, suffix_p1)
+    s2 = "%s/case%d/%s" % (prefix, i, suffix_p2)
+    s3 = "%s/case%d/%s" % (prefix, i, suffix_m1)
+    s4 = "%s/case%d/%s" % (prefix, i, suffix_m2)
+    s_orig = "%s/case%d/rps.expected" % (prefix, i)
+    action = ["./ex2", mode, out_path, s1, s2, s3, s4]
+    print("\ncase %d:\n\t%s" % (i, action))
+    code = subprocess.call(action)
+    if code == 1:
+        continue
+    f_out = open(out_path,"r")
+    lines_out = f_out.readlines()
+    f_orig = open(s_orig, "r")
+    lines_expected = f_orig.readlines()
+    f_res.write("\ncase %d\n-----------\n" % i)
+    f_exp.write("\ncase %d\n-----------\n" % i)
+    f_res.writelines(lines_out)
+    f_exp.writelines(lines_expected)
+############
 
 f_res.write("\n- End -")
 f_exp.write("\n- End -")
