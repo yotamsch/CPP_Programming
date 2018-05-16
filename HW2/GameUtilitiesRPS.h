@@ -64,6 +64,7 @@
 // gameplay related
 #define MAX_NUM_OF_MOVES 100
 #define GAME_IS_STILL_ON -1
+#define MAX_DEPTH 1
 
 /**
  * @brief An enum representing the returned reason of gameplay functions

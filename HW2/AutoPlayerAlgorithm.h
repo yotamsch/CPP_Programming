@@ -79,17 +79,23 @@ private:
     // attempting to locate flags, and update flag statistics
     void updateEnemyFlagsStat(int vPos);
     // is the proposed move legal
-    bool isMovePossible(int vOriginPos, int vDestPos);
+    bool isMovePossible(std::vector<piece>& rBoard, int vOriginPos, int vDestPos);
     // get integers of the possible moves of a piece at position
-    void getPossibleMovesForPiece(int vPos, std::vector<int>& rMoves);
+    void getPossibleMovesForPiece(std::vector<piece>& rBoard, int vPos, std::vector<int>& rMoves);
     // is a piece at position in danger
     bool isPieceInDanger(int vPos);
     // will the origin piece win the fight against the destination piece
     bool willWinFight(int vOriginPos, int vDestPos);
     // get the L2 distance from the given piece to the pieces of the opponent (other player)
     float calcL2Distance(int vPlayer, int vPos);
+    // performs a move on a given board
+    void performMoveOnBoard(std::vector<piece>& rBoard, move vMove);
     // calculate the "score" for a board representation
     float calcPlayerBoardScore(int vPlayer, std::vector<piece>& rBoard);
+    // gets the score for a move to be performed on a board
+    float getScoreForMove(int player, std::vector<piece> vBoard, move vMove);
+    // calculate the best move for a player to perform
+    move getBestMoveForPlayer(std::vector<piece>& rBoard, int player, int depth);
 
     // get the x dimention parameter from a unified position
     static int getXDim(int vPos);

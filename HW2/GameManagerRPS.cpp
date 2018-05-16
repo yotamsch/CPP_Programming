@@ -163,7 +163,7 @@ int PlayRPS(int vGameStyle, const char* outfile_path /*= "./rps.output"*/, const
         default:
             break;
         }
-        currentPlayer = (currentPlayer + 1) % (NUM_OF_PLAYERS + 1) + 1;
+        currentPlayer = (currentPlayer % NUM_OF_PLAYERS) + 1;
         ++turn;
     }
 

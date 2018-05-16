@@ -9,6 +9,7 @@
 #include "GameUtilitiesRPS.h"
 #include "PieceRPS.h"
 #include "PointRPS.h"
+#include "MoveRPS.h"
 
 #include <random>
 
@@ -51,7 +52,7 @@ void AutoPlayerAlgorithm::updateEnemyFlagsStat(int vPos)
     }
 }
 
-bool AutoPlayerAlgorithm::isMovePossible(int vOriginPos, int vDestPos)
+bool AutoPlayerAlgorithm::isMovePossible(std::vector<AutoPlayerAlgorithm::piece>& rBoard, int vOriginPos, int vDestPos)
 {
     int x, y, n_x, n_y;
     x = getXDim(vOriginPos);
@@ -62,39 +63,39 @@ bool AutoPlayerAlgorithm::isMovePossible(int vOriginPos, int vDestPos)
     if (n_x >= DIM_X || n_x < 0 || n_y >= DIM_Y || n_y < 0) {
         return false;
     }
-    if (this->_playerPieces.count(vDestPos) != 0) {
+    if (rBoard[vOriginPos]._M_player = rBoard[vDestPos]._M_player || rBoard[vOriginPos]._M_piece == FLAG_CHR || rBoard[vOriginPos]._M_piece == BOMB_CHR) {
         return false;
     }
-    if (this->_knownBoard[vDestPos]._M_player == 0) {
+    if (rBoard[vDestPos]._M_player == 0) {
         return true;
     }
     return willWinFight(vOriginPos, vDestPos);
 }
 
-void AutoPlayerAlgorithm::getPossibleMovesForPiece(int vPos, std::vector<int>& rMoves)
+void AutoPlayerAlgorithm::getPossibleMovesForPiece(std::vector<AutoPlayerAlgorithm::piece>& rBoard, int vPos, std::vector<int>& rMoves)
 {
     int x, y;
 
-    if (this->_knownBoard[vPos]._M_player != this->_player) {
+    if (rBoard[vPos]._M_player != this->_player) {
         return;
     }
     x = getXDim(vPos);
     y = getYDim(vPos);
 
     // x+1,y
-    if (isMovePossible(vPos, getPos(x + 1, y))) {
+    if (isMovePossible(rBoard, vPos, getPos(x + 1, y))) {
         rMoves.push_back(getPos(x + 1, y));
     }
     // x-1,y
-    if (isMovePossible(vPos, getPos(x - 1, y))) {
+    if (isMovePossible(rBoard, vPos, getPos(x - 1, y))) {
         rMoves.push_back(getPos(x - 1, y));
     }
     // x,y+1
-    if (isMovePossible(vPos, getPos(x, y + 1))) {
+    if (isMovePossible(rBoard, vPos, getPos(x, y + 1))) {
         rMoves.push_back(getPos(x, y + 1));
     }
     // x,y-1
-    if (isMovePossible(vPos, getPos(x, y - 1))) {
+    if (isMovePossible(rBoard, vPos, getPos(x, y - 1))) {
         rMoves.push_back(getPos(x, y - 1));
     }
 }
@@ -182,6 +183,53 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(int vPlayer, std::vector<AutoPla
 }
 
 // TODO create the recursion algorithm to find the best move
+void AutoPlayerAlgorithm::performMoveOnBoard(std::vector<AutoPlayerAlgorithm::piece>& rBoard, AutoPlayerAlgorithm::move vMove) {
+    // TODO check all cases are handled
+    rBoard[vMove._M_to] = rBoard[vMove._M_from];
+
+    rBoard[vMove._M_from]._M_player = NO_PLAYER;
+    rBoard[vMove._M_from]._M_isJoker = false;
+    rBoard[vMove._M_from]._M_piece = '\0';
+}
+
+float AutoPlayerAlgorithm::getScoreForMove(int player, std::vector<AutoPlayerAlgorithm::piece> vBoard, AutoPlayerAlgorithm::move vMove) {
+    // check if a piece exists
+    if (vBoard[vMove._M_from]._M_player == NO_PLAYER) {
+        return 0.0f;
+    }
+    performMoveOnBoard(vBoard, vMove);
+    return calcPlayerBoardScore(player, vBoard);
+}
+
+AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(std::vector<AutoPlayerAlgorithm::piece>& rBoard, int player, int depth) {
+    AutoPlayerAlgorithm::move currMove, maxMove;
+    std::set<int>& playerPices = player == this->_player ? this->_playerPieces : this->_oppPieces;
+    int nextPlayer = (player % NUM_OF_PLAYERS) + 1;
+    std::vector<int> possibleMoves;
+    float currScore = 0, maxScore = 0;
+
+    // TODO notice that might need to update the list of pieces for player
+    for (auto pos : playerPices) {
+        getPossibleMovesForPiece(rBoard, pos, possibleMoves);
+        for (auto mov : possibleMoves) {
+            currMove._M_from = pos;
+            currMove._M_to = mov;
+            currScore = getScoreForMove(player, rBoard, currMove);
+            if (currScore > maxScore) {
+                maxMove._M_from = currMove._M_from;
+                maxMove._M_to = currMove._M_to;
+            }
+        }
+    }
+    if (depth >= MAX_DEPTH && depth % 2 == 1) {
+        // go over all moves and choose the maximum score, return the move
+        return maxMove;
+    }
+    // perfom move
+    performMoveOnBoard(rBoard, maxMove);
+    // do next level
+    return getBestMoveForPlayer(rBoard, nextPlayer, ++depth);
+}
 
 void AutoPlayerAlgorithm::positionPiecesOfType(int vLimit,
     char vType, std::vector<unique_ptr<PiecePosition>>& vectorToFill)
@@ -346,6 +394,13 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo& fightInfo)
 
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
+    std::vector<AutoPlayerAlgorithm::piece> tempBoard = this->_knownBoard;
+    AutoPlayerAlgorithm::move bestMove = getBestMoveForPlayer(tempBoard, this->_player, 1);
+    if (bestMove._M_from == -1 || bestMove._M_to == -1) {
+        return nullptr;
+    }
+    std::unique_ptr<Move> retMove = std::make_unique<MoveRPS>(PointRPS(getXDim(bestMove._M_from), getYDim(bestMove._M_from)), PointRPS(getXDim(bestMove._M_to), getYDim(bestMove._M_to)));
+    return std::move(retMove);
 }
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
