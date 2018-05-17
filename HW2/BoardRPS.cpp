@@ -82,7 +82,7 @@ bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, s
             return false;
         }
         // a fight exists
-        rpFightInfo = std::make_unique<FightInfoRPS>(*this->_board[p(x, y)], *rpCurrPiece);
+        rpFightInfo = std::make_unique<FightInfoRPS>(*this->_board[p(x, y)], *rpCurrPiece, PointRPS(x,y));
         if (rpFightInfo->getWinner() == this->_board[p(x, y)]->getPlayer()) {
             // existing player won
             rpPiece = nullptr;
@@ -116,7 +116,7 @@ bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
     if (!isPositionValid(x, y, new_x, new_y) || this->_board[p(x, y)] == nullptr || this->_board[p(x, y)]->getPlayer() != player) {
         return false;
     }
-    if (this->_board[p(x, y)]->getPiece() == BOMB_CHR || this->_board[p(x, y)]->getPiece() == FLAG_CHR || this->_board[p(x,y)]->getJokerRep() == BOMB_CHR) {
+    if (this->_board[p(x, y)]->getPiece() == BOMB_CHR || this->_board[p(x, y)]->getPiece() == FLAG_CHR || this->_board[p(x, y)]->getJokerRep() == BOMB_CHR) {
         return false;
     }
     if (this->_board[p(new_x, new_y)] != nullptr && this->_board[p(x, y)]->getPlayer() == this->_board[p(new_x, new_y)]->getPlayer()) {
@@ -150,7 +150,7 @@ bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::u
         rpFightInfo = nullptr;
     } else {
         // there is a fight
-        rpFightInfo = std::make_unique<FightInfoRPS>(*(this->_board[p(new_x, new_y)]), *(this->_board[p(x, y)]));
+        rpFightInfo = std::make_unique<FightInfoRPS>(*(this->_board[p(new_x, new_y)]), *(this->_board[p(x, y)]), PointRPS(new_x, new_y));
         if (rpFightInfo->getWinner() == this->_board[p(new_x, new_y)]->getPlayer()) {
             // destination piece won : empty 'origin' piece
             this->_board[p(x, y)] = nullptr;
@@ -213,41 +213,32 @@ std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)
 }
 
 /**
- * @brief Helper function for BoardRPS::PrettyPrint(). prints a line of dashes based on the number of columns
- * 
- * @param columns An integer
- */
-void printLineOfDashes(int columns)
-{
-    std::cout << "\t";
-    for (int i = 0; i < (columns * 4 - 1); ++i) {
-        std::cout << "-";
-    }
-    std::cout << std::endl;
-}
-
-/**
  * @brief Prints the board.
  * 
  */
 void BoardRPS::prettyPrint()
 {
-    if (this->_n == 0 && this->_m == 0) {
-        std::cout << "[...]" << std::endl;
-        return;
+    std::cout << std::endl
+              << "main board:" << std::endl;
+    int idx = 0, i = 0;
+    std::cout << "  ";
+    for (i = 0; i < DIM_X; ++i)
+        std::cout << " " << i << " ";
+    i = 0;
+    for (int j = 0; j < DIM_X * DIM_Y; ++j) {
+        if (j % DIM_X == 0)
+            std::cout << std::endl
+                      << i++ << " ";
+        if (this->_board[j] == nullptr)
+            std::cout << "[ ]";
+        else if (this->_board[j]->getPlayer() == PLAYER_1)
+            std::cout << "["
+                      << "\033[0;32m" << this->_board[j]->getPiece() << "\033[0m"
+                      << "]";
+        else
+            std::cout << "["
+                      << "\033[1;34m" << (char)std::tolower(this->_board[j]->getPiece()) << "\033[0m"
+                      << "]";
     }
-    printLineOfDashes(_m);
-    for (int y = 0; y < _n; ++y) {
-        std::cout << y + 1 << "\t";
-        for (int x = 0; x < _m; ++x) {
-            if (x % 2 == 1)
-                std::cout << " ";
-            if (this->_board[p(x, y)] != nullptr) std::cout << "[" << *(this->_board[p(x, y)]) << "]";
-            else std::cout << "[ ]";
-            if (x % 2 == 1)
-                std::cout << " ";
-        }
-        std::cout << std::endl;
-        printLineOfDashes(_m);
-    }
+    std::cout << std::endl << std::endl;
 }

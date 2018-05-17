@@ -153,6 +153,10 @@ int PlayRPS(int vGameStyle, const char* outfile_path /*= "./rps.output"*/, const
     turn = 0;
 
     while (turn < MAX_NUM_OF_MOVES && !scoreManager.isGameOver()) {
+        
+        //myBoard.prettyPrint();
+        std::cout << "TURN #" << turn << std::endl;
+
         switch (currentPlayer) {
         case PLAYER_1:
             playCurrTurn(PLAYER_1, p1, p2, myBoard, scoreManager);

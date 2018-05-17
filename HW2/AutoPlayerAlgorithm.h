@@ -26,30 +26,36 @@ private:
         int _M_from = -1;
         int _M_to = -1;
     };
+    struct player_info {
+        int _M_id;
+        std::set<int> _M_pieces; // all pieces except flags (R,P,S,B)
+        std::set<int> _M_flags; // all flags (F)
+        std::set<int> _M_jokers; // all jokers (J)
+    };
+    struct info {
+        std::array<piece, DIM_X * DIM_Y> _M_board;
+        std::vector<move> _M_moves;
+        player_info _M_this_player;
+        player_info _M_other_player;
 
-// TODO maybe convert to std::vector<std::unique_ptr<...>>
+        void addPiece(piece p, int position);
+        void removePiece(int position);
+        void removeFlag(int position);
+        void emptyPiece(int position);
+        void updateJoker(int position);
+        void swapPieces(int pos1, int pos2);
+        void addMove(int from, int to);
+        const move& peekMove() const;
+        void swapPlayers();
+    };
+
 private:
-    // the player identifier
-    int _player;
-    // will have the known board
-    std::vector<piece> _knownBoard;
-    // will have the positions of the player pieces on the board
-    // needs to update regularly
-    std::set<int> _playerPieces;
-    std::set<int> _oppPieces;
-    // the pieces which are thought to be flags
-    std::set<int> _playerFlags;
-    std::set<int> _oppFlags;
-    // will have the move history of the opponent
-    std::vector<move> _oppMoveHistory;
+    const double UNKNOWN_WIN_CHANCE = 0.5;
+    info _info;
 
 public:
     // basic c'tor
-    AutoPlayerAlgorithm()
-        : _knownBoard(DIM_X * DIM_Y)
-        , _playerPieces()
-    {
-    }
+    AutoPlayerAlgorithm() {}
     AutoPlayerAlgorithm(const AutoPlayerAlgorithm& other) = delete;
 
     // d'tor
@@ -65,37 +71,32 @@ public:
     unique_ptr<Move> getMove();
     unique_ptr<JokerChange> getJokerChange();
 
-    // utility
-    // TODO is this needed?
-    const std::vector<piece>& getKnownBoard() { return _knownBoard; };
-    const std::set<int>& getPlayerPieces() { return _playerPieces; }
-
 private:
+    // gets a position not used yet
     int getPositionNotSelectedYet() const;
+    // position a piece of a givben type
     void positionPiecesOfType(int vLimit, char vType, std::vector<unique_ptr<PiecePosition>>& vectorToFill);
-    void removePiece(int pos);
-    void editPieceInPosition(int vPos, int vPlayer, char vType = '\0', bool vIsJoker = false);
 
-    // attempting to locate flags, and update flag statistics
-    void updateEnemyFlagsStat(int vPos);
     // is the proposed move legal
-    bool isMovePossible(std::vector<piece>& rBoard, int vOriginPos, int vDestPos);
+    bool isMovePossible(info& data, int vOriginPos, int vDestPos);
     // get integers of the possible moves of a piece at position
-    void getPossibleMovesForPiece(std::vector<piece>& rBoard, int vPos, std::vector<int>& rMoves);
+    void getPossibleMovesForPiece(info& data, int vPos, std::vector<int>& rMoves);
     // is a piece at position in danger
-    bool isPieceInDanger(int vPos);
+    bool isPieceInDanger(info& data, int vPos);
     // will the origin piece win the fight against the destination piece
-    bool willWinFight(int vOriginPos, int vDestPos);
+    bool willWinFight(info& data, int vOriginPos, int vDestPos);
+    // get the average L2 K closes opponent pieces
+    float calcKNearestL2Distance(info& data, int vFromPlayer, int vPos, int k);
     // get the L2 distance from the given piece to the pieces of the opponent (other player)
-    float calcL2Distance(int vPlayer, int vPos);
+    float calcAvgL2Distance(info& data, int vFromPlayer, int vPos);
     // performs a move on a given board
-    void performMoveOnBoard(std::vector<piece>& rBoard, move vMove);
+    void performMoveOnBoard(info& data, move vMove);
     // calculate the "score" for a board representation
-    float calcPlayerBoardScore(int vPlayer, std::vector<piece>& rBoard);
+    float calcPlayerBoardScore(info& data);
     // gets the score for a move to be performed on a board
-    float getScoreForMove(int player, std::vector<piece> vBoard, move vMove);
+    float getScoreForMove(info data, move vMove);
     // calculate the best move for a player to perform
-    move getBestMoveForPlayer(std::vector<piece>& rBoard, int player, int depth);
+    move getBestMoveForPlayer(info& data);
 
     // get the x dimention parameter from a unified position
     static int getXDim(int vPos);
@@ -107,6 +108,11 @@ private:
     static char getRandomJokerRep();
     // get a random position on the board by the boarrd dimensions
     static int getRandomPos();
+    // checks if the position or move is valid (location wise)
+    static bool isPosValid(int x, int y, int n_x = -1, int n_y = -1);
+
+public:
+    void prettyPrint();
 };
 
 #endif // !__H_AUTO_PLAYER_ALGORITHM

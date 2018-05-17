@@ -1,8 +1,8 @@
 
 #include "FightInfoRPS.h"
 
-FightInfoRPS::FightInfoRPS(PieceRPS& rPieceA, PieceRPS& rPieceB)
-    : _position(rPieceA.getPosition().getX(), rPieceA.getPosition().getY())
+FightInfoRPS::FightInfoRPS(PieceRPS& rPieceA, PieceRPS& rPieceB, PointRPS&& rPos)
+    : _position(rPos)
     , _winner(0) // initialize - no winner
 {
     // position was set based on rPieceA (should be equal to rPieceB)
