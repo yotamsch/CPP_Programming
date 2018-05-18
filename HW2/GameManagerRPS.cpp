@@ -49,7 +49,7 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
         return;
     }
     // notify the opponent on a move
-    rpOppPlayer->notifyOnOpponentMove(*currMove);
+    rpOppPlayer->notifyOnOpponentMove(*(currMove));
     if (fightInfo != nullptr) {
         // there was a fight
         rpCurrPlayer->notifyFightResult(*fightInfo);

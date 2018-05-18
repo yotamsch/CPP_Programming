@@ -11,8 +11,8 @@
 #include "PieceRPS.h"
 #include "PointRPS.h"
 
-#include <random>
 #include <algorithm>
+#include <random>
 
 // %% INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -91,6 +91,9 @@ void AutoPlayerAlgorithm::info::swapPieces(int pos1, int pos2)
 
     addPiece(p1, pos2);
     addPiece(p2, pos1);
+
+    removeFlag(pos1);
+    removeFlag(pos2);
 }
 
 void AutoPlayerAlgorithm::info::addMove(int from, int to)
@@ -229,6 +232,28 @@ void AutoPlayerAlgorithm::getPossibleMovesForPiece(AutoPlayerAlgorithm::info& da
     }
 }
 
+bool AutoPlayerAlgorithm::isPieceThreatening(AutoPlayerAlgorithm::info& data, int vPos)
+{
+    int x, y;
+    bool isThreat = false;
+
+    x = getXDim(vPos);
+    y = getYDim(vPos);
+
+    for (int ix = x - 1; ix <= x + 1; ++ix) {
+        for (int iy = y - 1; iy <= y + 1; ++iy) {
+            if (isPosValid(x, y, ix, iy) && data._M_board[getPos(x, y)]._M_player != NO_PLAYER && data._M_board[getPos(ix, iy)]._M_player != NO_PLAYER && data._M_board[getPos(x, y)]._M_player != data._M_board[getPos(ix, iy)]._M_player) {
+                if (data._M_other_player._M_flags.count(getPos(ix, iy)) <= 0)
+                    isThreat |= willWinFight(data, getPos(x, y), getPos(ix, iy));
+                else
+                    // if opp piece might be a flag, attempt "eat" it
+                    return true;
+            }
+        }
+    }
+    return isThreat;
+}
+
 bool AutoPlayerAlgorithm::isPieceInDanger(AutoPlayerAlgorithm::info& data, int vPos)
 {
     int x, y;
@@ -240,7 +265,9 @@ bool AutoPlayerAlgorithm::isPieceInDanger(AutoPlayerAlgorithm::info& data, int v
     for (int ix = x - 1; ix <= x + 1; ++ix) {
         for (int iy = y - 1; iy <= y + 1; ++iy) {
             if (isPosValid(x, y, ix, iy) && data._M_board[getPos(x, y)]._M_player != NO_PLAYER && data._M_board[getPos(x, y)]._M_player != data._M_board[getPos(ix, iy)]._M_player) {
-                isDanger |= !willWinFight(data, getPos(x, y), getPos(ix, iy));
+                // if opp piece might be a flag, attempt "eat" it
+                if (data._M_other_player._M_flags.count(getPos(ix, iy)) <= 0)
+                    isDanger |= !willWinFight(data, getPos(x, y), getPos(ix, iy));
             }
         }
     }
@@ -255,16 +282,17 @@ bool AutoPlayerAlgorithm::willWinFight(AutoPlayerAlgorithm::info& data, int vOri
     double chance = (double)std::rand() / (RAND_MAX);
 
     // checks normal rules and doesn't take chances
-    if ((destPiece._M_piece == UNKNOWN_CHR && origPiece._M_piece != UNKNOWN_CHR) && chance <= UNKNOWN_WIN_CHANCE) {
+    if ((destPiece._M_piece == origPiece._M_piece) || (destPiece._M_piece == ROCK_CHR && origPiece._M_piece == SCISSORS_CHR) || (destPiece._M_piece == SCISSORS_CHR && origPiece._M_piece == PAPER_CHR) || (destPiece._M_piece == PAPER_CHR && origPiece._M_piece == ROCK_CHR) || (destPiece._M_piece == BOMB_CHR && origPiece._M_piece != BOMB_CHR) || (destPiece._M_piece != FLAG_CHR && origPiece._M_piece == FLAG_CHR)) {
         return false;
     }
-    if ((destPiece._M_piece == origPiece._M_piece) || (destPiece._M_piece == ROCK_CHR && origPiece._M_piece == SCISSORS_CHR) || (destPiece._M_piece == SCISSORS_CHR && origPiece._M_piece == PAPER_CHR) || (destPiece._M_piece == PAPER_CHR && origPiece._M_piece == ROCK_CHR) || (destPiece._M_piece == BOMB_CHR && origPiece._M_piece != BOMB_CHR) || (destPiece._M_piece != FLAG_CHR && origPiece._M_piece == FLAG_CHR)) {
+    if ((destPiece._M_piece == UNKNOWN_CHR || origPiece._M_piece == UNKNOWN_CHR) && chance >= UNKNOWN_WIN_CHANCE) {
         return false;
     }
     return true;
 }
 
-float AutoPlayerAlgorithm::calcKNearestL2Distance(AutoPlayerAlgorithm::info& data, int vFromPlayer, int vPos, int k) {
+float AutoPlayerAlgorithm::calcKNearestDistance(AutoPlayerAlgorithm::info& data, int vFromPlayer, int vPos, int k)
+{
     std::vector<float> dist;
     float res = 0.0f;
     int orig_x, orig_y;
@@ -274,49 +302,30 @@ float AutoPlayerAlgorithm::calcKNearestL2Distance(AutoPlayerAlgorithm::info& dat
 
     for (int pos = 0; pos < DIM_X * DIM_Y; ++pos) {
         if (pos != vPos && data._M_board[pos]._M_player == vFromPlayer && data._M_board[pos]._M_piece != BOMB_CHR && data._M_board[pos]._M_piece != FLAG_CHR) {
-            dist.push_back(std::pow(std::pow(getXDim(pos) - orig_x, 2.0f) + std::pow(getYDim(pos) - orig_y, 2.0f), 0.5f));
+            dist.push_back(std::abs(getXDim(pos) - orig_x) + std::abs(getYDim(pos) - orig_y));
         }
     }
-    std::sort(dist.rbegin(), dist.rend());
-    for (int i = 0; i< k; ++i)
+    std::sort(dist.begin(), dist.end());
+    int i;
+    for (i = 0; i < k && i < dist.size(); ++i)
         res += dist[i];
-    
-    return res / k;
-}
 
-float AutoPlayerAlgorithm::calcAvgL2Distance(AutoPlayerAlgorithm::info& data, int vFromPlayer, int vPos)
-{
-    float res = 0.0f, counter = 0.0f;
-    int orig_x, orig_y;
-
-    orig_x = getXDim(vPos);
-    orig_y = getYDim(vPos);
-
-    for (int pos = 0; pos < DIM_X * DIM_Y; ++pos) {
-        if (pos != vPos && data._M_board[pos]._M_player == vFromPlayer && data._M_board[pos]._M_piece != BOMB_CHR && data._M_board[pos]._M_piece != FLAG_CHR) {
-            res += std::pow(std::pow(getXDim(pos) - orig_x, 2.0f) + std::pow(getYDim(pos) - orig_y, 2.0f), 0.5f);
-            ++counter;
-        }
-    }
-    return res / counter;
+    return res / i;
 }
 
 float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
 {
-    // any pieces in danger -> run away
-    const float DANGER_PARAM = -1.0f / (float)data._M_this_player._M_pieces.size();
-    // player has more pieces than enemy
-    const float PIECES_PARAM = 1.0f / (float)data._M_this_player._M_pieces.size();
-    // player flag related (enemy distance to flag, player distance to flag)
-    const float THIS_FLAG_PARAM = -1.0f / data._M_this_player._M_flags.size();
-    // the 
-    const float OPP_FLAG_PARAM = -1.0f / data._M_other_player._M_flags.size();
-    const float THIS_FLAG_DIST_PARAM = 1.0f / data._M_this_player._M_flags.size(); // far (large) is good
-    const float OPP_FLAG_DIST_PARAM = -((1.0f )/ (float)data._M_other_player._M_flags.size());
+    const int ALL_PIECES_EATEN = 10;
+    const int ALL_FLAGS_EATEN = 15;
+
+    const int K_PROXIMITY = 0.33f * (float)data._M_this_player._M_pieces.size();
+    const float PIECES_PARAM = 4.0f;
+    const float DANGER_PARAM = -4.0f / (float)data._M_this_player._M_pieces.size();
+    const float THREAT_PARAM = 5.0f / (float)data._M_this_player._M_pieces.size();
+    const float OPP_FLAG_DIST_PARAM = -10.0f / (float)data._M_other_player._M_flags.size();
 
     float score = 0.0f; // lower is worse heigher is better
     float avg = 0.0f;
-    float counter = 0;
     int player = data._M_this_player._M_id;
     int opp = data._M_other_player._M_id;
 
@@ -325,42 +334,39 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
     for (auto pos : data._M_this_player._M_pieces) {
         switch (data._M_board[pos]._M_piece) {
         case BOMB_CHR:
-            break;
         case FLAG_CHR:
-            avg += THIS_FLAG_DIST_PARAM * calcAvgL2Distance(data, opp, pos);
-            avg -= THIS_FLAG_DIST_PARAM * calcAvgL2Distance(data, player, pos);
-            ++counter;
             break;
         default:
             if (isPieceInDanger(data, pos))
                 score += DANGER_PARAM;
-            else 
-                score -= DANGER_PARAM;
+            if (isPieceThreatening(data, pos))
+                score += THREAT_PARAM;
             break;
         }
     }
-    score += avg / counter;
-
-    avg = 0.0f;
-    counter = 0;
     // average L2 distance oponent flag to this player's pieces
-    for (auto pos : data._M_other_player._M_flags) {
-        avg += OPP_FLAG_DIST_PARAM * calcAvgL2Distance(data, player, pos);
-        score += OPP_FLAG_PARAM;
-        ++counter;
+    if (data._M_other_player._M_flags.size() <= (data._M_other_player._M_pieces.size() + 1) / 2) {
+        avg = 0.0f;
+        for (auto pos : data._M_other_player._M_flags) {
+            avg += OPP_FLAG_DIST_PARAM * calcKNearestDistance(data, player, pos, K_PROXIMITY);
+        }
+        avg /= (float)data._M_other_player._M_flags.size();
+        score += avg;
     }
-    score += avg / counter;
 
-    // more existing player pieces is good
+    // more existing player pieces is good, encourage "eating"
     score += PIECES_PARAM * (data._M_this_player._M_pieces.size() - data._M_other_player._M_pieces.size());
 
-    // * maybe more?
+    if (data._M_other_player._M_pieces.size() <= 0)
+        score += ALL_PIECES_EATEN;
+    if (data._M_other_player._M_flags.size() <= 0)
+        score += ALL_FLAGS_EATEN;
+
     return score;
 }
 
 void AutoPlayerAlgorithm::performMoveOnBoard(AutoPlayerAlgorithm::info& data, AutoPlayerAlgorithm::move vMove)
 {
-    // TODO vefity this works
     data.swapPieces(vMove._M_from, vMove._M_to);
     data.removePiece(vMove._M_from);
 }
@@ -374,6 +380,34 @@ float AutoPlayerAlgorithm::getScoreForMove(AutoPlayerAlgorithm::info data, AutoP
 
     performMoveOnBoard(data, vMove);
     return calcPlayerBoardScore(data);
+}
+
+float AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAlgorithm::info& data, int depth, AutoPlayerAlgorithm::move& bestMove)
+{
+    std::vector<int> possibleMoves;
+    float maxScore = calcPlayerBoardScore(data);
+    float currScore;
+
+    if (depth >= MAX_DEPTH && depth % 2 == 0) {
+        return calcPlayerBoardScore(data);
+    }
+    ++depth;
+    for (auto pos : data._M_this_player._M_pieces) {
+        getPossibleMovesForPiece(data, pos, possibleMoves);
+        for (auto mov : possibleMoves) {
+            // perform move on a copy and send
+            AutoPlayerAlgorithm::info data_cpy = data;
+            performMoveOnBoard(data_cpy, { pos, mov });
+            data_cpy.swapPlayers();
+            currScore = getBestMoveForPlayer(data_cpy, depth, bestMove);
+            if (currScore >= maxScore) {
+                bestMove = { pos, mov };
+                maxScore = currScore;
+            }
+        }
+        possibleMoves.clear();
+    }
+    return maxScore;
 }
 
 AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAlgorithm::info& data)
@@ -399,16 +433,6 @@ AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAl
         possibleMoves.clear();
     }
     return maxMove;
-    /*
-    // perfom move
-    if (depth >= MAX_DEPTH && depth % 2 == 1) {
-        // go over all moves and choose the maximum score, return the move
-        return maxMove;
-    }
-    // do next level
-    performMoveOnBoard(data, maxMove);
-    data.swapPlayers();
-    return getBestMoveForPlayer(data, ++depth);*/
 }
 
 // %% INTERFACE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -423,8 +447,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player,
 
     // set the seed for the randomization
     // TODO replace lines after testing
-    // srand((unsigned)time(NULL) + player);
-    srand(10 * player);
+    srand((unsigned)time(NULL) + player);
 
     // insert flags
     positionPiecesOfType(FLAG_LIMIT, FLAG_CHR, vectorToFill);
@@ -476,8 +499,9 @@ void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move& move)
     // save the move into history vector
     this->_info.addMove(getPos(move.getFrom().getX(), move.getFrom().getY()), getPos(move.getTo().getX(), move.getTo().getY()));
 
-    this->_info.removeFlag(this->_info.peekMove()._M_from);
     this->_info.updateJoker(this->_info.peekMove()._M_from);
+    this->_info.removeFlag(this->_info.peekMove()._M_to);
+    this->_info.removeFlag(this->_info.peekMove()._M_from);
 
     if (this->_info._M_board[this->_info.peekMove()._M_to]._M_player == NO_PLAYER) {
         // clean move, no fight
@@ -515,7 +539,8 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
     AutoPlayerAlgorithm::move bestMove;
     AutoPlayerAlgorithm::info data = this->_info;
 
-    bestMove = getBestMoveForPlayer(data);
+    // bestMove = getBestMoveForPlayer(data);
+    getBestMoveForPlayer(data, 0, bestMove);
     if (bestMove._M_from == -1 && bestMove._M_to == -1) {
         return nullptr;
     }
@@ -557,7 +582,16 @@ void AutoPlayerAlgorithm::prettyPrint()
     for (int pos : this->_info._M_this_player._M_pieces)
         std::cout << "(" << getXDim(pos) << "," << getYDim(pos) << "), ";
     std::cout << std::endl;
+    std::cout << "enemy flags (maybe): ";
+    for (int pos : this->_info._M_other_player._M_flags)
+        std::cout << "(" << getXDim(pos) << "," << getYDim(pos) << "), ";
+    std::cout << std::endl;
     std::cout << "board score: " << calcPlayerBoardScore(this->_info) << std::endl;
+    prettyPrintBoard();
+}
+
+void AutoPlayerAlgorithm::prettyPrintBoard()
+{
     std::cout << "board:" << std::endl;
     int idx = 0, i = 0;
     std::cout << "  ";

@@ -50,7 +50,7 @@ private:
     };
 
 private:
-    const double UNKNOWN_WIN_CHANCE = 0.5;
+    const double UNKNOWN_WIN_CHANCE = 0.66;
     info _info;
 
 public:
@@ -83,12 +83,12 @@ private:
     void getPossibleMovesForPiece(info& data, int vPos, std::vector<int>& rMoves);
     // is a piece at position in danger
     bool isPieceInDanger(info& data, int vPos);
+    // is the piece threatening another piece
+    bool isPieceThreatening(info& data, int vPos);
     // will the origin piece win the fight against the destination piece
     bool willWinFight(info& data, int vOriginPos, int vDestPos);
-    // get the average L2 K closes opponent pieces
-    float calcKNearestL2Distance(info& data, int vFromPlayer, int vPos, int k);
-    // get the L2 distance from the given piece to the pieces of the opponent (other player)
-    float calcAvgL2Distance(info& data, int vFromPlayer, int vPos);
+    // get the average distance from the K closest vFromPlayer pieces
+    float calcKNearestDistance(info& data, int vFromPlayer, int vPos, int k);
     // performs a move on a given board
     void performMoveOnBoard(info& data, move vMove);
     // calculate the "score" for a board representation
@@ -97,6 +97,8 @@ private:
     float getScoreForMove(info data, move vMove);
     // calculate the best move for a player to perform
     move getBestMoveForPlayer(info& data);
+    // use recursion to get the best score
+    float getBestMoveForPlayer(info& data, int depth, move& bestMove);
 
     // get the x dimention parameter from a unified position
     static int getXDim(int vPos);
@@ -113,6 +115,7 @@ private:
 
 public:
     void prettyPrint();
+    void prettyPrintBoard();
 };
 
 #endif // !__H_AUTO_PLAYER_ALGORITHM
