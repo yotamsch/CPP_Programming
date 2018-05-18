@@ -8,6 +8,7 @@
 #include "AutoPlayerAlgorithm.h"
 #include "GameUtilitiesRPS.h"
 #include "MoveRPS.h"
+#include "JokerChangeRPS.h"
 #include "PieceRPS.h"
 #include "PointRPS.h"
 
@@ -382,34 +383,6 @@ float AutoPlayerAlgorithm::getScoreForMove(AutoPlayerAlgorithm::info data, AutoP
     return calcPlayerBoardScore(data);
 }
 
-float AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAlgorithm::info& data, int depth, AutoPlayerAlgorithm::move& bestMove)
-{
-    std::vector<int> possibleMoves;
-    float maxScore = calcPlayerBoardScore(data);
-    float currScore;
-
-    if (depth >= MAX_DEPTH && depth % 2 == 0) {
-        return calcPlayerBoardScore(data);
-    }
-    ++depth;
-    for (auto pos : data._M_this_player._M_pieces) {
-        getPossibleMovesForPiece(data, pos, possibleMoves);
-        for (auto mov : possibleMoves) {
-            // perform move on a copy and send
-            AutoPlayerAlgorithm::info data_cpy = data;
-            performMoveOnBoard(data_cpy, { pos, mov });
-            data_cpy.swapPlayers();
-            currScore = getBestMoveForPlayer(data_cpy, depth, bestMove);
-            if (currScore >= maxScore) {
-                bestMove = { pos, mov };
-                maxScore = currScore;
-            }
-        }
-        possibleMoves.clear();
-    }
-    return maxScore;
-}
-
 AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAlgorithm::info& data)
 {
     AutoPlayerAlgorithm::move currMove, maxMove;
@@ -539,8 +512,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
     AutoPlayerAlgorithm::move bestMove;
     AutoPlayerAlgorithm::info data = this->_info;
 
-    // bestMove = getBestMoveForPlayer(data);
-    getBestMoveForPlayer(data, 0, bestMove);
+    bestMove = getBestMoveForPlayer(data);
     if (bestMove._M_from == -1 && bestMove._M_to == -1) {
         return nullptr;
     }
@@ -565,7 +537,16 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
-    // TODO implement
+    std::unique_ptr<JokerChange> retJokerChange;
+    AutoPlayerAlgorithm::joker_change bestJokerChange;
+
+    bestJokerChange = getBestJokerChangeForPlayer(this->_info);
+    if (bestJokerChange._M_position == -1) {
+        return nullptr;
+    }
+
+    retJokerChange = std::make_unique<JokerChangeRPS>(PointRPS(getXDim(bestJokerChange._M_position), getYDim(bestJokerChange._M_position)), bestJokerChange._M_new_rep);
+
     return nullptr;
 }
 

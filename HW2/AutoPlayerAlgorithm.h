@@ -26,6 +26,10 @@ private:
         int _M_from = -1;
         int _M_to = -1;
     };
+    struct joker_change {
+        int _M_position;
+        char _M_new_rep;
+    };
     struct player_info {
         int _M_id;
         std::set<int> _M_pieces; // all pieces except flags (R,P,S,B)
@@ -97,8 +101,9 @@ private:
     float getScoreForMove(info data, move vMove);
     // calculate the best move for a player to perform
     move getBestMoveForPlayer(info& data);
-    // use recursion to get the best score
-    float getBestMoveForPlayer(info& data, int depth, move& bestMove);
+
+    // get the best joker change if one exists
+    joker_change getBestJokerChangeForPlayer(info& data);
 
     // get the x dimention parameter from a unified position
     static int getXDim(int vPos);
