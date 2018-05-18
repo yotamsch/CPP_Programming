@@ -62,7 +62,7 @@
 #define NO_PLAYER 0
 
 // gameplay related
-#define MAX_NUM_OF_MOVES 10
+#define MAX_NUM_OF_MOVES 100
 #define GAME_IS_STILL_ON -1
 #define MAX_DEPTH 2
 

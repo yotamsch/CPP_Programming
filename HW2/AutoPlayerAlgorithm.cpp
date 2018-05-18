@@ -7,8 +7,8 @@
  */
 #include "AutoPlayerAlgorithm.h"
 #include "GameUtilitiesRPS.h"
-#include "MoveRPS.h"
 #include "JokerChangeRPS.h"
+#include "MoveRPS.h"
 #include "PieceRPS.h"
 #include "PointRPS.h"
 
@@ -197,6 +197,23 @@ void AutoPlayerAlgorithm::positionPiecesOfType(int vLimit,
 
 // %% MOVE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+int AutoPlayerAlgorithm::getNumOfMovingPieces(AutoPlayerAlgorithm::info& data, AutoPlayerAlgorithm::player_info& player) const
+{
+    int counter = 0;
+    for (auto p : player._M_pieces) {
+
+        switch (data._M_board[p]._M_piece) {
+        case FLAG_CHR:
+        case BOMB_CHR:
+            break;
+        default:
+            ++counter;
+            break;
+        }
+    }
+    return counter;
+}
+
 bool AutoPlayerAlgorithm::isMovePossible(AutoPlayerAlgorithm::info& data, int vOriginPos, int vDestPos)
 {
     int x, y, n_x, n_y;
@@ -321,6 +338,7 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
 
     const int K_PROXIMITY = 0.33f * (float)data._M_this_player._M_pieces.size();
     const float PIECES_PARAM = 4.0f;
+    const float ENEMY_FLAG_EXIST_PARAM = -1.5f;
     const float DANGER_PARAM = -4.0f / (float)data._M_this_player._M_pieces.size();
     const float THREAT_PARAM = 5.0f / (float)data._M_this_player._M_pieces.size();
     const float OPP_FLAG_DIST_PARAM = -10.0f / (float)data._M_other_player._M_flags.size();
@@ -356,7 +374,9 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
     }
 
     // more existing player pieces is good, encourage "eating"
-    score += PIECES_PARAM * (data._M_this_player._M_pieces.size() - data._M_other_player._M_pieces.size());
+    score += PIECES_PARAM * (getNumOfMovingPieces(data, data._M_this_player) - getNumOfMovingPieces(data, data._M_other_player));
+    // attempt to each the flags
+    score += ENEMY_FLAG_EXIST_PARAM * (float)data._M_other_player._M_flags.size();
 
     if (data._M_other_player._M_pieces.size() <= 0)
         score += ALL_PIECES_EATEN;
@@ -383,6 +403,17 @@ float AutoPlayerAlgorithm::getScoreForMove(AutoPlayerAlgorithm::info data, AutoP
     return calcPlayerBoardScore(data);
 }
 
+float AutoPlayerAlgorithm::getScoreForJokerChange(AutoPlayerAlgorithm::info data, AutoPlayerAlgorithm::joker_change vChange)
+{
+    // just in case
+    if (data._M_board[vChange._M_position]._M_player == NO_PLAYER || !data._M_board[vChange._M_position]._M_isJoker) {
+        return 0.0f;
+    }
+
+    data._M_board[vChange._M_position]._M_piece = vChange._M_new_rep;
+    return calcPlayerBoardScore(data);
+}
+
 AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAlgorithm::info& data)
 {
     AutoPlayerAlgorithm::move currMove, maxMove;
@@ -406,6 +437,26 @@ AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAl
         possibleMoves.clear();
     }
     return maxMove;
+}
+
+AutoPlayerAlgorithm::joker_change AutoPlayerAlgorithm::getBestJokerChangeForPlayer(AutoPlayerAlgorithm::info& data)
+{
+    AutoPlayerAlgorithm::joker_change currChange, bestChange;
+    float currScore = 0;
+    float maxScore = calcPlayerBoardScore(data);
+    std::array<char, 4> possibleChanges = { ROCK_CHR, PAPER_CHR, SCISSORS_CHR, BOMB_CHR };
+
+    for (auto pos : data._M_this_player._M_jokers) {
+        for (auto change : possibleChanges) {
+            currChange = { pos, change };
+            currScore = getScoreForJokerChange(data, currChange);
+            if (currScore >= maxScore) {
+                bestChange = currChange;
+                maxScore = currScore;
+            }
+        }
+    }
+    return bestChange;
 }
 
 // %% INTERFACE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -541,13 +592,22 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
     AutoPlayerAlgorithm::joker_change bestJokerChange;
 
     bestJokerChange = getBestJokerChangeForPlayer(this->_info);
-    if (bestJokerChange._M_position == -1) {
+    if (bestJokerChange._M_position == -1 || this->_info._M_board[bestJokerChange._M_position]._M_piece == bestJokerChange._M_new_rep) {
         return nullptr;
     }
 
     retJokerChange = std::make_unique<JokerChangeRPS>(PointRPS(getXDim(bestJokerChange._M_position), getYDim(bestJokerChange._M_position)), bestJokerChange._M_new_rep);
 
-    return nullptr;
+    // TODO REMOVE
+    std::cout << "\033[0;35m"
+              << "joker change: (" << getXDim(bestJokerChange._M_position) << "," << getYDim(bestJokerChange._M_position) << "), [" << this->_info._M_board[bestJokerChange._M_position]._M_piece << "] -> [" << bestJokerChange._M_new_rep << "]"
+              << "\033[0m" << std::endl;
+    // -----------
+
+    // perform joker change
+    this->_info._M_board[bestJokerChange._M_position]._M_piece = bestJokerChange._M_new_rep;
+
+    return std::move(retJokerChange);
 }
 
 // FOR DEBUG

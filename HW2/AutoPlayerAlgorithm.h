@@ -27,8 +27,8 @@ private:
         int _M_to = -1;
     };
     struct joker_change {
-        int _M_position;
-        char _M_new_rep;
+        int _M_position = -1;
+        char _M_new_rep = '\0';
     };
     struct player_info {
         int _M_id;
@@ -81,6 +81,8 @@ private:
     // position a piece of a givben type
     void positionPiecesOfType(int vLimit, char vType, std::vector<unique_ptr<PiecePosition>>& vectorToFill);
 
+    // get the number of moving pieces for a player
+    int getNumOfMovingPieces(info& data, player_info& player) const;
     // is the proposed move legal
     bool isMovePossible(info& data, int vOriginPos, int vDestPos);
     // get integers of the possible moves of a piece at position
@@ -102,6 +104,8 @@ private:
     // calculate the best move for a player to perform
     move getBestMoveForPlayer(info& data);
 
+    // calculate the "score" for a board representation
+    float getScoreForJokerChange(info data, joker_change vChange);
     // get the best joker change if one exists
     joker_change getBestJokerChangeForPlayer(info& data);
 
