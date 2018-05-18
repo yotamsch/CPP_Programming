@@ -13,6 +13,16 @@
 #include <map>
 #include <memory>
 
+/**
+ * @brief : Fills output file with game results, describing:
+ * 1.winner 2.reason of winning 3.state of the board after the game is over
+ * 
+ * @param path - path of the output file to be filled
+ * @param b - the board at the final state
+ * @param winner - winner of the game
+ * @param msg_reason - reason of winning as specified in the homework guidelines
+ * @return int - 0 if there was an error filling the output file, and 1 otherwise
+ */
 int outputGameResult(const char* path, const BoardRPS& b, int winner, std::string msg_reason)
 {
     std::ofstream out;
@@ -29,6 +39,19 @@ int outputGameResult(const char* path, const BoardRPS& b, int winner, std::strin
     return 0;
 }
 
+/**
+ * @brief - Asks for next move of current player and performs the move by calling BoardRPS member function
+ * if the move was not legal then it notifies the ScoreManager of current player as loser
+ * if the move was legal: 1. it notifies both player of the fight result, in case there was a fight
+ * 2. it notifies opponent player of the current move
+ * 3. in case there was a joker change, notifies the ScoreManager of it.
+ * 
+ * @param currPlayerNumber - current player number which this is his turn
+ * @param rpCurrPlayer - reference to current player which this is his turn
+ * @param rpOppPlayer - reference to opponent player(which this is not his turn)
+ * @param myBoard - game board reference
+ * @param rScoreManager - ScoreManager reference
+ */
 void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurrPlayer, std::unique_ptr<PlayerAlgorithm>& rpOppPlayer, BoardRPS& myBoard, ScoreManager& rScoreManager)
 {
     std::unique_ptr<FightInfo> fightInfo;
@@ -65,7 +88,19 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
     }
 }
 
-// assume we have scoreManager as a parameter
+/**
+ * @brief - given a reference to a board and a vector of piece positions of one player, and a vector of FightInfo:
+ * fills the board by positioning the pieces given at positioningVec. if any of the positions is bad, notifies ScoreManager about current player as loser and returns false
+ * fills rpFightInfoVec with FightInfo instances for each fight that happened as a result of positioning the player's pieces on the board
+ * 
+ * @param rBoard - the board to be filled
+ * @param vCurrPlayer - current player number
+ * @param positioningVec - vector containing the current player's initial positionings
+ * @param rpFightInfoVec - vector to be filled with all the fights that occured as a result of the above positioning on the board
+ * @param rScoreManager - reference to the ScoreManager to be notified of a losing player as a result of bad positioning 
+ * @return true - if all positionings are legal
+ * @return false - if any of the positionings is "bad"
+ */
 bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<PiecePosition>>& positioningVec, std::vector<std::unique_ptr<FightInfo>>& rpFightInfoVec, ScoreManager& rScoreManager)
 {
     bool resultOfPositioning;

@@ -4,6 +4,10 @@
 #include "Move.h"
 #include "PointRPS.h"
 
+/**
+ * @brief a class inheriting from the abstract class Move
+ * 
+ */
 class MoveRPS : public Move {
 private:
     PointRPS _fromPoint;

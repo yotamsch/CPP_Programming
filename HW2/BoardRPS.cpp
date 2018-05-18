@@ -40,18 +40,6 @@ BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
     return *this;
 }
 
-/**
- * @brief The function creates and places a new piece on the board. 
- * Based on the rules of each piece (found by its type).
- * 
- * @param player The player type (PLAYER_1 or PLAYER_2)
- * @param type The piece type
- * @param x The x position on the board
- * @param y The y position on the board
- * @param is_joker Is the piece a joker piece
- * @return true If everything went fine and the piece has been inserted into the board.
- * @return false If an error occured
- */
 bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfo>& rpFightInfo)
 {
     // get needed information

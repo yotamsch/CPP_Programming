@@ -35,7 +35,12 @@ public:
     int getPlayer() const { return this->_player; }
 
     // setters
-    // set the type for joker pieces
+
+    /**
+     * @brief called ONLY when setting a joker's representation. Changes/Sets the calling joker's type(char representation)
+     * 
+     * @param type - the desired representation of a joker
+     */
     void setType(char type);
 
     // utility
@@ -49,8 +54,12 @@ public:
     bool operator<(const PieceRPS& p) const;
 
     // interface defined functions
+
+    //Gets the current position of this piece
     const Point& getPosition() const;
+    // gets the char representation of this piece
     char getPiece() const;
+    //if this piece is a joker, gets its char representation(R, P, S or B). otherwise returns '#'
     char getJokerRep() const;
 
 public:
