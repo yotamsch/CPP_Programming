@@ -54,8 +54,10 @@ private:
     };
 
 private:
-    const double UNKNOWN_WIN_CHANCE = 0.66;
+    const double UNKNOWN_WIN_CHANCE = 0.60;
+
     info _info;
+    unsigned _seed_value;
 
 public:
     // basic c'tor
