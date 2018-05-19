@@ -348,6 +348,8 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
     float avg = 0.0f;
     int player = data._M_this_player._M_id;
     int opp = data._M_other_player._M_id;
+    int counter;
+    std::vector<int> flagSample;
 
     // number of pieces in danger
     // average L2 ditance between THIS flag to opponent pieces
@@ -365,14 +367,30 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
         }
     }
     // average L2 distance oponent flag to this player's pieces
+
+    avg = 0.0f;
+    counter = 0;
+
+    // advances the pieces towards the "flags". if too many flags, picks a few of them
     if (data._M_other_player._M_flags.size() <= (data._M_other_player._M_pieces.size() + 1) / 2) {
-        avg = 0.0f;
         for (auto pos : data._M_other_player._M_flags) {
             avg += OPP_FLAG_DIST_PARAM * calcKNearestDistance(data, player, pos, K_PROXIMITY);
         }
-        if (avg != 0) avg /= (float)data._M_other_player._M_flags.size();
-        score += avg;
+        if (avg != 0)
+            avg /= (float)data._M_other_player._M_flags.size();
+    } else {
+        for (auto itr = data._M_other_player._M_flags.begin(); counter < (data._M_other_player._M_pieces.size() + 1) / 2;) {
+            std::advance(itr, std::rand() % data._M_other_player._M_flags.size());
+            if (itr == data._M_other_player._M_flags.end())
+                itr = data._M_other_player._M_flags.begin();
+            avg += OPP_FLAG_DIST_PARAM * calcKNearestDistance(data, player, *itr, K_PROXIMITY);
+            ++counter;
+        }
+        if (avg != 0)
+            avg /= counter;
     }
+
+    score += avg;
 
     // more existing player pieces is good, encourage "eating"
     score += PIECES_PARAM * (getNumOfMovingPieces(data, data._M_this_player) - getNumOfMovingPieces(data, data._M_other_player));

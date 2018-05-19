@@ -33,7 +33,7 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
 {
     std::unique_ptr<FightInfo> fightInfo;
     std::unique_ptr<JokerChange> jokerChange;
-    bool resultOfMoving;
+    bool resultOfMoving, resultOfJokerChange;
     char jokerPrevChar;
 
     std::unique_ptr<Move> currMove = rpCurrPlayer->getMove();
@@ -43,7 +43,7 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
     }
     // execute player move
     resultOfMoving = myBoard.movePiece(currPlayerNumber, currMove, fightInfo);
-    if (resultOfMoving == false) {
+    if (!resultOfMoving) {
         // announce loser
         rScoreManager.dismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
         return;
@@ -59,8 +59,17 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
     // handle joker change
     jokerChange = rpCurrPlayer->getJokerChange();
     if (jokerChange != nullptr) {
+        auto& jokerPiece = myBoard.getPieceAt(jokerChange->getJokerChangePosition());
+        if (jokerPiece == nullptr) {
+            rScoreManager.dismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
+            return;
+        }
         jokerPrevChar = myBoard.getPieceAt(jokerChange->getJokerChangePosition())->getJokerRep();
-        myBoard.changeJoker(currPlayerNumber, jokerChange);
+        resultOfJokerChange = myBoard.changeJoker(currPlayerNumber, jokerChange);
+        if (!resultOfJokerChange) {
+            rScoreManager.dismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
+            return;
+        }
         rScoreManager.notifyJokerChange(*jokerChange, jokerPrevChar, currPlayerNumber);
     }
 }
