@@ -335,18 +335,21 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
 {
     const int ALL_PIECES_EATEN = 10;
     const int ALL_FLAGS_EATEN = 15;
+    const int NUM_OF_PIECES = getNumOfMovingPieces(data, data._M_this_player);
 
-    const int K_PROXIMITY = 0.33f * (float)data._M_this_player._M_pieces.size();
-    const float PIECES_PARAM = 4.0f;
-    const float ENEMY_FLAG_EXIST_PARAM = -1.5f;
-    const float DANGER_PARAM = -4.0f / (float)data._M_this_player._M_pieces.size();
-    const float THREAT_PARAM = 5.0f / (float)data._M_this_player._M_pieces.size();
-    const float OPP_FLAG_DIST_PARAM = -10.0f / (float)data._M_other_player._M_flags.size();
+    const int K_PROXIMITY = 0.66f * NUM_OF_PIECES;
+    const float PIECES_PARAM = 9.0f;
+    const float ENEMY_FLAG_EXIST_PARAM = -2.5f;
+    const float DANGER_PARAM = -4.0f / NUM_OF_PIECES;
+    const float THREAT_PARAM = 3.0f / NUM_OF_PIECES;
+    const float OPP_FLAG_DIST_PARAM = -9.0f / (float)data._M_other_player._M_flags.size();
 
     float score = 0.0f; // lower is worse heigher is better
     float avg = 0.0f;
     int player = data._M_this_player._M_id;
     int opp = data._M_other_player._M_id;
+    int counter;
+    std::vector<int> flagSample;
 
     // number of pieces in danger
     // average L2 ditance between THIS flag to opponent pieces
@@ -364,18 +367,34 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
         }
     }
     // average L2 distance oponent flag to this player's pieces
+
+    avg = 0.0f;
+    counter = 0;
+
+    // advances the pieces towards the "flags". if too many flags, picks a few of them
     if (data._M_other_player._M_flags.size() <= (data._M_other_player._M_pieces.size() + 1) / 2) {
-        avg = 0.0f;
         for (auto pos : data._M_other_player._M_flags) {
             avg += OPP_FLAG_DIST_PARAM * calcKNearestDistance(data, player, pos, K_PROXIMITY);
         }
-        avg /= (float)data._M_other_player._M_flags.size();
-        score += avg;
+        if (avg != 0)
+            avg /= (float)data._M_other_player._M_flags.size();
+    } else {
+        for (auto itr = data._M_other_player._M_flags.begin(); counter < (data._M_other_player._M_pieces.size() + 1) / 2;) {
+            std::advance(itr, std::rand() % data._M_other_player._M_flags.size());
+            if (itr == data._M_other_player._M_flags.end())
+                itr = data._M_other_player._M_flags.begin();
+            avg += OPP_FLAG_DIST_PARAM * calcKNearestDistance(data, player, *itr, K_PROXIMITY);
+            ++counter;
+        }
+        if (avg != 0)
+            avg /= counter;
     }
+
+    score += avg;
 
     // more existing player pieces is good, encourage "eating"
     score += PIECES_PARAM * (getNumOfMovingPieces(data, data._M_this_player) - getNumOfMovingPieces(data, data._M_other_player));
-    // attempt to each the flags
+    // attempt to eat the flags
     score += ENEMY_FLAG_EXIST_PARAM * (float)data._M_other_player._M_flags.size();
 
     if (data._M_other_player._M_pieces.size() <= 0)
@@ -425,11 +444,13 @@ AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAl
     for (auto pos : data._M_this_player._M_pieces) {
         getPossibleMovesForPiece(data, pos, possibleMoves);
         for (auto mov : possibleMoves) {
-            currMove._M_from = pos;
-            currMove._M_to = mov;
+            currMove = { pos, mov };
+            // make sure doesn't go back and forth
+            if (data._M_moves.size() > 0 && data.peekMove()._M_from == mov && data.peekMove()._M_to == pos)
+                continue;
             // will use a copy of the data
             currScore = getScoreForMove(data, currMove);
-            if (currScore >= maxScore) {
+            if ((maxMove._M_from == -1 && maxMove._M_to == -1 && currScore >= maxScore) || (currScore > maxScore)) {
                 maxMove = currMove;
                 maxScore = currScore;
             }
@@ -470,8 +491,8 @@ void AutoPlayerAlgorithm::getInitialPositions(int player,
     this->_info._M_this_player._M_id = player;
 
     // set the seed for the randomization
-    // TODO replace lines after testing
-    srand((unsigned)time(NULL) + player);
+    this->_seed_value = (unsigned)time(NULL);
+    srand(this->_seed_value + player * PRIME_NUMBER);
 
     // insert flags
     positionPiecesOfType(FLAG_LIMIT, FLAG_CHR, vectorToFill);
@@ -577,6 +598,13 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
         this->_info.swapPieces(this->_info.peekMove()._M_from, this->_info.peekMove()._M_to);
     }
 
+    // if only one piece "can" be flag, mark it as flag
+    if (this->_info._M_other_player._M_flags.size() <= FLAG_LIMIT) {
+        for (auto pos : this->_info._M_other_player._M_flags) {
+            this->_info._M_board[pos]._M_piece = FLAG_CHR;
+        }
+    }
+
     // TODO REMOVE
     prettyPrint();
     std::cout << "\033[0;31m"
@@ -615,6 +643,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 void AutoPlayerAlgorithm::prettyPrint()
 {
     std::cout << "player: " << this->_info._M_this_player._M_id << std::endl;
+    std::cout << "seed base: " << this->_seed_value << std::endl;
     std::cout << "flags at: ";
     for (int pos : this->_info._M_this_player._M_flags)
         std::cout << "(" << getXDim(pos) << "," << getYDim(pos) << "), ";
