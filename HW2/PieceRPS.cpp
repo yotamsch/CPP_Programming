@@ -1,13 +1,6 @@
 
 #include "PieceRPS.h"
 
-/**
- * @brief Overloading on the lower than (<) operator. According to the rules of the game. Returns true only if the left side is lower "in strength" than the right side.
- * 
- * @param p The right hand side to compare to.
- * @return true If the left side is lower "in strength" than the right side
- * @return false Otherwise
- */
 bool PieceRPS::operator<(const PieceRPS& p) const
 {
     if ((p._piece_type == ROCK_CHR && this->_piece_type == SCISSORS_CHR) || (p._piece_type == SCISSORS_CHR && this->_piece_type == PAPER_CHR) || (p._piece_type == PAPER_CHR && this->_piece_type == ROCK_CHR) || 
@@ -52,13 +45,6 @@ char PieceRPS::getJokerRep() const
     return _piece_type;
 }
 
-/**
- * @brief Overloading on the print to ostream (<<) operator.
- * 
- * @param output The ostream to output into
- * @param piece The play piece to print
- * @return ostream& The modified ostream
- */
 std::ostream& operator<<(std::ostream& output, const PieceRPS& piece)
 {
     char type = piece.getPiece();

@@ -2,7 +2,11 @@
 #define __H_POINT_RPS
 
 #include "Point.h"
-
+/**
+ * @brief A class inheriting from the abstract class Point, 
+ * responsible for the creation of points, each point consisting of a x-coordinate and y-coordinate
+ * 
+ */
 class PointRPS : public Point {
 private:
     int _x; // x coordinate (the column)

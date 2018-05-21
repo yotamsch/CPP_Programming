@@ -5,7 +5,8 @@
 #include "PointRPS.h"
 
 /**
- * @brief a class inheriting from the abstract class Move
+ * @brief a class inheriting from the abstract class Move,
+ * responsible for creating a move, each move consisting from a "souce position" and a "destination position"
  * 
  */
 class MoveRPS : public Move {
@@ -25,10 +26,20 @@ public:
     ~MoveRPS() {}
 
     // interace defined functions
+    /**
+     * @brief Gets the source position of this move
+     * 
+     * @return const Point& - reference to a Point representing the source position
+     */
     const Point& getFrom() const
     {
         return _fromPoint;
     }
+    /**
+     * @brief Gets the destination position of this move
+     * 
+     * @return const Point& - reference to a Point representing the destination position
+     */
     const Point& getTo() const
     {
         return _toPoint;

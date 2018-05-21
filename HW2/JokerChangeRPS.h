@@ -5,7 +5,9 @@
 #include "JokerChange.h"
 #include "PointRPS.h"
 /**
- * @brief a class inheriting from the abstract class JokerChange. Holds information about joker change
+ * @brief a class inheriting from the abstract class JokerChange.
+ * responsible for creating a joker-change object
+ * Holds information about a single joker change: 1. where the change occurs 2. what is the new desired representation of this joker
  * 
  */
 class JokerChangeRPS : public JokerChange {

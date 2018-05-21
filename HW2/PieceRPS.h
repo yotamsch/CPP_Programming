@@ -5,7 +5,13 @@
 #include "PiecePosition.h"
 #include "PointRPS.h"
 #include <iostream>
-
+/**
+ * @brief A class inheriting from the abstract class PiecePosition, 
+ * responsible for the creation of game pieces,
+ * each piece consisting of 1. its owner 2. a boolean to tell if it's a joker
+ * 3. its char representation 4.its location on the board 
+ * 
+ */
 class PieceRPS : public PiecePosition {
 private:
     int _player; // the id of the owning player
@@ -31,7 +37,7 @@ public:
     ~PieceRPS() {}
 
     // getters
-    // get the player [currently enum]
+    // get the player owner of the piece
     int getPlayer() const { return this->_player; }
 
     // setters
@@ -44,13 +50,23 @@ public:
     void setType(char type);
 
     // utility
+    //Tells if current piece is a joker
     bool isJoker() { return _is_joker; }
     // overloading the copy assignment operator '='
     PieceRPS& operator=(const PieceRPS& p);
     // no need for equivalance operator
     // TODO: maybe implement anyway
     bool operator==(const PieceRPS& p) const = delete;
+    //no need to implement because it's enough to overload the > operator
     bool operator>(const PieceRPS& p) const = delete;
+    
+    /**
+     * @brief Overloading on the lower than (<) operator. According to the rules of the game. Returns true only if the left side is lower "in strength" than the right side.
+     * 
+     * @param p The right hand side to compare to.
+     * @return true If the left side is lower "in strength" than the right side
+     * @return false Otherwise
+     */
     bool operator<(const PieceRPS& p) const;
 
     // interface defined functions
@@ -63,7 +79,14 @@ public:
     char getJokerRep() const;
 
 public:
-    // overloading the '<<' operator for printing piece
+
+/**
+ * @brief Overloading on the print to ostream (<<) operator.
+ * 
+ * @param output The ostream to output into
+ * @param piece The play piece to print
+ * @return ostream& The modified ostream
+ */
     friend std::ostream& operator<<(std::ostream& output, const PieceRPS& piece);
 };
 
