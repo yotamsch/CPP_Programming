@@ -17,6 +17,13 @@
 
 // %% INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+/**
+ * @brief : Adds a specified piece to the board and 
+ * updates the number and positions of this type of piece for the corresponding owner
+ * 
+ * @param p - the specified piece
+ * @param position - the position on board of the specified piece
+ */
 void AutoPlayerAlgorithm::info::addPiece(AutoPlayerAlgorithm::piece p, int position)
 {
     if (p._M_player == NO_PLAYER) {
@@ -38,7 +45,12 @@ void AutoPlayerAlgorithm::info::addPiece(AutoPlayerAlgorithm::piece p, int posit
     }
     this->_M_board[position] = p;
 }
-
+/**
+ * @brief : Given a position on board, removes the piece that is currently at this position
+ * and updates the number and positions of this type of piece for the corresponding owner
+ * 
+ * @param position - the position where the piece-to-be-deleted is
+ */
 void AutoPlayerAlgorithm::info::removePiece(int position)
 {
     auto& p = this->_M_board[position];
@@ -56,7 +68,11 @@ void AutoPlayerAlgorithm::info::removePiece(int position)
     }
     emptyPiece(position);
 }
-
+/**
+ * @brief Removes the flag at a specified position and updates number of flags for the owner
+ * 
+ * @param position - where the flag is currently
+ */
 void AutoPlayerAlgorithm::info::removeFlag(int position)
 {
     auto& p = this->_M_board[position];
@@ -69,19 +85,33 @@ void AutoPlayerAlgorithm::info::removeFlag(int position)
         this->_M_other_player._M_flags.erase(position);
     }
 }
-
+/**
+ * @brief : Given a position on board, resets the piece at the position.
+ * After invoking the function, the board at the specified position will be neutralized piece-wise
+ * 
+ * @param position - the specified position which we want to be empty of pieces
+ */
 void AutoPlayerAlgorithm::info::emptyPiece(int position)
 {
     this->_M_board[position]._M_player = 0;
     this->_M_board[position]._M_isJoker = false;
     this->_M_board[position]._M_piece = '\0';
 }
-
+/**
+ * @brief given a positon, sets the piece at this position to be a joker
+ * 
+ * @param position - the specified position
+ */
 void AutoPlayerAlgorithm::info::updateJoker(int position)
 {
     this->_M_board[position]._M_isJoker = true;
 }
-
+/**
+ * @brief : Swaps the positions of two pieces on the board
+ * 
+ * @param pos1 - the piece at pos1 will be at pos2 at end of function
+ * @param pos2 - the piece at pos2 will be at pos1 at end of function
+ */
 void AutoPlayerAlgorithm::info::swapPieces(int pos1, int pos2)
 {
     auto p1 = this->_M_board[pos1];
@@ -96,17 +126,33 @@ void AutoPlayerAlgorithm::info::swapPieces(int pos1, int pos2)
     removeFlag(pos1);
     removeFlag(pos2);
 }
-
+/**
+ * @brief updates the struct "info" with a new move from->to
+ * Adds a new move on board
+ * 
+ * @param from - starting position
+ * @param to - destination position
+ */
 void AutoPlayerAlgorithm::info::addMove(int from, int to)
 {
     this->_M_moves.push_back({ from, to });
 }
-
+/**
+ * @brief - Gets the last committed move in the game
+ * 
+ * @return const AutoPlayerAlgorithm::move& - reference to the last move committed
+ */
 const AutoPlayerAlgorithm::move& AutoPlayerAlgorithm::info::peekMove() const
 {
+    if(this->_M_moves.empty) {
+        //TODO: handle case because otherwise there is undefined behaviour, according to cppreference
+    }
     return this->_M_moves.back();
 }
-
+/**
+ * @brief Swaps between the two players
+ * 
+ */
 void AutoPlayerAlgorithm::info::swapPlayers()
 {
     // TODO verify it works
@@ -117,13 +163,17 @@ void AutoPlayerAlgorithm::info::swapPlayers()
 
 // %% GENERAL %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+/**
+ * @brief the function calculates a random position on board and returns that position as an int
+ * 
+ * @return int - the random position on board
+ */
 /*static*/ int AutoPlayerAlgorithm::getRandomPos()
 {
     const int range_from = 0;
     const int range_to = DIM_X * DIM_Y;
     return rand() % (range_to - range_from) + range_from;
 }
-
 /*static*/ int AutoPlayerAlgorithm::getXDim(int vPos)
 {
     return vPos % DIM_X;
@@ -145,11 +195,20 @@ void AutoPlayerAlgorithm::info::swapPlayers()
     int choose = rand() % 4;
     return vTypes[choose];
 }
-
+/**
+ * @brief - Checks if the move from (x,y) to (n_x,n_y) is in the allowed range
+ * 
+ * @param x - the old x coord
+ * @param y - the old y coord
+ * @param n_x - the new x coord
+ * @param n_y - the new y coord
+ * @return true - if the range of the arguments is within the board and also the move from (x,y) to (n_x,n_y) is valid according to the game rules: one step only either horizontally or vertically
+ * @return false - otherwise
+ */
 bool AutoPlayerAlgorithm::isPosValid(int x, int y, int n_x /*= -1*/, int n_y /*= -1*/)
-{
+{//TODO: verify with Yotam how do we handle the case where this function is used to check position and not move, both here and in BoardRPS
     bool result = true;
-    if (n_x >= DIM_X || n_x < 0 || n_y >= DIM_Y || n_y < 0) {
+    if (n_x >= DIM_X || n_x < 0 || n_y >= DIM_Y || n_y < 0) {//TODO: ask Yotam how this line is not supposed to always return false whenever the test is for a positioning and not a move
         result = false;
     }
     if (n_x != -1 || n_y != -1) {
@@ -166,7 +225,11 @@ bool AutoPlayerAlgorithm::isPosValid(int x, int y, int n_x /*= -1*/, int n_y /*=
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // %% POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+/**
+ * @brief Gets a random position on board that hasn't been chosen yet
+ * 
+ * @return int - random position 
+ */
 int AutoPlayerAlgorithm::getPositionNotSelectedYet() const
 {
     int vRandPosition = 0;
@@ -175,7 +238,13 @@ int AutoPlayerAlgorithm::getPositionNotSelectedYet() const
     } while (_info._M_this_player._M_pieces.count(vRandPosition) != 0);
     return vRandPosition;
 }
-
+/**
+ * @brief - finds a random not-taken-position on the board to place a piece of type vType and actually places it there
+ * 
+ * @param vLimit - maximal number of this type of piece that each player shall have according to the game rules
+ * @param vType - type of the piece that needs to be positioned
+ * @param vectorToFill - a vector that is filled inside the function with PiecePositions according to the random positioning of the pieces
+ */
 void AutoPlayerAlgorithm::positionPiecesOfType(int vLimit,
     char vType, std::vector<unique_ptr<PiecePosition>>& vectorToFill)
 {
@@ -196,7 +265,13 @@ void AutoPlayerAlgorithm::positionPiecesOfType(int vLimit,
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // %% MOVE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+/**
+ * @brief gets the number of moving pieces(R,P,S) of the player player. 
+ * 
+ * @param data - reference to the struct "info", used to access the board
+ * @param player - the player we require about
+ * @return int - number of moving piece the player player has
+ */
 int AutoPlayerAlgorithm::getNumOfMovingPieces(AutoPlayerAlgorithm::info& data, AutoPlayerAlgorithm::player_info& player) const
 {
     int counter = 0;
@@ -213,7 +288,17 @@ int AutoPlayerAlgorithm::getNumOfMovingPieces(AutoPlayerAlgorithm::info& data, A
     }
     return counter;
 }
-
+/**
+ * @brief Check if a move from vOriginPos to vDestPos is allowed(valid according to the game rules)
+ *  and also if the move is not "definitely losing" i.e. the player's piece is attacking a stronger opponent piece
+ * 
+ * 
+ * @param data - reference to struct info, used to access the board
+ * @param vOriginPos - source position
+ * @param vDestPos - destination position
+ * @return true - if the move is valid and also causes the current player to NOT lose this fight
+ * @return false - otherwise
+ */
 bool AutoPlayerAlgorithm::isMovePossible(AutoPlayerAlgorithm::info& data, int vOriginPos, int vDestPos)
 {
     int x, y, n_x, n_y;
@@ -230,7 +315,14 @@ bool AutoPlayerAlgorithm::isMovePossible(AutoPlayerAlgorithm::info& data, int vO
     }
     return willWinFight(data, vOriginPos, vDestPos);
 }
-
+/**
+ * @brief For a specified position, checks what possible moves the piece at positon may have
+ * and updates these possible moves in the given vector rMoves
+ * 
+ * @param data - reference to the struct info, used to access the board
+ * @param vPos - the specified position
+ * @param rMoves - a vector to be filled by the function with all the allowed moves for the piece at vPos
+ */
 void AutoPlayerAlgorithm::getPossibleMovesForPiece(AutoPlayerAlgorithm::info& data, int vPos, std::vector<int>& rMoves)
 {
     int x = getXDim(vPos);
@@ -249,7 +341,14 @@ void AutoPlayerAlgorithm::getPossibleMovesForPiece(AutoPlayerAlgorithm::info& da
         }
     }
 }
-
+/**
+ * @brief Checks if the piece located at vPos is threatening to opponent
+ * 
+ * @param data - reference to the stuct info, used to access board infromation
+ * @param vPos - the specified position
+ * @return true -if the piece at vPos can eat an opponent piece in one step
+ * @return false -otherwise
+ */
 bool AutoPlayerAlgorithm::isPieceThreatening(AutoPlayerAlgorithm::info& data, int vPos)
 {
     int x, y;
@@ -271,7 +370,14 @@ bool AutoPlayerAlgorithm::isPieceThreatening(AutoPlayerAlgorithm::info& data, in
     }
     return isThreat;
 }
-
+/**
+ * @brief  Checks if the piece located at vPos is threatened by opponent
+ * 
+ * @param data - reference to the stuct info, used to access board infromation
+ * @param vPos - the specified position
+ * @return true - if the piece at vPos can be reached and eaten by an opponent piece in one step
+ * @return false - otherwise
+ */
 bool AutoPlayerAlgorithm::isPieceInDanger(AutoPlayerAlgorithm::info& data, int vPos)
 {
     int x, y;
@@ -292,6 +398,17 @@ bool AutoPlayerAlgorithm::isPieceInDanger(AutoPlayerAlgorithm::info& data, int v
     return isDanger;
 }
 
+
+//TODO: let Yotam see if the "high chance" thing is correct
+/**
+ * @brief Checks if moving from vOrigPos to vDestPos will result in winning the fight 
+ * 
+ * @param data - reference to struct info, used to access the board
+ * @param vOriginPos - source position 
+ * @param vDestPos - destination position 
+ * @return true - if the move will result in winning the fight certainly or in a hight chance
+ * @return false - otherwise
+ */
 bool AutoPlayerAlgorithm::willWinFight(AutoPlayerAlgorithm::info& data, int vOriginPos, int vDestPos)
 {
     // NOTE: assumes that origin and dest are on the board and correct pieces of two different players
@@ -308,7 +425,15 @@ bool AutoPlayerAlgorithm::willWinFight(AutoPlayerAlgorithm::info& data, int vOri
     }
     return true;
 }
-
+/**
+ * @brief Caluculates the average distance of the k closest opponent pieces to vPos 
+ * 
+ * @param data - reference to struct info, used to access the board 
+ * @param vFromPlayer - the opponent player
+ * @param vPos - the position of a current player's pieces
+ * @param k - the number of nearest pieces needed to get average
+ * @return float - average of the distances of the k nearest opponent pieces to vPos
+ */
 float AutoPlayerAlgorithm::calcKNearestDistance(AutoPlayerAlgorithm::info& data, int vFromPlayer, int vPos, int k)
 {
     std::vector<float> dist;
@@ -330,7 +455,14 @@ float AutoPlayerAlgorithm::calcKNearestDistance(AutoPlayerAlgorithm::info& data,
 
     return res / i;
 }
-
+/**
+ * @brief - The function calculates the "score" for the current player
+ *  of a specific representation of the board. It takes into account how many moving pieces this 
+ * player has compared to the opponent, how many pieces are in danger compared to threatening etc.
+ * 
+ * @param data - reference to the struct info, used to extract inforation about the board
+ * @return float - the score of the player, meaning how good the current  board status is for the player
+ */
 float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
 {
     const int ALL_PIECES_EATEN = 10;
@@ -404,13 +536,24 @@ float AutoPlayerAlgorithm::calcPlayerBoardScore(AutoPlayerAlgorithm::info& data)
 
     return score;
 }
-
+/**
+ * @brief - Performs a given move on the current board 
+ * 
+ * @param data - reference to the struct info, used to access board
+ * @param vMove - a copy of the struct move
+ */
 void AutoPlayerAlgorithm::performMoveOnBoard(AutoPlayerAlgorithm::info& data, AutoPlayerAlgorithm::move vMove)
 {
     data.swapPieces(vMove._M_from, vMove._M_to);
     data.removePiece(vMove._M_from);
 }
-
+/**
+ * @brief Gets a "score" for a potentional move on the board, as in "how good this move will be for the player"
+ * 
+ * @param data - a copy of the struct info, used to perform a hypothetical move on it 
+ * @param vMove - hypothetical move of type copy of the struct move
+ * @return float - the calculated score
+ */
 float AutoPlayerAlgorithm::getScoreForMove(AutoPlayerAlgorithm::info data, AutoPlayerAlgorithm::move vMove)
 {
     // just in case
@@ -421,7 +564,14 @@ float AutoPlayerAlgorithm::getScoreForMove(AutoPlayerAlgorithm::info data, AutoP
     performMoveOnBoard(data, vMove);
     return calcPlayerBoardScore(data);
 }
-
+/**
+ * @brief Gets a "score" for a potentional joker-change on the board,
+ *  as in "how good this joker-change will be for the player"
+ * 
+ * @param data - a copy of the struct info, used to perform a hypothetical move on it 
+ * @param vChange - the potential joker-change
+ * @return float - the calculated score
+ */
 float AutoPlayerAlgorithm::getScoreForJokerChange(AutoPlayerAlgorithm::info data, AutoPlayerAlgorithm::joker_change vChange)
 {
     // just in case
@@ -432,7 +582,12 @@ float AutoPlayerAlgorithm::getScoreForJokerChange(AutoPlayerAlgorithm::info data
     data._M_board[vChange._M_position]._M_piece = vChange._M_new_rep;
     return calcPlayerBoardScore(data);
 }
-
+/**
+ * @brief Gets the best move possible out of all available moves for this player
+ * 
+ * @param data - a reference of the struct info
+ * @return AutoPlayerAlgorithm::move - the move that has the highest score among all other valid moves
+ */
 AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAlgorithm::info& data)
 {
     AutoPlayerAlgorithm::move currMove, maxMove;
@@ -459,7 +614,12 @@ AutoPlayerAlgorithm::move AutoPlayerAlgorithm::getBestMoveForPlayer(AutoPlayerAl
     }
     return maxMove;
 }
-
+/**
+ * @brief Gets the best joker-change possible out of all available joker-change for this player
+ * 
+ * @param data - a reference of the struct info
+ * @return AutoPlayerAlgorithm::joker_change - the joker-change that has the highest score among all other valid joker-changes
+ */
 AutoPlayerAlgorithm::joker_change AutoPlayerAlgorithm::getBestJokerChangeForPlayer(AutoPlayerAlgorithm::info& data)
 {
     AutoPlayerAlgorithm::joker_change currChange, bestChange;
@@ -482,8 +642,14 @@ AutoPlayerAlgorithm::joker_change AutoPlayerAlgorithm::getBestJokerChangeForPlay
 
 // %% INTERFACE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-// Implemented with Smart Random method, which spreads the pices randomly.
-// It will not place two pieces in the same spot.
+/**
+ * @brief Fills vectorToFill with the initial board positions of this player.
+ * Implemented with Smart Random method, which spreads the pices randomly.
+ * It will not place two pieces in the same spot.
+ * 
+ * @param player - int representation of current player  
+ * @param vectorToFill - the vector sepcified above to be filled
+ */
 void AutoPlayerAlgorithm::getInitialPositions(int player,
     std::vector<unique_ptr<PiecePosition>>& vectorToFill)
 {
@@ -508,6 +674,14 @@ void AutoPlayerAlgorithm::getInitialPositions(int player,
     positionPiecesOfType(SCISSORS_LIMIT, SCISSORS_CHR, vectorToFill);
 }
 
+/**
+ * @brief Notifies the AutoPlayerAlgorithm about the initial board after placing both players' pieces
+ * and also notifies about all the fights that took place in the initial positioning.
+ * The function uses the parameter b to extract information and store it in the suitable data structures
+ * 
+ * @param b - a reference to the Board 
+ * @param fights - a vector of unique pointers to be filled by the function with all the initial fights
+ */
 void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board& b,
     const std::vector<unique_ptr<FightInfo>>& fights)
 {
@@ -538,7 +712,11 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board& b,
         }
     }
 }
-
+/**
+ * @brief Notifies the AutoPlayerAlgorithm about an opponent move
+ * 
+ * @param move - a reference to the opponent move
+ */
 void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move& move)
 {
     // save the move into history vector
@@ -553,7 +731,11 @@ void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move& move)
         this->_info.swapPieces(this->_info.peekMove()._M_from, this->_info.peekMove()._M_to);
     }
 }
-
+/**
+ * @brief Notifies the AutoPlayerAlgorithm about the latest fight
+ * 
+ * @param fightInfo - a reference to FightInfo, holds the information about : winner, where the fight happened, and what pieces particicpatd in it
+ */
 void AutoPlayerAlgorithm::notifyFightResult(const FightInfo& fightInfo)
 {
     int fightPos = getPos(fightInfo.getPosition().getX(), fightInfo.getPosition().getY());
@@ -577,7 +759,11 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo& fightInfo)
         this->_info.removePiece(this->_info.peekMove()._M_from);
     }
 }
-
+/**
+ * @brief Calculates the smartest move that the current player can make in this board state and returns a pointer to this move
+ * 
+ * @return unique_ptr<Move> - a pointer to the best move that the auto player would want to make next
+ */
 unique_ptr<Move> AutoPlayerAlgorithm::getMove()
 {
     std::unique_ptr<Move> retMove;
@@ -613,7 +799,12 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove()
     // -----------
     return std::move(retMove);
 }
+/**
+ * @brief Calculates the smartest joker-change that the current player can make in this board state and returns a pointer to this joker-change
 
+ * 
+ * @return unique_ptr<JokerChange> - a pointer to the best joker-change that the auto player would want to make next
+ */
 unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange()
 {
     std::unique_ptr<JokerChange> retJokerChange;
