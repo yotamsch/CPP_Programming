@@ -1,4 +1,10 @@
-
+/**
+ * @brief The header file for the BoardRPS class.
+ * 
+ * @file BoardRPS.h
+ * @author Yotam Sechayk
+ * @date 2018-05-13
+ */
 #ifndef __H_BOARD_RPS
 #define __H_BOARD_RPS
 
@@ -34,7 +40,6 @@ public:
     // no need for copy c'tor
     BoardRPS(const BoardRPS& other) = delete;
     // move c'tor
-    // TODO: maybe move c'tor not needed
     BoardRPS(BoardRPS&& other)
         : _n(other._n) // the number of rows
         , _m(other._m) // the number of columns
@@ -46,71 +51,37 @@ public:
     ~BoardRPS() {}
 
     // getters
-    // TODO: not sure if they are in use, maybe not needed
-    int getN() const { return _n; }
-    int getM() const { return _m; }
-    // TODO: not sure this getter is needed
-    const std::vector<std::unique_ptr<PieceRPS>>& getBoard() const { return _board; }
+    // gets a reference to the pointer of a piece in position
+    const std::unique_ptr<PieceRPS>& getPieceAt(const Point& point) const;
 
     // utility
     // move assignment
-    // TODO: maybe move assignment not needed
     BoardRPS& operator=(BoardRPS&& b);
     // clears the board of pieces
     void clearBoard();
-
-    /**
-     * @brief Gets a reference to the pointer of the piece at position point
-     * 
-     * @param point - the position that we need to know what piece happens to be in.
-     * @return const std::unique_ptr<PieceRPS>& -reference to the piece at the specified position (nullptr if there is no piece)
-     */
-    const std::unique_ptr<PieceRPS>& getPieceAt(const Point& point);
-    
-
-/**
- * @brief The function creates and places a new piece on the board. 
- * Based on the rules of each piece (found by its type).
- * 
- * @param player The player type (PLAYER_1 or PLAYER_2)
- * @param type The piece type
- * @param x The x position on the board
- * @param y The y position on the board
- * @param is_joker Is the piece a joker piece
- * @return true If everything went fine and the piece has been inserted into the board.
- * @return false If an error occured
- */
+    // place a piece on the board, update fight info accordingly
     bool placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfo>& rpFightInfo);
     // move an existing piece on the board 'from' -> 'to'
     bool movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfo>& rpFightInfo);
     // change an existing joker's representation
     bool changeJoker(int player, const std::unique_ptr<JokerChange>& rpJokerChange);
     // print the board nicely
-    // TODO: remove method before submission
     void prettyPrint();
+
     // interface defined functions
     // get the player number (id/type) of the piece in the position
     int getPlayer(const Point& pos) const;
 
 private:
 
-    /**
-     * @brief checks if the point position is valid 
-     * 
-     * @param x - row coordinate
-     * @param y - column coordinate
-     * @return false - if x<0 or x> #of rows or y<0 or y> #of columns
-     * @return true - otherwise
-     */
+    // checks if the position is valid
     bool isPositionValid(int x, int y);
-
     // checks if the point position is valid for (x,y) and (new_x,new_y)
     // also checks if the position is 'movable-valid'
     bool isPositionValid(int x, int y, int new_x, int new_y);
     //check if a certain move is legal
     bool isMoveLegal(int player, int x, int y, int new_x, int new_y);
     // calculates the correct vector position
-    // TODO: maybe rename to something else
     int p(int x, int y) const { return y * _m + x; }
 
 public:

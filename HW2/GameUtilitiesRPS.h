@@ -3,7 +3,7 @@
  * 
  * @file GameUtilitiesRPS.h
  * @author Yotam Sechayk
- * @date 2018-05-05
+ * @date 2018-05-10
  */
 #ifndef __H_GAME_UTILITIES_RPS
 #define __H_GAME_UTILITIES_RPS
@@ -44,7 +44,6 @@
 #define FLAG_LIMIT 1
 
 // possible output messages
-// TODO re-think possible messages
 #define BAD_ARGS_MESSAGE "Please enter (as the first argument): auto-vs-auto, file-vs-file, auto-vs-file or file-vs-auto and try again."
 #define RSN_ALL_FLAGS_CAPTURED "All flags of the opponent are captured"
 #define RSN_ALL_PIECES_EATEN "All moving PIECEs of the opponent are eaten"
@@ -70,7 +69,6 @@
  * @brief An enum representing the returned reason of gameplay functions
  * 
  */
-// TODO concider replacing
 enum class Reason {
     BAD_MOVE_ERROR,
     POSITION_FILE_ERROR

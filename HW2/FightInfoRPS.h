@@ -1,4 +1,10 @@
-
+/**
+ * @brief The header of the FightInfoRPS class.
+ * 
+ * @file FightInfoRPS.h
+ * @author Yotam Sechayk
+ * @date 2018-05-06
+ */
 #ifndef __H_FIGHT_INFO_RPS
 #define __H_FIGHT_INFO_RPS
 
@@ -22,14 +28,7 @@ private:
     int _winner; // the winner of the fight
 
 public:
-    /**
-     * @brief Construct a new FightInfoRPS object
-     * assumes that (rPieceA->position == rPieceB->position)
-     * gets the right values from both pieces and decides on the winner
-     * @param rPieceA - the first piece that participates in the fight
-     * @param rPieceB - the second piece that participates in the fight
-     * @param rPos - the position where the fight happens
-     */
+    // basic c'tor
     FightInfoRPS(PieceRPS& rPieceA, PieceRPS& rPieceB, PointRPS&& rPos);
 
     // d'tor
@@ -37,33 +36,15 @@ public:
 
     // interface defined functions
     // get the position of the fight
-    const Point& getPosition() const;
-
-    /**
-     * @brief given a player, return the char representation of the player's piece that was involved in current fight
-     * 
-     * @param player - the owner
-     * @return char - char representation of the player's piece that was involved in current fight
-     *              could be R, P, S, B or F (but NOT J)
-     */
-    char getPiece(int player) const;
-
-    /**
-     * @brief Get the Winner of the fight
-     * 
-     * @return int - 1 if player 1 won, 2 if player 2 won, 0 if the fight results in a tie
-     */
-    int getWinner() const;
+    const Point& getPosition() const { return _position; }
+    // given a player, return the char representation of the player's piece that was involved in current fight. could be R, P, S, B or F (but NOT J)
+    char getPiece(int player) const { return this->_pieceChar[player - 1]; }
+    // get the Winner of the fight. 1 if player 1 won, 2 if player 2 won, 0 if the fight results in a tie
+    int getWinner() const { return _winner; }
 
 private:
-
-    /**
-     * @brief Get the char representation of the Piece object
-     * 
-     * @param p - reference to PieceRPS object
-     * @return char - char representation of p
-     */
-    char getActualPiece (PieceRPS& p);
+    // gets the actual representation of the piece
+    char getActualPiece(PieceRPS& p);
 };
 
 #endif // !__H_FIGHT_INFO_RPS

@@ -1,10 +1,20 @@
+/**
+ * @brief The PointRPS class header and implementation.
+ * 
+ * @file PointRPS.h
+ * @author Yotam Sechayk
+ * @date 2018-05-12
+ */
 #ifndef __H_POINT_RPS
 #define __H_POINT_RPS
 
 #include "Point.h"
+
 /**
  * @brief A class inheriting from the abstract class Point, 
- * responsible for the creation of points, each point consisting of a x-coordinate and y-coordinate
+ * responsible for the creation of points, each point consisting of:
+ * 1. x-coordinate
+ * 2. y-coordinate
  * 
  */
 class PointRPS : public Point {
@@ -37,7 +47,9 @@ public:
     ~PointRPS(){};
 
     // interface defined functions
+    // get the X dimension of the point
     int getX() const { return _x; }
+    // get the Y dimension of the point
     int getY() const { return _y; }
 };
 

@@ -1,14 +1,39 @@
+/**
+ * @brief The implementation file for the BoardRPS class.
+ * 
+ * @file BoardRPS.cpp
+ * @author Yotam Sechayk
+ * @date 2018-05-13
+ */
 #include "BoardRPS.h"
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <memory>
 
+/**
+ * @brief checks if the point position is valid 
+ * 
+ * @param x - row coordinate
+ * @param y - column coordinate
+ * @return false - if x<0 or x> #of rows or y<0 or y> #of columns
+ * @return true - otherwise
+ */
 bool BoardRPS::isPositionValid(int x, int y)
 {
     return (x >= 0 && x < this->_m) && (y >= 0 && y < this->_n);
 }
 
+/**
+ * @brief Checks if a position is valid for both (x,y) and (new_x,new_y) and also if a move (x,y) -> (new_x,new_y) is possible
+ * 
+ * @param x - the X dimension parameter
+ * @param y - the Y dimension parameter
+ * @param new_x - the new X dimension parameter
+ * @param new_y - the new Y dimension parameter
+ * @return true - iff all tearms are met
+ * @return false - otherwise
+ */
 bool BoardRPS::isPositionValid(int x, int y, int new_x, int new_y)
 {
     if (!isPositionValid(x, y) || !isPositionValid(new_x, new_y)) {
@@ -20,6 +45,10 @@ bool BoardRPS::isPositionValid(int x, int y, int new_x, int new_y)
     return true;
 }
 
+/**
+ * @brief Empties the board of pieces, clears it.
+ * 
+ */
 void BoardRPS::clearBoard()
 {
     for (int i = 0; i < this->_board.size(); ++i) {
@@ -27,11 +56,23 @@ void BoardRPS::clearBoard()
     }
 }
 
-const std::unique_ptr<PieceRPS>& BoardRPS::getPieceAt(const Point& point)
+/**
+ * @brief Gets a reference to the pointer of the piece at position point
+ * 
+ * @param point - the position that we need to know what piece happens to be in.
+ * @return const std::unique_ptr<PieceRPS>& -reference to the piece at the specified position (nullptr if there is no piece)
+ */
+const std::unique_ptr<PieceRPS>& BoardRPS::getPieceAt(const Point& point) const
 {
     return this->_board[p(point.getX(), point.getY())];
 }
 
+/**
+ * @brief The move assignment operator.
+ * 
+ * @param rrOther - an Rvalue reference to another object
+ * @return BoardRPS& - a reference to the current object
+ */
 BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
 {
     this->_n = rrOther._n;
@@ -40,6 +81,15 @@ BoardRPS& BoardRPS::operator=(BoardRPS&& rrOther)
     return *this;
 }
 
+/**
+ * @brief Places a piece on the board, matching with the rules of the Rock Papaer Scissors game. The fight info is updated if there was a fight during placement.
+ * 
+ * @param player - the id of the player which places a piece
+ * @param rpPiece - a reference to a unique pointer of the piece
+ * @param rpFightInfo - the fight info object to be updated
+ * @return true - iff all tearms are met and the positioning is legal
+ * @return false - otherwise
+ */
 bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, std::unique_ptr<FightInfo>& rpFightInfo)
 {
     // get needed information
@@ -100,7 +150,6 @@ bool BoardRPS::placePiece(int player, std::unique_ptr<PiecePosition>& rpPiece, s
  */
 bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
 {
-    // TODO: verify all conditions are met
     if (!isPositionValid(x, y, new_x, new_y) || this->_board[p(x, y)] == nullptr || this->_board[p(x, y)]->getPlayer() != player) {
         return false;
     }
@@ -114,12 +163,13 @@ bool BoardRPS::isMoveLegal(int player, int x, int y, int new_x, int new_y)
 }
 
 /**
- * @brief Moves a piece from (x,y) to (new_x,new_y). Based on the rules of the game. Message is updated correctly.
+ * @brief Attempts to move a piece based on the Move object. If all conditions are met and the move is legal it moves the piece and updates FightInfo accordingly.
  * 
- * @param x The origin X
- * @param y The origin Y
- * @param new_x The destination X
- * @param new_y The destination Y
+ * @param player - the current player id which attempts the move
+ * @param rpMove - a reference to a pointer of the Move object
+ * @param rpFightInfo - the FightInfo object to update
+ * @return true - iff the move is possible
+ * @return false - otherwise
  */
 bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::unique_ptr<FightInfo>& rpFightInfo)
 {
@@ -158,6 +208,14 @@ bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::u
     return true;
 }
 
+/**
+ * @brief Executes a joker representation change if possible
+ * 
+ * @param player - the player id which requests the change
+ * @param rpJokerChange - the Jokerchange ovject to go by
+ * @return true - iff the change is possible
+ * @return false - otherwise
+ */
 bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChange>& rpJokerChange)
 {
     const int x = rpJokerChange->getJokerChangePosition().getX();
@@ -177,14 +235,27 @@ bool BoardRPS::changeJoker(int player, const std::unique_ptr<JokerChange>& rpJok
     return true;
 }
 
+/**
+ * @brief Get the player id of a piece in position. If no piece exists returns 0
+ * 
+ * @param pos - the Point object containing the position
+ * @return int - the player ID number at position, or 0
+ */
 int BoardRPS::getPlayer(const Point& pos) const
 {
     if (_board[p(pos.getX(), pos.getY())] != nullptr)
         return _board[p(pos.getX(), pos.getY())]->getPlayer();
     // return 0 if empty
-    return 0;
+    return NO_PLAYER;
 }
 
+/**
+ * @brief The print operator implementation. A friend function. Prints a board.
+ * 
+ * @param output - the stream to print to
+ * @param rBoard - the Board to print
+ * @return std::ostream& - the stream for continuation of printing
+ */
 std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)
 {
     for (int y = 0; y < rBoard._n; ++y) {
@@ -201,7 +272,8 @@ std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)
 }
 
 /**
- * @brief Prints the board.
+ 
+ * @brief Prints the board nicely for DEBUG uses. Was left to give the option to use while debugging.
  * 
  */
 void BoardRPS::prettyPrint()

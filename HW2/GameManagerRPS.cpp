@@ -1,4 +1,10 @@
-
+/**
+ * @brief the game manager for the Rock Paper Scissors game.
+ * 
+ * @file GameManagerRPS.cpp
+ * @author Tala Amouri
+ * @date 2018-05-04
+ */
 #include "GameManagerRPS.h"
 #include "AutoPlayerAlgorithm.h"
 #include "BoardRPS.h"
@@ -133,14 +139,13 @@ bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
     return true;
 }
 
-// TODO maybe get rid of the possibility of 'args'
-int PlayRPS(int vGameStyle, const char* outfile_path /*= "./rps.output"*/, const char* p1_posfile_path /*= "./player1.rps_board"*/, const char* p2_posfile_path /*= "./player2.rps_board"*/, const char* p1_movfile_path /*= "./player1.rps_moves"*/, const char* p2_movfile_path /*= "./player2.rps_moves"*/)
+int PlayRPS(int vGameStyle)
 {
-    /*const char* outfile_path = "./rps.output";
+    const char* outfile_path = "./rps.output";
     const char* p1_posfile_path = "./player1.rps_board";
     const char* p2_posfile_path = "./player2.rps_board";
     const char* p1_movfile_path = "./player1.rps_moves";
-    const char* p2_movfile_path = "./player2.rps_moves";*/
+    const char* p2_movfile_path = "./player2.rps_moves";
 
     std::unique_ptr<PlayerAlgorithm> p1;
     std::unique_ptr<PlayerAlgorithm> p2;
@@ -174,9 +179,8 @@ int PlayRPS(int vGameStyle, const char* outfile_path /*= "./rps.output"*/, const
     p1->getInitialPositions(PLAYER_1, initPositionP1);
     p2->getInitialPositions(PLAYER_2, initPositionP2);
 
-    // TODO maybe move to a unique_ptr of ScoreManager
+    // since will be used only as long as this function in operating, chose to implement using an Lvalue
     ScoreManager scoreManager;
-    // TODO maybe create a unique_ptr of BoardRPS
     BoardRPS myBoard(DIM_X, DIM_Y);
 
     fillRes1 = fillBoard(myBoard, PLAYER_1, initPositionP1, fightsInfoVec, scoreManager);
@@ -197,10 +201,6 @@ int PlayRPS(int vGameStyle, const char* outfile_path /*= "./rps.output"*/, const
     turn = 0;
 
     while (turn < MAX_NUM_OF_MOVES && !scoreManager.isGameOver()) {
-        
-        //myBoard.prettyPrint();
-        std::cout << "TURN #" << turn << std::endl;
-
         switch (currentPlayer) {
         case PLAYER_1:
             playCurrTurn(PLAYER_1, p1, p2, myBoard, scoreManager);

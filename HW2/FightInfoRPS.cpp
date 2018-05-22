@@ -1,6 +1,20 @@
-
+/**
+ * @brief The implementation of the FightInfoRPS class.
+ * 
+ * @file FightInfoRPS.cpp
+ * @author Yotam Sechayk
+ * @date 2018-05-06
+ */
 #include "FightInfoRPS.h"
 
+/**
+ * @brief Construct a new FightInfoRPS object
+ * assumes that (rPieceA->position == rPieceB->position)
+ * gets the right values from both pieces and decides on the winner
+ * @param rPieceA - the first piece that participates in the fight
+ * @param rPieceB - the second piece that participates in the fight
+ * @param rPos - the position where the fight happens
+ */
 FightInfoRPS::FightInfoRPS(PieceRPS& rPieceA, PieceRPS& rPieceB, PointRPS&& rPos)
     : _position(rPos)
     , _winner(0) // initialize - no winner
@@ -15,27 +29,16 @@ FightInfoRPS::FightInfoRPS(PieceRPS& rPieceA, PieceRPS& rPieceB, PointRPS&& rPos
         this->_winner = rPieceA < rPieceB ? rPieceB.getPlayer() : rPieceA.getPlayer();
     }
 
-    // NOTE:
-    // -----
-    // the case where the origin piece of MOVE cannot be a BOMB is unrelevant here
-    // and is being taken care of in the place which creates the Fight?Info instance
+    // NOTE: The case where the origin piece of MOVE cannot be a BOMB is unrelevant here
+    // and is being taken care of in the place which creates the FightInfo instance
 }
 
-const Point& FightInfoRPS::getPosition() const
-{
-    return _position;
-}
-
-char FightInfoRPS::getPiece(int player) const
-{
-    return this->_pieceChar[player - 1];
-}
-
-int FightInfoRPS::getWinner() const
-{
-    return _winner;
-}
-
+/**
+ * @brief Get the char representation of the Piece object
+ * 
+ * @param p - reference to PieceRPS object
+ * @return char - char representation of p
+ */
 char FightInfoRPS::getActualPiece(PieceRPS& p) {
     if (p.isJoker()) {
         return p.getJokerRep();

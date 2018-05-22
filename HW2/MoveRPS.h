@@ -1,3 +1,10 @@
+/**
+ * @brief The header file for the MoveRPS class.
+ * 
+ * @file MoveRPS.h
+ * @author Tala Amouri
+ * @date 2018-05-09
+ */
 #ifndef __H_MOVE_RPS
 #define __H_MOVE_RPS
 
@@ -26,24 +33,10 @@ public:
     ~MoveRPS() {}
 
     // interace defined functions
-    /**
-     * @brief Gets the source position of this move
-     * 
-     * @return const Point& - reference to a Point representing the source position
-     */
-    const Point& getFrom() const
-    {
-        return _fromPoint;
-    }
-    /**
-     * @brief Gets the destination position of this move
-     * 
-     * @return const Point& - reference to a Point representing the destination position
-     */
-    const Point& getTo() const
-    {
-        return _toPoint;
-    }
+    // gets a reference to a Point representing the source position
+    const Point& getFrom() const { return _fromPoint; }
+    // gets a reference to a Point representing the destination position
+    const Point& getTo() const { return _toPoint; }
 };
 
 #endif // !__H_MOVE_RPS

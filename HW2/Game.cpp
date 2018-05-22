@@ -5,7 +5,6 @@
  * @author Yotam Sechayk
  * @date 2018-04-27
  */
-
 #include "GameManagerRPS.h"
 #include "GameUtilitiesRPS.h"
 
@@ -32,18 +31,12 @@ int main(int argc, char** argv)
         return 1; // exit in case of error
     }
 
-    // TODO maybve remove before submission
     printMessageToScreen(INFO, argv[1]);
 
     if (!ava.compare(argv[1])) {
         gameResult = PlayRPS(AUTO_VS_AUTO);
     } else if (!fvf.compare(argv[1])) {
-        // TODO maybe get rid of the possibility of 'args'
-        if (argc >= 7) {
-            gameResult = PlayRPS(FILE_VS_FILE, argv[2], argv[3], argv[4], argv[5], argv[6]);
-        } else {
-            gameResult = PlayRPS(FILE_VS_FILE);
-        }
+        gameResult = PlayRPS(FILE_VS_FILE);
     } else if (!avf.compare(argv[1])) {
         gameResult = PlayRPS(AUTO_VS_FILE);
     } else if (!fva.compare(argv[1])) {
@@ -52,8 +45,11 @@ int main(int argc, char** argv)
         printMessageToScreen(ERROR, "The play type was not entered correctly.", BAD_ARGS_MESSAGE);
         return 1;
     }
+
     if (gameResult != 0) {
         printMessageToScreen(ERROR, "Failed to open/create output file.");
         return 1;
     }
+
+    printMessageToScreen(INFO, "Game play finished successfully.");
 }

@@ -1,3 +1,10 @@
+/**
+ * @brief The header file for the PieceRPS class.
+ * 
+ * @file PieceRPS.h
+ * @author Yotam Sechayk
+ * @date 2018-05-12
+ */
 #ifndef __H_PIECE_RPS
 #define __H_PIECE_RPS
 
@@ -5,11 +12,15 @@
 #include "PiecePosition.h"
 #include "PointRPS.h"
 #include <iostream>
+
 /**
  * @brief A class inheriting from the abstract class PiecePosition, 
  * responsible for the creation of game pieces,
- * each piece consisting of 1. its owner 2. a boolean to tell if it's a joker
- * 3. its char representation 4.its location on the board 
+ * each piece consisting of:
+ * 1. its owner 
+ * 2. a boolean to tell if it's a joker
+ * 3. its char representation 
+ * 4. its location on the board 
  * 
  */
 class PieceRPS : public PiecePosition {
@@ -41,52 +52,30 @@ public:
     int getPlayer() const { return this->_player; }
 
     // setters
-
-    /**
-     * @brief called ONLY when setting a joker's representation. Changes/Sets the calling joker's type(char representation)
-     * 
-     * @param type - the desired representation of a joker
-     */
+    // if this piece is a joker piece, changes it's type, otherwise does nothing
     void setType(char type);
 
     // utility
-    //Tells if current piece is a joker
+    // tells if current piece is a joker
     bool isJoker() { return _is_joker; }
     // overloading the copy assignment operator '='
     PieceRPS& operator=(const PieceRPS& p);
     // no need for equivalance operator
-    // TODO: maybe implement anyway
     bool operator==(const PieceRPS& p) const = delete;
-    //no need to implement because it's enough to overload the > operator
+    // no need to implement because it's enough to overload the > operator
     bool operator>(const PieceRPS& p) const = delete;
-    
-    /**
-     * @brief Overloading on the lower than (<) operator. According to the rules of the game. Returns true only if the left side is lower "in strength" than the right side.
-     * 
-     * @param p The right hand side to compare to.
-     * @return true If the left side is lower "in strength" than the right side
-     * @return false Otherwise
-     */
+    // overloading the lower than (<) operator
     bool operator<(const PieceRPS& p) const;
 
     // interface defined functions
-
-    //Gets the current position of this piece
+    // gets the current position of this piece
     const Point& getPosition() const;
     // gets the char representation of this piece
     char getPiece() const;
-    //if this piece is a joker, gets its char representation(R, P, S or B). otherwise returns '#'
+    // if this piece is a joker, gets its char representation(R, P, S or B). otherwise returns '#'
     char getJokerRep() const;
 
 public:
-
-/**
- * @brief Overloading on the print to ostream (<<) operator.
- * 
- * @param output The ostream to output into
- * @param piece The play piece to print
- * @return ostream& The modified ostream
- */
     friend std::ostream& operator<<(std::ostream& output, const PieceRPS& piece);
 };
 

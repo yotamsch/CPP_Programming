@@ -1,3 +1,10 @@
+/**
+ * @brief The header file of the FilePlayerAlgorithm class.
+ * 
+ * @file FilePlayerAlgorithm.h
+ * @author Yotam Sechayk, Tala Amouri
+ * @date 2018-05-15
+ */
 #ifndef __H_FILE_PLAYER_ALGORITHM
 #define __H_FILE_PLAYER_ALGORITHM
 
@@ -30,68 +37,31 @@ public:
     ~FilePlayerAlgorithm();
 
     // interface defined functions
+    // gets the positions from position file and populates the vector
     void getInitialPositions(int player, std::vector<std::unique_ptr<PiecePosition>>& vectorToFill);
-    void notifyOnInitialBoard(const Board& b, const std::vector<std::unique_ptr<FightInfo>>& fights) {} // empty
-    void notifyOnOpponentMove(const Move& move) {} // empty
-    void notifyFightResult(const FightInfo& fightInfo) {} // empty
+    // not used - empty implementation
+    void notifyOnInitialBoard(const Board& b, const std::vector<std::unique_ptr<FightInfo>>& fights) {}
+    // not used - empty implementation
+    void notifyOnOpponentMove(const Move& move) {}
+    // not used - empty implementation
+    void notifyFightResult(const FightInfo& fightInfo) {}
+    // gets the next move of the player
     std::unique_ptr<Move> getMove();
+    // gets the current joker change if one was accompaneeing the last retrieved move
     std::unique_ptr<JokerChange> getJokerChange();
 
 private:
-
-/**
- * @brief 
- * Parses the positions' file of a specified player and fills a vector with the pieces found in this file
- * 
- * @param player - the player that the current file belongs to  
- * @param vectorToFill - a vector that is filled by this function with all the pieces that exist in the positons' file of this player
- * @return true - if parsing was done successfully
- * @return false - if: 1.There is a bad formatted line 2.There are not enough flags 3.There are extra pieces than should be 4.There was any other problem in reading a line
- */
+    // parse the positions file and updates the positions vector
     bool parsePositions(int player, std::vector<std::unique_ptr<PiecePosition>>& vectorToFill);
-
-/**
- * @brief 
- * Parses the next move from the moves' file of current player and places it in the given reference rpMove
- * @param rpMove - a reference of a pointer to a Move object that is filled correctly inside the function with the parsed move 
- * @return false - if there was any problem with openning the moves' file or if the current line in the file is bad formatted
- * @return true - if there was no problem with the current line 
- */
+    // parse the next move from the moves files
     bool parseMove(std::unique_ptr<Move>& rpMove);
-
-/**
- * @brief 
- * 
- * @param _f - referece of std::ifstream used to open the given file path below
- * @param filePath - file path given as a string 
- * @return true - if file was opened successfully
- * @return false - otherwise
- */
-    // TODO choose static or non-static
+    // initializes a file stream from file path
     static bool initializeFile(std::ifstream& _f, const char* filePath);
-
-/**
- * @brief 
- * Reads a single line from the file pointed at by _f and stores the read line in the parameter line
- * 
- * @param _f - ifstream reference to the current file
- * @param line - reference to a string, populated inside the function with the single read file
- * @return true - if a line was read successfully
- * @return false - otherwise
- */
+    // reads the next line in a given file stream
     static bool readLine(std::ifstream& _f, std::string& line);
-   
-
-
+    // trims a given string line
     static std::string& trimLine(std::string& s, const std::string& delmiters = " \f\n\r\t\v");
-
-/**
- * @brief 
- * Given a string line the function returns a vector containing the different parts("words") of the string that are seperated by delimters  
- * @param s - string to be splitted
- * @param delimiter  - the string s will be splitted according to this parameter
- * @return std::vector<std::string> - a vector containing the parts of the string that were seperated by delimeter
- */
+    // splits the line into a vector of string by the delimiter
     static std::vector<std::string> splitLine(const std::string& s, const char delimiter);
 };
 
