@@ -223,8 +223,6 @@ int PlayRPS(int vGameStyle)
         // reached max number of turns without a result
         winner = NO_PLAYER;
         reason = RSN_MOVE_FILES_NO_WINNER;
-    } else {
-        // TODO there might be an edge case which will reach here
     }
 
     return outputGameResult(outfile_path, myBoard, winner, reason);
