@@ -25,3 +25,11 @@ Tala
 - [X] Write the GameManager
 - [X] Complete FilePlayerAlgorithm
 - [X] Testing
+
+## HW3 (`HW3/HW3_CPP.pdf` / https://docs.google.com/document/d/19CvE3ixhn5t534VHXcUjjH1clHBBEr7EUV3bYmvOVBM/edit?usp=sharing)
+### Divided Work
+Yotam
+- [ ] ...
+
+Tala
+- [ ] ...
