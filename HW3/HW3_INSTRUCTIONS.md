@@ -1,4 +1,4 @@
-<div style="direction: rtl;">
+<div style="direction: rtl;text-align: right;">
 בתרגיל 3 עליכם להגיש:
 
 1. תכנית שיודעת להריץ קרבות בין שחקנים לפי ההנחיות שיפורטו לעיל (מתקמפלת לקובץ הרצה)
