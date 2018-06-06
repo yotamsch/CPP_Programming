@@ -2,11 +2,14 @@
 #include <memory>
 #include <iostream>
 #include <map>
+
 #include "PlayerAlgorithm.h"
 
 class TournamentManager {
     static TournamentManager theTournamentManager;
     std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory;
+    static std::vector<std::string> so_files_names;
+
     // private ctor
     TournamentManager() {}
 public:
@@ -30,5 +33,8 @@ public:
             const auto& factoryMethod = pair.second;
             factoryMethod()->getMove(); //TODO: complete this later
         }
+    }
+    static std::vector<std::string>& getSoFilesNames() {
+        return so_files_names;
     }
 };

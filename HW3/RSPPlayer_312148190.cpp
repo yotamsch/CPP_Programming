@@ -1,10 +1,4 @@
-/**
- * @brief The implementation file of the RSPPlayer_312148190 (AI) class.
- * 
- * @file RSPPlayer_312148190.cpp
- * @author Yotam Sechayk
- * @date 2018-05-10
- */
+
 #include "AlgorithmRegistration.h"
 
 #include "RSPPlayer_312148190.h"
@@ -16,7 +10,7 @@
 
 #include <algorithm>
 #include <random>
-
+//TODO: make sure there are no static variables in this class because there might be two or more instances used in multiple threads
 //REGISTER_ALGORITHM(312148190)
 
 // %% INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
