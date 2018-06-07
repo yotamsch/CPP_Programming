@@ -112,11 +112,15 @@ bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
     }
     return true;
 }
-
-int PlayRPS()
+/**
+ * @brief The function to actually start a game between player p1 and player p2
+ * 
+ * @param p1 
+ * @param p2 
+ * @return int - winner: 0,1 or 2
+ */
+int GameManager::PlayRPS(std::unique_ptr<PlayerAlgorithm> p1, std::unique_ptr<PlayerAlgorithm> p2)
 {
-    std::unique_ptr<PlayerAlgorithm> p1 = std::make_unique<RSPPlayer_312148190>();
-    std::unique_ptr<PlayerAlgorithm> p2 = std::make_unique<RSPPlayer_312148190>();
     std::vector<std::unique_ptr<PiecePosition>> initPositionP1;
     std::vector<std::unique_ptr<PiecePosition>> initPositionP2;
     std::vector<std::unique_ptr<FightInfo>> fightsInfoVec;

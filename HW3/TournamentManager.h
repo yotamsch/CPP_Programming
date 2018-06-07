@@ -2,13 +2,14 @@
 #include <memory>
 #include <iostream>
 #include <map>
-
+#include <queue>
 #include "PlayerAlgorithm.h"
 
 class TournamentManager {
     static TournamentManager theTournamentManager;
     std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory;
     static std::vector<std::string> so_files_names;
+    std::queue<std::pair<std::string,std::string>> pairsOfPlayersQueue;
 
     // private ctor
     TournamentManager() {}

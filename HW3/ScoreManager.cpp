@@ -12,8 +12,7 @@ ScoreManager::ScoreManager()
     for (int i = 0; i < NUM_OF_PLAYERS; i++) {
         this->_flagPiecesCounter[i] = 0;
         this->_movablePiecesCounter[i] = 0;
-        this->_isBadMove[i] = false;
-        this->_isBadPositioning[i] = false;
+        this->_isBadPositonOrMove[i] = false;
     }
 }
 
@@ -89,18 +88,9 @@ void ScoreManager::notifyJokerChange(const JokerChange& rJokerChange, char joker
  * @param player - loser 
  * @param reason - reason of losing: either Reason::POSITION_FILE_ERROR or Reason::BAD_MOVE_ERROR
  */
-void ScoreManager::dismissPlayer(int player, Reason reason)
+void ScoreManager::dismissPlayer(int player)
 {
-    switch (reason) {
-    case Reason::POSITION_FILE_ERROR:
-        markBadPosition(player);
-        break;
-    case Reason::BAD_MOVE_ERROR:
-        markBadMove(player);
-        break;
-    default:
-        break;
-    }
+    markBadPositionOrMove(player);
 }
 
 /**
@@ -141,40 +131,25 @@ bool ScoreManager::isGameOver()
  */
 int ScoreManager::getWinner()
 {
-    if (_isBadPositioning[PLAYER_1 - 1] && _isBadPositioning[PLAYER_2 - 1]) {
-        _reasonOfFinalResult = RSN_BAD_POSITION_FILE_DOUBLE;
+    if (_isBadPositonOrMove[PLAYER_1 - 1] && _isBadPositonOrMove[PLAYER_2 - 1]) {
         return NO_PLAYER;
     }
-    if (_isBadPositioning[PLAYER_1 - 1]) {
-        _reasonOfFinalResult = RSN_BAD_POSISION_FILE_SINGLE;
+    if (_isBadPositonOrMove[PLAYER_1 - 1]) {
         return PLAYER_2;
     }
-    if (_isBadPositioning[PLAYER_2 - 1]) {
-        _reasonOfFinalResult = RSN_BAD_POSISION_FILE_SINGLE;
-        return PLAYER_1;
-    }
-    if (_isBadMove[PLAYER_1 - 1]) {
-        _reasonOfFinalResult = RSN_BAD_MOVE_FILE_SINGLE;
-        return PLAYER_2;
-    }
-    if (_isBadMove[PLAYER_2 - 1]) {
-        _reasonOfFinalResult = RSN_BAD_MOVE_FILE_SINGLE;
+    if (_isBadPositonOrMove[PLAYER_2 - 1]) {
         return PLAYER_1;
     }
     if (_flagPiecesCounter[PLAYER_1 - 1] <= 0 && _flagPiecesCounter[PLAYER_2 - 1] <= 0) {
-        _reasonOfFinalResult = RSN_POSITION_NO_FLAGS;
         return NO_PLAYER;
     }
     if (_movablePiecesCounter[PLAYER_1 - 1] <= 0 && _movablePiecesCounter[PLAYER_2 - 1] <= 0) {
-        _reasonOfFinalResult = RSN_POSITION_NO_PIECES;
         return NO_PLAYER;
     }
     if (_flagPiecesCounter[PLAYER_1 - 1] <= 0 || _movablePiecesCounter[PLAYER_1 - 1] <= 0) {
-        _reasonOfFinalResult = !_flagPiecesCounter[PLAYER_1 - 1] ? RSN_ALL_FLAGS_CAPTURED : RSN_ALL_PIECES_EATEN;
         return PLAYER_2;
     }
     if (_flagPiecesCounter[PLAYER_2 - 1] <= 0 || _movablePiecesCounter[PLAYER_2 - 1] <= 0) {
-        _reasonOfFinalResult = !_flagPiecesCounter[PLAYER_2 - 1] ? RSN_ALL_FLAGS_CAPTURED : RSN_ALL_PIECES_EATEN;
         return PLAYER_1;
     }
     return GAME_IS_STILL_ON;

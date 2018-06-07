@@ -11,12 +11,6 @@
 #include <iostream>
 #include <string>
 
-// game-play options
-#define AUTO_VS_AUTO 1
-#define FILE_VS_FILE 2
-#define AUTO_VS_FILE 3
-#define FILE_VS_AUTO 4
-
 // message output prefix
 #define INFO "[INFO]"
 #define ERROR "[ERROR]"
@@ -43,17 +37,6 @@
 #define JOKER_LIMIT 2
 #define FLAG_LIMIT 1
 
-// possible output messages
-#define BAD_ARGS_MESSAGE "Please enter (as the first argument): auto-vs-auto, file-vs-file, auto-vs-file or file-vs-auto and try again."
-#define RSN_ALL_FLAGS_CAPTURED "All flags of the opponent are captured"
-#define RSN_ALL_PIECES_EATEN "All moving PIECEs of the opponent are eaten"
-#define RSN_MOVE_FILES_NO_WINNER "A tie - both Moves input files done without a winner"
-#define RSN_POSITION_NO_FLAGS "A tie - all flags are eaten by both players in the position files"
-#define RSN_POSITION_NO_PIECES "A tie - all moving PIECEs of both players are eaten"
-#define RSN_BAD_POSISION_FILE_SINGLE "Bad positioning input for opponent"
-#define RSN_BAD_POSITION_FILE_DOUBLE "Bad positioning input for both players"
-#define RSN_BAD_MOVE_FILE_SINGLE "Bad move input for opponent"
-
 // player related
 #define NUM_OF_PLAYERS 2
 #define PLAYER_1 1
@@ -64,14 +47,5 @@
 #define MAX_NUM_OF_MOVES 100
 #define GAME_IS_STILL_ON -1
 #define PRIME_NUMBER 179
-
-/**
- * @brief An enum representing the returned reason of gameplay functions
- * 
- */
-enum class Reason {
-    BAD_MOVE_ERROR,
-    POSITION_FILE_ERROR
-};
 
 #endif // !__H_GAME_UTILITIES_RPS

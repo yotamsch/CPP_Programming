@@ -21,9 +21,7 @@ private:
     // [0] : player 1, [1] : player 2 ...
     int _movablePiecesCounter[NUM_OF_PLAYERS]; //at index 0 holds number of movable pieces of player 1, at index 1 hold number of movable pieces of player 2
     int _flagPiecesCounter[NUM_OF_PLAYERS]; //at index 0 holds number of flag pieces of player 1, at index 1 hold number of flag pieces of player 2
-    bool _isBadPositioning[NUM_OF_PLAYERS]; //marks players with either having some bad position or not
-    bool _isBadMove[NUM_OF_PLAYERS]; //marks players with either having some bad move or not
-    const char* _reasonOfFinalResult; // this will hold the reasoning to the result
+    bool _isBadPositonOrMove[NUM_OF_PLAYERS]; //marks players with either having some bad move or not
 
 public:
     // basic c'tor
@@ -34,15 +32,13 @@ public:
     // updates member according to the joker change
     void notifyJokerChange(const JokerChange& rJokerChange, char jokerPreviousRep, int player);
     // set a player to be the loser
-    void dismissPlayer(int player, Reason reason);
+    void dismissPlayer(int player);
     // increase the number of pieces for player
     void increaseNumOfPieces(int player, char pieceChar);
     // returns true iff the game is over (no moves for both players)
     bool isGameOver();
     // get the winner of the game
     int getWinner();
-    // gets the reason of the final result of the game
-    const char* getReasonOfFinalResult() { return _reasonOfFinalResult; }
 
 private:
     // helper function to decrease the piece count (by type)
@@ -55,8 +51,6 @@ private:
     void increaseNumOfFlags(int player) { this->_flagPiecesCounter[--player]++; }
     // helper function: decreases _flagPiecesCounter
     void decreaseNumOfFlags(int player) { this->_flagPiecesCounter[--player]--; }
-    // mark current player as having a bad positioning
-    void markBadPosition(int player) { this->_isBadPositioning[--player] = true; }
-    // mark current player as having a bad move
-    void markBadMove(int player) { this->_isBadMove[--player] = true; }
+    // mark current player as having a bad positioning or move
+    void markBadPositionOrMove(int player){ this->_isBadPositonOrMove[--player] = true; }
 };

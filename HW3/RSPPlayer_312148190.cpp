@@ -7,12 +7,11 @@
 #include "MoveRPS.h"
 #include "PieceRPS.h"
 #include "PointRPS.h"
-
+#include "HW3/AlgorithmRegistration.h"
 #include <algorithm>
 #include <random>
 //TODO: make sure there are no static variables in this class because there might be two or more instances used in multiple threads
 //REGISTER_ALGORITHM(312148190)
-
 // %% INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /**

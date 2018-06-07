@@ -11,6 +11,21 @@ TournamentManager TournamentManager::theTournamentManager;
 // size of buffer for reading in directory entries 
 static unsigned int BUF_SIZE = 1024;
 
+void parseArg(char* arg, int& numOfThreads, std::string& so_path){
+    std::string path("-path ");
+    std::string threads("-threads ");
+    std::string _arg(arg);
+    if(path.compare(_arg.substr(0,6)) == 0){
+        so_path = _arg.substr(6);
+        if(so_path.at(so_path.size()-1) != '/'){
+            so_path = so_path + "/";
+        }
+    }
+    if(threads.compare(_arg.substr(0,9))){
+        numOfThreads = std::stoi(_arg.substr(9));
+    }
+}
+
 int main(int argc, char** argv){
     int numOfThreads = 4;
     std::string soFilesDirectory("./"); 
@@ -22,13 +37,16 @@ int main(int argc, char** argv){
     char name[1024]; 
     
     if(argc<1){
-        //TODO: announce error
+        //TODO: announce error in number of arguments
     }
-    if(argc == 3){
-        //TODO: update soFilesDirectory and numOfThreads
-        //assuming PATH IS IN argv[3] and number of threads is in argv[2]
-        numOfThreads = std::stoi(argv[2]);
-        soFilesDirectory.assign(argv[3]);
+    if((argc == 2 || argc == 3) && argv[1] != nullptr){
+        parseArg(argv[1], numOfThreads, soFilesDirectory);
+        if(argc == 3 && argv[2] != nullptr){
+            parseArg(argv[2], numOfThreads, soFilesDirectory);
+        }
+    }
+    if(argc > 3){
+        //TODO: announce error in number of arguments
     }
     std::string command_str = "ls "+ soFilesDirectory + "*.so";  // command string to get dynamic lib names
     char in_buf[BUF_SIZE]; // input buffer for lib names 

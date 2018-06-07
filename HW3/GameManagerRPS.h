@@ -8,6 +8,17 @@
 #ifndef __H_GAME_MANAGER_RPS
 #define __H_GAME_MANAGER_RPS
 
-int PlayRPS();
+class GameManager{
+    static GameManager staticGameManager;
+
+public:
+    static GameManager& GetGameManager() {
+        return staticGameManager;
+    }
+
+    int PlayRPS(std::unique_ptr<PlayerAlgorithm> p1, std::unique_ptr<PlayerAlgorithm> p2);
+};
+
+
 
 #endif // !__H_GAME_MANAGER_RPS
