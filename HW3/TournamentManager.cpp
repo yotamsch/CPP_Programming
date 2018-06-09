@@ -14,24 +14,23 @@ std::queue<std::pair<std::string,std::string>> TournamentManager::pairsOfPlayers
 // size of buffer for reading in directory entries 
 #define BUF_SIZE 1024
 
-void parseArg(char* arg, int& numOfThreads, std::string& so_path){
-    std::string path("-path ");
-    std::string threads("-threads ");
-    std::string _arg(arg);
-    if(path.compare(_arg.substr(0,6)) == 0){
-        so_path = _arg.substr(6);
-        if(so_path.at(so_path.size()-1) != '/'){
-            so_path = so_path + "/";
-        }
-    }
-    if(threads.compare(_arg.substr(0,9))){
-        numOfThreads = std::stoi(_arg.substr(9));
-    }
-}
-
 int main(int argc, char** argv){
     int numOfThreads = 4;
-    std::string soFilesDirectory("./"); 
+    std::string soFilesDirectory("./");
+    std::string path("-path");
+    std::string threads("-threads");
+
+    for(int i = 1; i < argc; i++){
+        if(path.compare(argv[i]) == 0 && argc > i+1){
+            soFilesDirectory = argv[i+1];
+            if(soFilesDirectory.at(soFilesDirectory.size()-1) != '/'){
+                soFilesDirectory = soFilesDirectory + "/";
+            }
+        }
+        else if(threads.compare(argv[i]) == 0 && argc > i+1){
+            numOfThreads = std::stoi(argv[i+1]);
+        }
+    }
 
     FILE *dl;   // handle to read directory 
     std::list<void *> dl_list; // list to hold handles for dynamic libs 
@@ -39,18 +38,7 @@ int main(int argc, char** argv){
     void *dlib;
     char name[1024]; 
     
-    if(argc<1){
-        //TODO: announce error in number of arguments
-    }
-    if((argc == 2 || argc == 3) && argv[1] != nullptr){
-        parseArg(argv[1], numOfThreads, soFilesDirectory);
-        if(argc == 3 && argv[2] != nullptr){
-            parseArg(argv[2], numOfThreads, soFilesDirectory);
-        }
-    }
-    if(argc > 3){
-        //TODO: announce error in number of arguments
-    }
+
     std::string command_str = "ls "+ soFilesDirectory + "*.so";  // command string to get dynamic lib names
     char in_buf[BUF_SIZE]; // input buffer for lib names 
     // get the names of all the dynamic libs (.so  files) in the current dir 
