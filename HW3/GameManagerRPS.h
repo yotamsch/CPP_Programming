@@ -7,6 +7,8 @@
  */
 #ifndef __H_GAME_MANAGER_RPS
 #define __H_GAME_MANAGER_RPS
+#include <memory>
+#include "PlayerAlgorithm.h"
 
 class GameManager{
     static GameManager staticGameManager;

@@ -6,10 +6,13 @@
 #include <iostream> 
 #include <list>
 TournamentManager TournamentManager::theTournamentManager;
-
+std::vector<std::string> TournamentManager::so_files_names;
+std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> TournamentManager::id2factory;
+std::map<std::string,int> TournamentManager::id2Score;//TODO: correctly initialize map
+std::queue<std::pair<std::string,std::string>> TournamentManager::pairsOfPlayersQueue;//TODO: correctly fill this map, YOTAM's
 
 // size of buffer for reading in directory entries 
-static unsigned int BUF_SIZE = 1024;
+#define BUF_SIZE 1024
 
 void parseArg(char* arg, int& numOfThreads, std::string& so_path){
     std::string path("-path ");
@@ -66,10 +69,11 @@ int main(int argc, char** argv){
     }
     if(TournamentManager::getSoFilesNames().size() <= 1 ){
         //TODO: print usage msg accordingly, "not enough competitors"
+        std::cout << "no .so files in directory" << std::endl;
         return(-1);
     }
-    for(int i = 0; i < TournamentManager::getSoFilesNames().size(); i++){
-        dlib = dlopen(TournamentManager::getSoFilesNames()[i].c_str(), RTLD_NOW);
+    for(int i = 0; i < (int)TournamentManager::getSoFilesNames().size(); i++){
+        dlib = dlopen(TournamentManager::getTournamentManager().getSoFilesNames()[i].c_str(), RTLD_NOW);
         if(dlib == NULL){
             std::cerr << dlerror() << std::endl; 
             return(-1);
@@ -77,7 +81,7 @@ int main(int argc, char** argv){
         dl_list.insert(dl_list.end(), dlib);
     }
 
-    TournamentManager::getTournamentManager().run();
+    TournamentManager::getTournamentManager().run(numOfThreads);
     
     // close all the dynamic libs we opened
     for(itr=dl_list.begin(); itr!=dl_list.end(); itr++){

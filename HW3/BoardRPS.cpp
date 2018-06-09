@@ -51,7 +51,7 @@ bool BoardRPS::isPositionValid(int x, int y, int new_x, int new_y)
  */
 void BoardRPS::clearBoard()
 {
-    for (int i = 0; i < this->_board.size(); ++i) {
+    for (int i = 0; i < (int)this->_board.size(); ++i) {
         this->_board[i] = nullptr;
     }
 }
@@ -179,7 +179,6 @@ bool BoardRPS::movePiece(int player, const std::unique_ptr<Move>& rpMove, std::u
     const int new_x = rpMove->getTo().getX();
     const int new_y = rpMove->getTo().getY();
 
-    int winner = 0;
     if (!isMoveLegal(player, x, y, new_x, new_y)) {
         return false;
     }
@@ -280,7 +279,7 @@ void BoardRPS::prettyPrint()
 {
     std::cout << std::endl
               << "main board:" << std::endl;
-    int idx = 0, i = 0;
+    int i = 0;
     std::cout << "  ";
     for (i = 0; i < DIM_X; ++i)
         std::cout << " " << i << " ";

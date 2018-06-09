@@ -1,17 +1,16 @@
 
-#include "AlgorithmRegistration.h"
 
 #include "RSPPlayer_312148190.h"
+
 #include "GameUtilitiesRPS.h"
 #include "JokerChangeRPS.h"
 #include "MoveRPS.h"
 #include "PieceRPS.h"
 #include "PointRPS.h"
-#include "HW3/AlgorithmRegistration.h"
+#include "AlgorithmRegistration.h"
 #include <algorithm>
 #include <random>
-//TODO: make sure there are no static variables in this class because there might be two or more instances used in multiple threads
-//REGISTER_ALGORITHM(312148190)
+
 // %% INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 /**
@@ -480,7 +479,7 @@ float RSPPlayer_312148190::calcKNearestDistance(RSPPlayer_312148190::info& data,
     }
     std::sort(dist.begin(), dist.end());
     int i;
-    for (i = 0; i < k && i < dist.size(); ++i)
+    for (i = 0; i < k && i < (int)dist.size(); ++i)
         res += dist[i];
 
     return res / i;
@@ -508,7 +507,7 @@ float RSPPlayer_312148190::calcPlayerBoardScore(RSPPlayer_312148190::info& data)
     float score = 0.0f; // lower is worse heigher is better
     float avg = 0.0f;
     int player = data._M_this_player._M_id;
-    int opp = data._M_other_player._M_id;
+//    int opp = data._M_other_player._M_id;
     int counter;
     int flag_amount;
     std::vector<int> flagSample;
@@ -535,7 +534,7 @@ float RSPPlayer_312148190::calcPlayerBoardScore(RSPPlayer_312148190::info& data)
     flag_amount = std::max((int)((data._M_other_player._M_pieces.size() + 1) / 2), FLAG_LIMIT);
 
     // advances the pieces towards the "flags". if too many flags, picks a few of them
-    if (data._M_other_player._M_flags.size() <= flag_amount) {
+    if ((int)data._M_other_player._M_flags.size() <= flag_amount) {
         for (auto pos : data._M_other_player._M_flags) {
             avg += OPP_FLAG_DIST_PARAM * calcKNearestDistance(data, player, pos, K_PROXIMITY);
         }
@@ -919,3 +918,5 @@ void RSPPlayer_312148190::prettyPrintBoard()
     }
     std::cout << std::endl;
 }
+
+REGISTER_ALGORITHM(312148190)

@@ -18,6 +18,7 @@
 #include <map>
 #include <memory>
 
+GameManager GameManager::staticGameManager;
 
 /**
  * @brief - Asks for next move of current player and performs the move by calling BoardRPS member function
@@ -48,7 +49,7 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
     resultOfMoving = myBoard.movePiece(currPlayerNumber, currMove, fightInfo);
     if (!resultOfMoving) {
         // announce loser
-        rScoreManager.dismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
+        rScoreManager.dismissPlayer(currPlayerNumber);
         return;
     }
     // notify the opponent on a move
@@ -64,13 +65,13 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
     if (jokerChange != nullptr) {
         auto& jokerPiece = myBoard.getPieceAt(jokerChange->getJokerChangePosition());
         if (jokerPiece == nullptr) {
-            rScoreManager.dismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
+            rScoreManager.dismissPlayer(currPlayerNumber);
             return;
         }
         jokerPrevChar = myBoard.getPieceAt(jokerChange->getJokerChangePosition())->getJokerRep();
         resultOfJokerChange = myBoard.changeJoker(currPlayerNumber, jokerChange);
         if (!resultOfJokerChange) {
-            rScoreManager.dismissPlayer(currPlayerNumber, Reason::BAD_MOVE_ERROR);
+            rScoreManager.dismissPlayer(currPlayerNumber);
             return;
         }
         rScoreManager.notifyJokerChange(*jokerChange, jokerPrevChar, currPlayerNumber);
@@ -96,12 +97,12 @@ bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
     char currPiece;
     std::unique_ptr<FightInfo> thisFightInfo;
 
-    for (int i = 0; i < positioningVec.size(); i++) {
+    for (int i = 0; i < (int)positioningVec.size(); i++) {
         currPiece = positioningVec[i]->getPiece() == JOKER_CHR ? positioningVec[i]->getJokerRep() : positioningVec[i]->getPiece();
         resultOfPositioning = rBoard.placePiece(vCurrPlayer, positioningVec[i], thisFightInfo);
         if (resultOfPositioning == false) {
             // announce vCurrPlayer as losing
-            rScoreManager.dismissPlayer(vCurrPlayer, Reason::POSITION_FILE_ERROR);
+            rScoreManager.dismissPlayer(vCurrPlayer);
             return false;
         }
         rScoreManager.increaseNumOfPieces(vCurrPlayer, currPiece);
