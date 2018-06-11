@@ -1,0 +1,6 @@
+# Custome ignores
+ex3
+.project
+*.rps*
+*.output
+*tests

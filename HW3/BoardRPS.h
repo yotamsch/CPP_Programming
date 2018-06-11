@@ -82,7 +82,7 @@ private:
     //check if a certain move is legal
     bool isMoveLegal(int player, int x, int y, int new_x, int new_y);
     // calculates the correct vector position
-    int p(int x, int y) const { return y * _m + x; }
+    int p(int x, int y) const { return (y - 1) * _m + (x - 1); }
 
 public:
     // friend method, overloading '<<' for printing the board

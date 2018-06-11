@@ -21,7 +21,7 @@
  */
 bool BoardRPS::isPositionValid(int x, int y)
 {
-    return (x >= 0 && x < this->_m) && (y >= 0 && y < this->_n);
+    return (x > 0 && x <= this->_m) && (y > 0 && y <= this->_n);
 }
 
 /**
@@ -257,8 +257,8 @@ int BoardRPS::getPlayer(const Point& pos) const
  */
 std::ostream& operator<<(std::ostream& output, const BoardRPS& rBoard)
 {
-    for (int y = 0; y < rBoard._n; ++y) {
-        for (int x = 0; x < rBoard._m; ++x) {
+    for (int y = 1; y <= rBoard._n; ++y) {
+        for (int x = 1; x <= rBoard._m; ++x) {
             if (rBoard._board[rBoard.p(x, y)] == nullptr) {
                 output << ' ';
             } else {

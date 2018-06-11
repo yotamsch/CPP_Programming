@@ -27,7 +27,9 @@ $(SO): RSPPlayer_312148190.o PieceRPS.o
 	$(COMP) $(CPP_COMP_FLAG) -shared -Wl,-soname,$@ RSPPlayer_312148190.o PieceRPS.o -o $@
 
 # TODO: verify correctness
-Game.o: Game.cpp TournamentManager.h PlayerAlgorithm.h
+Game.o: Game.cpp TournamentManager.h PlayerAlgorithm.h Point.h \
+ PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h ThreadPool.h \
+ GameManagerRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
 GameManagerRPS.o: GameManagerRPS.cpp GameManagerRPS.h \
@@ -51,7 +53,7 @@ ScoreManager.o: ScoreManager.cpp ScoreManager.h FightInfo.h JokerChange.h \
 
 TournamentManager.o: TournamentManager.cpp TournamentManager.h \
  PlayerAlgorithm.h Point.h PiecePosition.h Board.h FightInfo.h Move.h \
- JokerChange.h GameManagerRPS.h ThreadPool.h
+ JokerChange.h ThreadPool.h GameManagerRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
 AlgorithmRegistration.o: AlgorithmRegistration.cpp \

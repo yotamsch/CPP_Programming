@@ -283,7 +283,7 @@ void RSPPlayer_312148190::positionPiecesOfType(int vLimit,
     for (i = 0; i < vLimit; ++i) {
         vRandPosition = getPositionNotSelectedYet();
         vType = vIsJoker ? getRandomJokerRep() : vType;
-        pPiece = std::make_unique<PieceRPS>(this->_info._M_this_player._M_id, vIsJoker, vType, PointRPS(getXDim(vRandPosition), getYDim(vRandPosition)));
+        pPiece = std::make_unique<PieceRPS>(this->_info._M_this_player._M_id, vIsJoker, vType, PointRPS(getXDim(vRandPosition) + 1, getYDim(vRandPosition) + 1));
         vectorToFill.push_back(std::move(pPiece));
         this->_info.addPiece({ this->_info._M_this_player._M_id, vIsJoker, vType }, vRandPosition);
     }
@@ -506,7 +506,6 @@ float RSPPlayer_312148190::calcPlayerBoardScore(RSPPlayer_312148190::info& data)
     float score = 0.0f; // lower is worse heigher is better
     float avg = 0.0f;
     int player = data._M_this_player._M_id;
-    //    int opp = data._M_other_player._M_id;
     int counter;
     int flag_amount;
     std::vector<int> flagSample;
@@ -727,7 +726,7 @@ void RSPPlayer_312148190::notifyOnInitialBoard(const Board& b,
 
     // go over fights and place/update pieces
     for (auto&& fight : fights) {
-        pos = getPos(fight->getPosition().getX(), fight->getPosition().getY());
+        pos = getPos(fight->getPosition().getX() - 1, fight->getPosition().getY() - 1);
         // tie or other player won
         if (fight->getWinner() != this->_info._M_this_player._M_id) {
             this->_info.removePiece(pos);
@@ -739,7 +738,7 @@ void RSPPlayer_312148190::notifyOnInitialBoard(const Board& b,
     }
     // mark the rest of the board if a known piece exists
     for (i = 0; i < DIM_X * DIM_Y; ++i) {
-        player = b.getPlayer(PointRPS(getXDim(i), getYDim(i)));
+        player = b.getPlayer(PointRPS(getXDim(i) + 1, getYDim(i) + 1));
         if (player != NO_PLAYER && player != this->_info._M_this_player._M_id) {
             if (this->_info._M_other_player._M_id != player)
                 this->_info._M_other_player._M_id = player;
@@ -757,7 +756,7 @@ void RSPPlayer_312148190::notifyOnInitialBoard(const Board& b,
 void RSPPlayer_312148190::notifyOnOpponentMove(const Move& move)
 {
     // save the move into history vector
-    this->_info.addMove(getPos(move.getFrom().getX(), move.getFrom().getY()), getPos(move.getTo().getX(), move.getTo().getY()));
+    this->_info.addMove(getPos(move.getFrom().getX() - 1, move.getFrom().getY() - 1), getPos(move.getTo().getX() - 1, move.getTo().getY() - 1));
     // now _M_moves is sure to have at least one move (i.e. size() > 0)
 
     this->_info.updateJoker(this->_info.peekMove()._M_from);
@@ -777,7 +776,7 @@ void RSPPlayer_312148190::notifyOnOpponentMove(const Move& move)
  */
 void RSPPlayer_312148190::notifyFightResult(const FightInfo& fightInfo)
 {
-    int fightPos = getPos(fightInfo.getPosition().getX(), fightInfo.getPosition().getY());
+    int fightPos = getPos(fightInfo.getPosition().getX() - 1, fightInfo.getPosition().getY() - 1);
 
     // since there was a fight, _M_moves is sure to have at least one move (i.e. size() > 0)
 
@@ -816,7 +815,7 @@ unique_ptr<Move> RSPPlayer_312148190::getMove()
         return nullptr;
     }
 
-    retMove = std::make_unique<MoveRPS>(PointRPS(getXDim(bestMove._M_from), getYDim(bestMove._M_from)), PointRPS(getXDim(bestMove._M_to), getYDim(bestMove._M_to)));
+    retMove = std::make_unique<MoveRPS>(PointRPS(getXDim(bestMove._M_from) + 1, getYDim(bestMove._M_from) + 1), PointRPS(getXDim(bestMove._M_to) + 1, getYDim(bestMove._M_to) + 1));
 
     // add to history
     this->_info.addMove(bestMove._M_from, bestMove._M_to);
@@ -853,7 +852,7 @@ unique_ptr<JokerChange> RSPPlayer_312148190::getJokerChange()
         return nullptr;
     }
 
-    retJokerChange = std::make_unique<JokerChangeRPS>(PointRPS(getXDim(bestJokerChange._M_position), getYDim(bestJokerChange._M_position)), bestJokerChange._M_new_rep);
+    retJokerChange = std::make_unique<JokerChangeRPS>(PointRPS(getXDim(bestJokerChange._M_position) + 1, getYDim(bestJokerChange._M_position) + 1), bestJokerChange._M_new_rep);
 
     // perform joker change
     this->_info._M_board[bestJokerChange._M_position]._M_piece = bestJokerChange._M_new_rep;
