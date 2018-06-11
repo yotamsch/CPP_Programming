@@ -1,13 +1,12 @@
 
-
 #include "RSPPlayer_312148190.h"
 
+#include "AlgorithmRegistration.h"
 #include "GameUtilitiesRPS.h"
 #include "JokerChangeRPS.h"
 #include "MoveRPS.h"
 #include "PieceRPS.h"
 #include "PointRPS.h"
-#include "AlgorithmRegistration.h"
 #include <algorithm>
 #include <random>
 
@@ -238,7 +237,7 @@ bool RSPPlayer_312148190::isPosValid(int x, int y, int n_x, int n_y)
 {
     bool result = true;
 
-    if (!isPosValid(x,y) || !isPosValid(n_x,n_y)) {
+    if (!isPosValid(x, y) || !isPosValid(n_x, n_y)) {
         result = false;
     }
     if (std::abs(n_x - x) > 1 || std::abs(n_y - y) > 1) {
@@ -334,7 +333,7 @@ bool RSPPlayer_312148190::isMovePossible(RSPPlayer_312148190::info& data, int x,
         return false;
     }
 
-    vOriginPos = getPos(x,y);
+    vOriginPos = getPos(x, y);
     vDestPos = getPos(n_x, n_y);
 
     if (data._M_board[vOriginPos]._M_player == data._M_board[vDestPos]._M_player || data._M_board[vOriginPos]._M_piece == FLAG_CHR || data._M_board[vOriginPos]._M_piece == BOMB_CHR) {
@@ -507,7 +506,7 @@ float RSPPlayer_312148190::calcPlayerBoardScore(RSPPlayer_312148190::info& data)
     float score = 0.0f; // lower is worse heigher is better
     float avg = 0.0f;
     int player = data._M_this_player._M_id;
-//    int opp = data._M_other_player._M_id;
+    //    int opp = data._M_other_player._M_id;
     int counter;
     int flag_amount;
     std::vector<int> flagSample;
@@ -918,5 +917,7 @@ void RSPPlayer_312148190::prettyPrintBoard()
     }
     std::cout << std::endl;
 }
+
+// %% REGISTRATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 REGISTER_ALGORITHM(312148190)

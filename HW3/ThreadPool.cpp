@@ -2,6 +2,17 @@
 
 std::queue<std::pair<std::string,std::string>> ThreadPool::pairsOfPlayersQueue;
 
+void ThreadPool::stop() noexcept
+    {
+        {
+            std::unique_lock<std::mutex> lock{ mEventMutex };
+            mStopping = true;
+        }
+        mEventVar.notify_all();
+        for (auto& thread : mThreads) {
+            thread.join();
+        }
+    }
 
 void ThreadPool::start(int numThreads, std::map<std::string,int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory)
     {

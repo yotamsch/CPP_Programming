@@ -1,40 +1,34 @@
-#include <functional>
-#include <memory>
-#include <iostream>
-#include <map>
-#include <queue>
 #include "PlayerAlgorithm.h"
-#include "GameManagerRPS.h"
 #include "ThreadPool.h"
-
+#include <functional>
+#include <map>
+#include <memory>
+#include <queue>
 
 class TournamentManager {
-    static TournamentManager theTournamentManager;
+private:
+    static TournamentManager instance;
     static std::vector<std::string> so_files_names;
-    
-    // private ctor
-    TournamentManager() {}
+
+    // private default c'tor
+    TournamentManager() = default;
+
 public:
     static std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory;
-    static std::map<std::string,int> id2Score;//TODO: correctly initialize map
-    static std::queue<std::pair<std::string,std::string>> pairsOfPlayersQueue;//TODO: correctly fill this map, YOTAM's
+    //TODO: correctly initialize map
+    static std::map<std::string, int> id2Score;
+    //TODO: correctly fill this map, YOTAM's
+    static std::queue<std::pair<std::string, std::string>> pairsOfPlayersQueue;
 
-    static TournamentManager& getTournamentManager() {
-        return theTournamentManager;
-    }
-    static std::vector<std::string>& getSoFilesNames() {
-        return so_files_names;
-    }
-    void registerAlgorithm(std::string id, std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod) {
-        if (id2factory.find(id) == id2factory.end())
-        {
-            //TODO: WARN
-            //ID ALREADY EXISTS
-        }else{
-            id2factory[id] = factoryMethod;
-        }
-    }
-    void run(int numOfThreads)const {
-        ThreadPool thread_pool(numOfThreads, pairsOfPlayersQueue, id2Score, id2factory);  
+    // gets the static instance of the tournament manager (singelton)
+    static TournamentManager& getTournamentManager() { return instance; }
+    // gets the list of algorithm file names
+    static std::vector<std::string>& getSoFilesNames() { return so_files_names; }
+    // registers an algorithm into the tournament
+    bool registerAlgorithm(std::string id, std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod);
+
+    void run(int numOfThreads) const
+    {
+        ThreadPool thread_pool(numOfThreads, pairsOfPlayersQueue, id2Score, id2factory);
     }
 };

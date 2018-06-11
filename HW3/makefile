@@ -1,18 +1,34 @@
+# compiler, onb nova set to g++-5.3.0
 COMP = g++
-OBJS = GameManagerRPS.o BoardRPS.o FightInfoRPS.o PieceRPS.o ScoreManager.o TournamentManager.o AlgorithmRegistration.o ThreadPool.o RSPPlayer_312148190.o
+# object for the main tournament game
+OBJS = Game.o GameManagerRPS.o BoardRPS.o FightInfoRPS.o PieceRPS.o ScoreManager.o TournamentManager.o AlgorithmRegistration.o ThreadPool.o
+# the executable name, don't change
 EXEC = ex3
+# the shared library for the player algorithm
+SO = RSPPlayer_312148190.so
+# the general flags for compilation
 CPP_COMP_FLAG = -std=c++14 -Wall -Wextra \
 -Werror -pedantic-errors -DNDEBUG
 
-$(EXEC): $(OBJS) RSPPlayer_312148190.so
+# COMMANDS
+# --------
+# creates both shared library and tournament execuatable
+all: rps_tournament rps_lib
+# creates the tournament binary executable file
+rps_tournament: $(EXEC)
+# creates the shared library *.so file
+rps_lib: $(SO)
+
+$(EXEC): $(OBJS)
 	$(COMP) $(OBJS) -rdynamic -ldl -pthread -o $@
 
-RSPPlayer_312148190.so: RSPPlayer_312148190.o
-	$(COMP) RSPPlayer_312148190.o -shared -o $@
+# TODO: fix the compilation
+$(SO): RSPPlayer_312148190.o PieceRPS.o
+	$(COMP) $(CPP_COMP_FLAG) -shared -Wl,-soname,$@ RSPPlayer_312148190.o PieceRPS.o -o $@
 
-############this should be handled later, not implemented yet!!##############
-#AlgorithmRegistration.o: AlgorithmRegistration.cpp AlgorithmRegistration.h
-#	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
+# TODO: verify correctness
+Game.o: Game.cpp TournamentManager.h PlayerAlgorithm.h
+	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
 GameManagerRPS.o: GameManagerRPS.cpp GameManagerRPS.h \
  RSPPlayer_312148190.h GameUtilitiesRPS.h PlayerAlgorithm.h Point.h \
@@ -29,10 +45,6 @@ FightInfoRPS.o: FightInfoRPS.cpp FightInfoRPS.h FightInfo.h \
  GameUtilitiesRPS.h PieceRPS.h PiecePosition.h PointRPS.h Point.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
-PieceRPS.o: PieceRPS.cpp PieceRPS.h GameUtilitiesRPS.h PiecePosition.h \
- PointRPS.h Point.h
-	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
-
 ScoreManager.o: ScoreManager.cpp ScoreManager.h FightInfo.h JokerChange.h \
  GameUtilitiesRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
@@ -45,7 +57,7 @@ TournamentManager.o: TournamentManager.cpp TournamentManager.h \
 AlgorithmRegistration.o: AlgorithmRegistration.cpp \
  AlgorithmRegistration.h PlayerAlgorithm.h Point.h PiecePosition.h \
  Board.h FightInfo.h Move.h JokerChange.h TournamentManager.h \
- GameManagerRPS.h ThreadPool.h
+ ThreadPool.h GameManagerRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
 ThreadPool.o: ThreadPool.cpp ThreadPool.h GameManagerRPS.h \
@@ -53,11 +65,15 @@ ThreadPool.o: ThreadPool.cpp ThreadPool.h GameManagerRPS.h \
  JokerChange.h TournamentManager.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
+PieceRPS.o: PieceRPS.cpp PieceRPS.h GameUtilitiesRPS.h PiecePosition.h \
+ PointRPS.h Point.h
+	$(COMP) $(CPP_COMP_FLAG) -fPIC -c $*.cpp
+
 RSPPlayer_312148190.o: RSPPlayer_312148190.cpp RSPPlayer_312148190.h \
  GameUtilitiesRPS.h PlayerAlgorithm.h Point.h PiecePosition.h Board.h \
  FightInfo.h Move.h JokerChange.h JokerChangeRPS.h PointRPS.h MoveRPS.h \
  PieceRPS.h AlgorithmRegistration.h
-	$(COMP) -fPIC $(CPP_COMP_FLAG) -c $*.cpp
+	$(COMP) $(CPP_COMP_FLAG) -fPIC -c $*.cpp
 
 .PHONY: all
 

@@ -5,8 +5,8 @@
  * @author Yotam Sechayk
  * @date 2018-05-10
  */
-#ifndef __H_AUTO_PLAYER_ALGORITHM
-#define __H_AUTO_PLAYER_ALGORITHM
+#ifndef __H_RSP_PLAYER_312148190
+#define __H_RSP_PLAYER_312148190
 
 #include "GameUtilitiesRPS.h"
 #include "PlayerAlgorithm.h"
@@ -148,4 +148,4 @@ public:
     void prettyPrintBoard();
 };
 
-#endif // !__H_AUTO_PLAYER_ALGORITHM
+#endif // !__H_RSP_PLAYER_312148190
