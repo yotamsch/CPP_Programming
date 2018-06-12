@@ -1,13 +1,15 @@
 #include "TournamentManager.h"
+#include <random>
+#include <set>
 #include <string>
 
+// initialization of the singelton instance
 TournamentManager TournamentManager::instance;
-std::vector<std::string> TournamentManager::so_files_names;
-std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> TournamentManager::id2factory;
-//TODO: correctly initialize map
-std::map<std::string, int> TournamentManager::id2Score;
-//TODO: correctly fill this map, YOTAM's
-std::queue<std::pair<std::string, std::string>> TournamentManager::pairsOfPlayersQueue;
+
+void TournamentManager::addFileName(std::string fileName)
+{
+    this->soFileNames.emplace_back(fileName);
+}
 
 bool TournamentManager::registerAlgorithm(std::string id, std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod)
 {
@@ -15,5 +17,32 @@ bool TournamentManager::registerAlgorithm(std::string id, std::function<std::uni
         return false;
     }
     id2factory[id] = factoryMethod;
+    soIds.emplace_back(id);
     return true;
+}
+
+void TournamentManager::run(int numOfThreads)
+{
+    for (auto& name : this->soIds) {
+        // initialization for id2Score
+        id2Score[name] = 0;
+        // preprocessing for pairsOfPlayersQueue
+        getFightsForPlayer(name);
+    }
+    ThreadPool thread_pool(numOfThreads, pairsOfPlayersQueue, id2Score, id2factory);
+}
+
+void TournamentManager::getFightsForPlayer(std::string name)
+{
+    std::set<std::string> choice = { name };
+    int counter = 0;
+    do {
+        int randIndex = std::rand() % this->soIds.size();
+        std::string opp = this->soIds[randIndex];
+        if (choice.count(opp) == 0) {
+            this->pairsOfPlayersQueue.emplace(std::make_pair(name, opp));
+            choice.insert(opp);
+            ++counter;
+        }
+    } while (choice.size() < this->soIds.size() && counter < NUM_OF_OPP);
 }

@@ -525,8 +525,8 @@ float RSPPlayer_312148190::calcPlayerBoardScore(RSPPlayer_312148190::info& data)
             break;
         }
     }
-    // average L2 distance oponent flag to this player's pieces
 
+    // average L2 distance oponent flag to this player's pieces
     avg = 0.0f;
     counter = 0;
     flag_amount = std::max((int)((data._M_other_player._M_pieces.size() + 1) / 2), FLAG_LIMIT);
@@ -692,10 +692,6 @@ void RSPPlayer_312148190::getInitialPositions(int player,
     // set the player number
     this->_info._M_this_player._M_id = player;
 
-    // set the seed for the randomization
-    this->_seed_value = (unsigned)time(NULL);
-    srand(this->_seed_value + player * PRIME_NUMBER);
-
     // insert flags
     positionPiecesOfType(FLAG_LIMIT, FLAG_CHR, vectorToFill);
     // insert bombs
@@ -798,6 +794,10 @@ void RSPPlayer_312148190::notifyFightResult(const FightInfo& fightInfo)
         this->_info.swapPieces(this->_info.peekMove()._M_from, this->_info.peekMove()._M_to);
         this->_info.removePiece(this->_info.peekMove()._M_from);
     }
+
+    if (fightInfo.getWinner() != this->_info._M_this_player._M_id) {
+        this->_info._M_board[this->_info.peekMove()._M_to]._M_piece = fightInfo.getPiece(fightInfo.getWinner());
+    }
 }
 
 /**
@@ -869,7 +869,6 @@ unique_ptr<JokerChange> RSPPlayer_312148190::getJokerChange()
 void RSPPlayer_312148190::prettyPrint()
 {
     std::cout << "player: " << this->_info._M_this_player._M_id << std::endl;
-    std::cout << "seed base: " << this->_seed_value << std::endl;
     std::cout << "flags at: ";
     for (int pos : this->_info._M_this_player._M_flags)
         std::cout << "(" << getXDim(pos) << "," << getYDim(pos) << "), ";

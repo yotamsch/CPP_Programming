@@ -8,7 +8,7 @@ EXEC = ex3
 SO = RSPPlayer_312148190.so
 # the general flags for compilation
 CPP_COMP_FLAG = -std=c++14 -Wall -Wextra \
--Werror -pedantic-errors -DNDEBUG
+-Werror -pedantic-errors -DNDEBUG -g
 
 # COMMANDS
 # --------
@@ -22,11 +22,9 @@ rps_lib: $(SO)
 $(EXEC): $(OBJS)
 	$(COMP) $(OBJS) -rdynamic -ldl -pthread -o $@
 
-# TODO: fix the compilation
 $(SO): RSPPlayer_312148190.o PieceRPS.o
 	$(COMP) $(CPP_COMP_FLAG) -shared -Wl,-soname,$@ RSPPlayer_312148190.o PieceRPS.o -o $@
 
-# TODO: verify correctness
 Game.o: Game.cpp TournamentManager.h PlayerAlgorithm.h Point.h \
  PiecePosition.h Board.h FightInfo.h Move.h JokerChange.h ThreadPool.h \
  GameManagerRPS.h
@@ -53,7 +51,7 @@ ScoreManager.o: ScoreManager.cpp ScoreManager.h FightInfo.h JokerChange.h \
 
 TournamentManager.o: TournamentManager.cpp TournamentManager.h \
  PlayerAlgorithm.h Point.h PiecePosition.h Board.h FightInfo.h Move.h \
- JokerChange.h ThreadPool.h GameManagerRPS.h
+ JokerChange.h ThreadPool.h GameManagerRPS.h GameUtilitiesRPS.h
 	$(COMP) $(CPP_COMP_FLAG) -c $*.cpp
 
 AlgorithmRegistration.o: AlgorithmRegistration.cpp \
@@ -78,8 +76,6 @@ RSPPlayer_312148190.o: RSPPlayer_312148190.cpp RSPPlayer_312148190.h \
 	$(COMP) $(CPP_COMP_FLAG) -fPIC -c $*.cpp
 
 .PHONY: all
-
-all: $(EXEC)
 
 clean:
 	rm -f $(OBJS) RSPPlayer_312148190.so RSPPlayer_312148190.o $(EXEC)

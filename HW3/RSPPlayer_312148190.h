@@ -62,10 +62,9 @@ protected:
     };
 
 private:
-    const double UNKNOWN_WIN_CHANCE = 0.60; // how aggressive we want the player to be (1 - very aggressive, 0 - not aggressive at all)
+    const double UNKNOWN_WIN_CHANCE = 0.66; // how aggressive we want the player to be (1 - very aggressive, 0 - not aggressive at all)
 
     info _info; // will hold the current info on the thought state of the game
-    unsigned _seed_value; // the random seed value
 
 public:
     // basic c'tor

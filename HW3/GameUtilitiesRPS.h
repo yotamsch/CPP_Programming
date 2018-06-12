@@ -48,4 +48,7 @@
 #define GAME_IS_STILL_ON -1
 #define PRIME_NUMBER 179
 
+// tournament related
+#define NUM_OF_OPP 30
+
 #endif // !__H_GAME_UTILITIES_RPS

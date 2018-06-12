@@ -3,13 +3,17 @@
 #include <iostream>
 #include <list>
 #include <string>
-#include <cstring>
+#include <string.h>
+#include <random>
 
 // size of buffer for reading in directory entries
 #define BUF_SIZE 1024
 
 int main(int argc, char** argv)
 {
+    // set the seed for the randomization
+    srand((unsigned)time(NULL));
+
     int numOfThreads = 4;
     std::string soFilesDirectory("./");
     std::string path("-path");
@@ -26,11 +30,13 @@ int main(int argc, char** argv)
         }
     }
 
+    std::cout << "Using # threads: " << numOfThreads << std::endl;
+
     FILE* dl; // handle to read directory
     std::list<void*> dl_list; // list to hold handles for dynamic libs
     std::list<void*>::iterator itr;
     void* dlib;
-    char name[1024];
+    char name[BUF_SIZE];
 
     std::string command_str = "ls " + soFilesDirectory + "*.so"; // command string to get dynamic lib names
     char in_buf[BUF_SIZE]; // input buffer for lib names
@@ -41,34 +47,48 @@ int main(int argc, char** argv)
         exit(-1);
     }
     while (fgets(in_buf, BUF_SIZE, dl)) {
-        // trim off the whitespace
+        // trim off the whitespace at the end
         char* ws = strpbrk(in_buf, " \t\n");
         if (ws)
             *ws = '\0';
         // append ./ to the front of the lib name
-        sprintf(name, "./%s", in_buf);
-        TournamentManager::getSoFilesNames().push_back(name);
+        if ((in_buf[0] == '.' && in_buf[1] == '/') || in_buf[0] == '/')
+            sprintf(name, "%s", in_buf);
+        else
+            sprintf(name, "./%s", in_buf);
+        
+        TournamentManager::get().addFileName(name);
     }
-    if (TournamentManager::getSoFilesNames().size() <= 1) {
+
+    if (TournamentManager::get().getFilesNames().size() <= 1) {
         //TODO: print usage msg accordingly, "not enough competitors"
-        std::cout << "no .so files in directory" << std::endl;
+        std::cout << "not enough .so files in directory" << std::endl;
         return (-1);
     }
-    for (int i = 0; i < (int)TournamentManager::getSoFilesNames().size(); i++) {
-        dlib = dlopen(TournamentManager::getTournamentManager().getSoFilesNames()[i].c_str(), RTLD_NOW);
+
+    for (int i = 0; i < (int)TournamentManager::get().getFilesNames().size(); ++i) {
+        dlib = dlopen(TournamentManager::get().getFilesNames()[i].c_str(), RTLD_NOW);
         if (dlib == NULL) {
+            // TODO: handle error message correctly
             std::cerr << dlerror() << std::endl;
             return (-1);
         }
         dl_list.insert(dl_list.end(), dlib);
     }
+    // run the tournament
+    TournamentManager::get().run(numOfThreads);
 
-    TournamentManager::getTournamentManager().run(numOfThreads);
+    // print the scores
+    for (auto& s : TournamentManager::get().getScores()) {
+        std::cout << s.first << " : " << s.second << std::endl;
+    }
 
     // close all the dynamic libs we opened
     for (itr = dl_list.begin(); itr != dl_list.end(); itr++) {
         dlclose(*itr);
     }
 
+    std::cout << "closed all libs" << std::endl;
+    
     return 0;
 }

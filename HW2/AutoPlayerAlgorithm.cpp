@@ -804,6 +804,10 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo& fightInfo)
         this->_info.swapPieces(this->_info.peekMove()._M_from, this->_info.peekMove()._M_to);
         this->_info.removePiece(this->_info.peekMove()._M_from);
     }
+
+    if (fightInfo.getWinner() != this->_info._M_this_player._M_id) {
+        this->_info._M_board[this->_info.peekMove()._M_to]._M_piece = fightInfo.getPiece(fightInfo.getWinner());
+    }
 }
 
 /**

@@ -3,8 +3,10 @@
 
 #include "GameManagerRPS.h"
 #include "PlayerAlgorithm.h"
+#include <atomic>
 #include <condition_variable>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <queue>
 #include <string>
@@ -12,15 +14,28 @@
 #include <vector>
 
 class ThreadPool {
+private:
+    volatile bool mStopping = false;
+
+    std::queue<std::pair<std::string, std::string>> pairsOfPlayersQueue;
+    std::vector<std::thread> mThreads;
+    std::condition_variable mEventVar;
+    std::mutex mEventMutex;
+
 public:
     // c'tor
-    explicit ThreadPool(int numThreads, const std::queue<std::pair<std::string, std::string>>& mPairsOfPlayersQueue, std::map<std::string, int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory)
+    explicit ThreadPool(int numThreads, const std::queue<std::pair<std::string, std::string>>& mPairsOfPlayersQueue, std::map<std::string, std::atomic_int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory)
     {
-        pairsOfPlayersQueue = mPairsOfPlayersQueue;
+        this->pairsOfPlayersQueue = mPairsOfPlayersQueue;
         start(numThreads, id2Score, id2factory);
+        wait_join();
     }
     // d'tor
-    ~ThreadPool() { stop(); }
+    ~ThreadPool()
+    {
+        std::cout << "in ThreadPool d'tor" << std::endl;
+        stop();
+    }
     /*
     void enqueue(std::pair<std::string, std::string> pairOfIDs){
         {
@@ -31,12 +46,15 @@ public:
     }
     */
 private:
-    std::vector<std::thread> mThreads;
-    std::condition_variable mEventVar;
-    static std::queue<std::pair<std::string, std::string>> pairsOfPlayersQueue;
-    std::mutex mEventMutex;
-    bool mStopping = false;
-    void start(int numThreads, std::map<std::string, int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory);
+    void start(int numThreads, std::map<std::string, std::atomic_int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory);
+
+    void wait_join()
+    {
+        for (auto& thread : mThreads) {
+            thread.join();
+        }
+    }
+
     void stop() noexcept;
 };
 
