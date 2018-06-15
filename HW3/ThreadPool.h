@@ -27,7 +27,9 @@ public:
     explicit ThreadPool(int numThreads, const std::queue<std::pair<std::string, std::string>>& mPairsOfPlayersQueue, std::map<std::string, std::atomic_int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory)
     {
         this->pairsOfPlayersQueue = mPairsOfPlayersQueue;
+        std::cout << "Starting threads" << std::endl;
         start(numThreads, id2Score, id2factory);
+        std::cout << "Waiting for threads" << std::endl;
         wait_join();
     }
     // d'tor

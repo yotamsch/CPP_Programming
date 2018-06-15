@@ -31,6 +31,7 @@ private:
     std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory;
     std::map<std::string, std::atomic_int> id2Score;
     std::queue<std::pair<std::string, std::string>> pairsOfPlayersQueue;
+    std::unique_ptr<ThreadPool> threadPool;
 
 public:
     // gets the list of algorithm file names
@@ -43,6 +44,10 @@ public:
     bool registerAlgorithm(std::string id, std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod);
     // run the tournament
     void run(int numOfThreads);
+    // clears the algorithm factory list
+    void clearAlgorithms() {this->id2factory.clear();}
+    // gets the sorted scores into the given vector
+    void getSortedScores(std::vector<std::pair<std::string,int>>& finalScores);
 
 private:
     // arranges and updates fights for the player with id (name)

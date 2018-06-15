@@ -49,6 +49,6 @@
 #define PRIME_NUMBER 179
 
 // tournament related
-#define NUM_OF_OPP 30
+#define NUM_OF_OPP 100
 
 #endif // !__H_GAME_UTILITIES_RPS

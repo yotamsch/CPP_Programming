@@ -75,13 +75,20 @@ int main(int argc, char** argv)
         }
         dl_list.insert(dl_list.end(), dlib);
     }
+
+    std::cout << "Starting tournamnt" << std::endl;
     // run the tournament
     TournamentManager::get().run(numOfThreads);
 
+    std::vector<std::pair<std::string,int>> finalScores;
+    TournamentManager::get().getSortedScores(finalScores);
+
     // print the scores
-    for (auto& s : TournamentManager::get().getScores()) {
+    for (auto& s : finalScores) {
         std::cout << s.first << " : " << s.second << std::endl;
     }
+
+    TournamentManager::get().clearAlgorithms();
 
     // close all the dynamic libs we opened
     for (itr = dl_list.begin(); itr != dl_list.end(); itr++) {
