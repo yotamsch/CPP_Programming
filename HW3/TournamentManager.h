@@ -70,7 +70,7 @@ private:
     std::set<std::pair<std::string, std::string>>& playSet);
     // update the score of a player by id, when needed
     void updateScoreForId(std::string id, int score) {
-        if (id2GameNum[id] > 0) {
+        if (id2GameNum[id] < NUM_OF_OPP) {
             id2Score[id] += score;
         }
     }

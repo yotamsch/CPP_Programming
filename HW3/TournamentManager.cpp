@@ -34,6 +34,11 @@ void TournamentManager::initialize()
     for (auto& name : this->soIds) {
         getFightsForPlayer(name, playSet);
     }
+
+    // reset the game numbers
+    for (auto& name : this->soIds) {
+        id2GameNum[name] = 0;
+    }
 }
 
 void TournamentManager::getFightsForPlayer(std::string name, 
@@ -92,6 +97,6 @@ void TournamentManager::updateScores(std::string id_p1, std::string id_p2, int w
     if (winner == 2) {
         this->updateScoreForId(id_p2, 3);
     }
-    --this->id2GameNum[id_p1];
-    --this->id2GameNum[id_p2];
+    ++this->id2GameNum[id_p1];
+    ++this->id2GameNum[id_p2];
 }
