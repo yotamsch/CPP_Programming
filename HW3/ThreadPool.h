@@ -1,13 +1,14 @@
 #ifndef __THREAD_POOL_H_
 #define __THREAD_POOL_H_
 
-#include "GameManagerRPS.h"
-#include "PlayerAlgorithm.h"
+#include "TournamentManager.h"
+
 #include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <queue>
 #include <string>
 #include <thread>
@@ -17,20 +18,16 @@ class ThreadPool {
 private:
     volatile bool mStopping = false;
 
-    std::queue<std::pair<std::string, std::string>> pairsOfPlayersQueue;
+    std::queue<std::pair<std::string, std::string>> mPlayQueue;
     std::vector<std::thread> mThreads;
     std::condition_variable mEventVar;
     std::mutex mEventMutex;
 
 public:
     // c'tor
-    explicit ThreadPool(int numThreads, const std::queue<std::pair<std::string, std::string>>& mPairsOfPlayersQueue, std::map<std::string, std::atomic_int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory)
+    explicit ThreadPool(std::queue<std::pair<std::string, std::string>>& playQueue)
     {
-        this->pairsOfPlayersQueue = mPairsOfPlayersQueue;
-        std::cout << "Starting threads" << std::endl;
-        start(numThreads, id2Score, id2factory);
-        std::cout << "Waiting for threads" << std::endl;
-        wait_join();
+        this->mPlayQueue = playQueue;
     }
     // d'tor
     ~ThreadPool()
@@ -38,26 +35,29 @@ public:
         std::cout << "in ThreadPool d'tor" << std::endl;
         stop();
     }
-    /*
-    void enqueue(std::pair<std::string, std::string> pairOfIDs){
-        {
-            std::unique_lock<std::mutex> lock{mEventMutex};
-            pairsOfPlayersQueue.emplace(std::move(pairOfIDs));
-        }
-        mEventVar.notify_one();
-    }
-    */
-private:
-    void start(int numThreads, std::map<std::string, std::atomic_int>& id2Score, std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory);
+    // waits for all the threads in the pool to finish
+    void waitForAll() { this->wait_join(); }
+    // fun the match
+    void run(int numThreads);
 
+private:
+    // start the threads run
+    void start(int numThreads);
+    // wait for all threads to join
     void wait_join()
     {
+        std::cout << "Waiting for threads" << std::endl;
         for (auto& thread : mThreads) {
-            thread.join();
+            if (thread.joinable()) thread.join();
         }
     }
-
-    void stop() noexcept;
+    // stop the running of the threads
+    void stop() noexcept
+    {
+        this->mStopping = true;
+        wait_join();
+        std::cout << "queue size: " << this->mPlayQueue.size() << std::endl;
+    }
 };
 
 #endif // !__THREAD_POOL_H_

@@ -4,20 +4,24 @@
 
 #include "GameUtilitiesRPS.h"
 #include "PlayerAlgorithm.h"
-#include "ThreadPool.h"
+
 #include <atomic>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <queue>
-#include <iostream>
+#include <string>
+
 
 class TournamentManager {
 private:
     static TournamentManager instance;
     // private default c'tor
     TournamentManager() = default;
-    ~TournamentManager() {
+    ~TournamentManager()
+    {
         std::cout << "in TournamentManager d'tor" << std::endl;
     }
 
@@ -26,28 +30,41 @@ public:
     static TournamentManager& get() { return instance; }
 
 private:
-    std::vector<std::string> soFileNames;
     std::vector<std::string> soIds;
-    std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2factory;
-    std::map<std::string, std::atomic_int> id2Score;
+    std::map<std::string, std::function<std::unique_ptr<PlayerAlgorithm>()>> id2Factory;
+    std::map<std::string, int> id2Score;
+    std::map<std::string, int> id2GameNum;
     std::queue<std::pair<std::string, std::string>> pairsOfPlayersQueue;
-    std::unique_ptr<ThreadPool> threadPool;
+
+    std::mutex scoreLock;
 
 public:
-    // gets the list of algorithm file names
-    std::vector<std::string>& getFilesNames() { return soFileNames; }
-    // get the scores
-    std::map<std::string, std::atomic_int>& getScores() { return id2Score; }
-    // add a lib file name to list
-    void addFileName(std::string fileName);
     // registers an algorithm into the tournament
     bool registerAlgorithm(std::string id, std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod);
-    // run the tournament
-    void run(int numOfThreads);
+    // initialize all the needed elements
+    void initialize();
     // clears the algorithm factory list
-    void clearAlgorithms() {this->id2factory.clear();}
+    void clearAlgorithms() { this->id2Factory.clear(); }
     // gets the sorted scores into the given vector
-    void getSortedScores(std::vector<std::pair<std::string,int>>& finalScores);
+    void getSortedScores(std::vector<std::pair<std::string, int>>& finalScores);
+    // update the score of a player by id, when needed
+    void updateScoreForId(std::string id, int score) {
+        std::lock_guard<std::mutex> lock(this->scoreLock);
+        if (id2GameNum[id] < 30) {
+            id2Score[id] += score;
+            ++id2GameNum[id];
+        }
+    }
+    // returns a player from id
+    std::unique_ptr<PlayerAlgorithm> getPlayer(std::string id) {
+        return this->id2Factory[id]();
+    }
+    // play a match between players
+    void playMatch(std::string id_p1, std::string id_p2);
+    // returns the play queue
+    std::queue<std::pair<std::string, std::string>>& getPlayQueue() {
+        return pairsOfPlayersQueue;
+    }
 
 private:
     // arranges and updates fights for the player with id (name)

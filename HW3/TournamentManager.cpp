@@ -1,52 +1,44 @@
 #include "TournamentManager.h"
+#include "GameManagerRPS.h"
+
+#include <algorithm>
 #include <random>
 #include <set>
 #include <string>
-#include <algorithm>
 
 // initialization of the singelton instance
 TournamentManager TournamentManager::instance;
 
-void TournamentManager::addFileName(std::string fileName)
-{
-    this->soFileNames.emplace_back(fileName);
-}
-
 bool TournamentManager::registerAlgorithm(std::string id, std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod)
 {
-    if (id2factory.find(id) != id2factory.end())
-    {
+    if (id2Factory.find(id) != id2Factory.end()) {
         return false;
     }
-    id2factory[id] = factoryMethod;
+    id2Factory[id] = factoryMethod;
     soIds.emplace_back(id);
     return true;
 }
 
-void TournamentManager::run(int numOfThreads)
-{
-    for (auto &name : this->soIds)
-    {
+void TournamentManager::initialize() {
+    for (auto& name : this->soIds) {
         // initialization for id2Score
         id2Score[name] = 0;
+        // initialization for id2GameNum
+        id2GameNum[name] = 0;
         // preprocessing for pairsOfPlayersQueue
         getFightsForPlayer(name);
     }
-    this->threadPool = std::make_unique<ThreadPool>(numOfThreads, pairsOfPlayersQueue, id2Score, id2factory);
 }
 
 void TournamentManager::getFightsForPlayer(std::string name)
 {
     int counter = 0;
-    do
-    {
-        std::set<std::string> choice = {name};
-        do
-        {
+    do {
+        std::set<std::string> choice = { name };
+        do {
             int randIndex = std::rand() % this->soIds.size();
             std::string opp = this->soIds[randIndex];
-            if (choice.count(opp) == 0)
-            {
+            if (choice.count(opp) == 0) {
                 this->pairsOfPlayersQueue.emplace(std::make_pair(name, opp));
                 choice.insert(opp);
                 ++counter;
@@ -59,10 +51,24 @@ void TournamentManager::getSortedScores(std::vector<std::pair<std::string, int>>
 {
     finalScores.clear();
 
-    for (auto s : this->soIds)
-    {
+    for (auto s : this->soIds) {
         finalScores.emplace_back(s, (int)this->id2Score[s]);
     }
 
-    std::sort(finalScores.begin(), finalScores.end(), [](std::pair<std::string, int> const &a, std::pair<std::string, int> const &b) { return a.second > b.second; });
+    std::sort(finalScores.begin(), finalScores.end(), [](std::pair<std::string, int> const& a, std::pair<std::string, int> const& b) { return a.second > b.second; });
+}
+
+void TournamentManager::playMatch(std::string id_p1, std::string id_p2) {
+    int gameResult = GameManager::get().PlayRPS(this->getPlayer(id_p1), this->getPlayer(id_p2));
+
+    if (gameResult == 0) {
+        this->updateScoreForId(id_p1, 1);
+        this->updateScoreForId(id_p2, 1);
+    }
+    if (gameResult == 1) {
+        this->updateScoreForId(id_p1, 3);
+    }
+    if (gameResult == 2) {
+        this->updateScoreForId(id_p2, 3);
+    }
 }

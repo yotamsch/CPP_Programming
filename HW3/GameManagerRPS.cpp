@@ -6,19 +6,13 @@
  * @date 2018-05-04
  */
 #include "GameManagerRPS.h"
-#include "RSPPlayer_312148190.h"
-#include "BoardRPS.h"
-#include "MoveRPS.h"
-#include "PieceRPS.h"
-#include "PointRPS.h"
-#include "ScoreManager.h"
 
 #include <cassert>
 #include <fstream>
 #include <map>
 #include <memory>
 
-GameManager GameManager::staticGameManager;
+GameManager GameManager::instance;
 
 /**
  * @brief - Asks for next move of current player and performs the move by calling BoardRPS member function
@@ -33,7 +27,7 @@ GameManager GameManager::staticGameManager;
  * @param myBoard - game board reference
  * @param rScoreManager - ScoreManager reference
  */
-void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurrPlayer, std::unique_ptr<PlayerAlgorithm>& rpOppPlayer, BoardRPS& myBoard, ScoreManager& rScoreManager)
+void GameManager::playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurrPlayer, std::unique_ptr<PlayerAlgorithm>& rpOppPlayer, BoardRPS& myBoard, ScoreManager& rScoreManager)
 {
     std::unique_ptr<FightInfo> fightInfo;
     std::unique_ptr<JokerChange> jokerChange;
@@ -91,7 +85,7 @@ void playCurrTurn(int currPlayerNumber, std::unique_ptr<PlayerAlgorithm>& rpCurr
  * @return true - if all positionings are legal
  * @return false - if any of the positionings is "bad"
  */
-bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<PiecePosition>>& positioningVec, std::vector<std::unique_ptr<FightInfo>>& rpFightInfoVec, ScoreManager& rScoreManager)
+bool GameManager::fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<PiecePosition>>& positioningVec, std::vector<std::unique_ptr<FightInfo>>& rpFightInfoVec, ScoreManager& rScoreManager)
 {
     bool resultOfPositioning;
     char currPiece;
@@ -113,6 +107,7 @@ bool fillBoard(BoardRPS& rBoard, int vCurrPlayer, std::vector<std::unique_ptr<Pi
     }
     return true;
 }
+
 /**
  * @brief The function to actually start a game between player p1 and player p2
  * 

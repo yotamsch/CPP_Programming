@@ -9,6 +9,7 @@
 #include "PointRPS.h"
 #include <algorithm>
 #include <random>
+#include <limits>
 
 // %% INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -625,13 +626,19 @@ float RSPPlayer_312148190::getScoreForJokerChange(RSPPlayer_312148190::info data
 RSPPlayer_312148190::move RSPPlayer_312148190::getBestMoveForPlayer(RSPPlayer_312148190::info& data)
 {
     RSPPlayer_312148190::move currMove, maxMove;
+    RSPPlayer_312148190::move anyMove;
     std::vector<int> possibleMoves;
+    double countPossibleMoves = 0;
     float currScore = 0;
+    float anyScore = std::numeric_limits<float>::min();
+
+    // get the current score of the board
     float maxScore = calcPlayerBoardScore(data);
 
     // get the best move possible out of all available moves
     for (auto pos = data._M_this_player._M_pieces.begin(); pos != data._M_this_player._M_pieces.end(); ++pos) {
         getPossibleMovesForPiece(data, *pos, possibleMoves);
+        countPossibleMoves += possibleMoves.size();
         for (auto mov = possibleMoves.begin(); mov != possibleMoves.end(); ++mov) {
             currMove = { *pos, *mov };
             // make sure doesn't go back and forth
@@ -643,8 +650,18 @@ RSPPlayer_312148190::move RSPPlayer_312148190::getBestMoveForPlayer(RSPPlayer_31
                 maxMove = currMove;
                 maxScore = currScore;
             }
+            else if (currScore > anyScore) {
+                anyMove = currMove;
+                anyScore = currScore;
+            }
         }
         possibleMoves.clear();
+    }
+
+    // if couldn't find a good move, just return any move
+    // if no move was possible returns an illegal move
+    if (maxMove._M_from == -1 && maxMove._M_to == -1) {
+        return anyMove;
     }
     return maxMove;
 }
@@ -811,8 +828,9 @@ unique_ptr<Move> RSPPlayer_312148190::getMove()
     RSPPlayer_312148190::move bestMove;
 
     bestMove = getBestMoveForPlayer(this->_info);
+
     if (bestMove._M_from == -1 && bestMove._M_to == -1) {
-        return nullptr;
+        return std::move(std::make_unique<MoveRPS>(PointRPS(-1,-1), PointRPS(-1,-1)));
     }
 
     retMove = std::make_unique<MoveRPS>(PointRPS(getXDim(bestMove._M_from) + 1, getYDim(bestMove._M_from) + 1), PointRPS(getXDim(bestMove._M_to) + 1, getYDim(bestMove._M_to) + 1));
