@@ -94,6 +94,8 @@ public:
 private:
     // gets a position not used yet
     int getPositionNotSelectedYet() const;
+    // initial flag and bombs positioning
+    void positionInitial(std::vector<unique_ptr<PiecePosition>>& vectorToFill);
     // position a piece of a givben type
     void positionPiecesOfType(int vLimit, char vType, std::vector<unique_ptr<PiecePosition>>& vectorToFill);
 

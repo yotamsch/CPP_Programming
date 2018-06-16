@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     // this executes a command "ls"
     dl = popen(command_str.c_str(), "r");
     if (!dl) {
-        std::cout << "Error while attempting to open: " << soFilesDirectory << std::endl;
+        std::cout << "Error while attempting to look up: " << soFilesDirectory << std::endl;
         return ERR_RETURN;
     }
 
@@ -91,7 +91,6 @@ int main(int argc, char** argv)
 
     // close dl since don't need it anymore
     if (pclose(dl) != 0) {
-        std::cout << "An error occured while dismissing the directory look up." << std::endl;
         return ERR_RETURN;
     }
 
@@ -125,10 +124,10 @@ int main(int argc, char** argv)
     // make sure the play queue and the needed information exists
     TournamentManager::get().initialize();
 
-    // create the thread play pool
+    // create the thread play pool (works with 0 or more additional threads)
     ThreadPool playPool(TournamentManager::get().getPlayQueue());
 
-    // run the tournament
+    // run the tournament wait for pool to finish
     playPool.run(numOfThreads - 1);
     playPool.waitForAll();
 
@@ -137,8 +136,9 @@ int main(int argc, char** argv)
     TournamentManager::get().getSortedScores(finalScores);
 
     // print the scores
+    int i = 1;
     for (auto& s : finalScores) {
-        std::cout << s.first << " : " << s.second << std::endl;
+        std::cout << "#" << i++ << " - " << s.first << " : " << s.second << std::endl;
     }
 
     TournamentManager::get().clearAlgorithms();

@@ -8,8 +8,8 @@
 #include "PieceRPS.h"
 #include "PointRPS.h"
 #include <algorithm>
-#include <random>
 #include <limits>
+#include <random>
 
 // %% INFO %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -264,6 +264,55 @@ int RSPPlayer_312148190::getPositionNotSelectedYet() const
         vRandPosition = getRandomPos();
     } while (_info._M_this_player._M_pieces.count(vRandPosition) != 0);
     return vRandPosition;
+}
+
+/**
+ * @brief Performs the initial positioning of the flag and bomb pieces. The function assumes there is at least one flag and at least two bombs.
+ * 
+ * @param vectorToFill - The function fills the vector with the created pieces
+ */
+void RSPPlayer_312148190::positionInitial(std::vector<unique_ptr<PiecePosition>>& vectorToFill)
+{
+    std::unique_ptr<PiecePosition> pPiece;
+    int cornerChoice = rand() % 4;
+    int flagPos = -1;
+    int bombPos1 = -1;
+    int bombPos2 = -1;
+    
+    switch (cornerChoice) {
+    case 0:
+        flagPos = getPos(0, 0);
+        bombPos1 = getPos(1, 0);
+        bombPos2 = getPos(0, 1);
+        break;
+    case 1:
+        flagPos = getPos(DIM_X - 1, 0);
+        bombPos1 = getPos(DIM_X - 2, 0);
+        bombPos2 = getPos(DIM_X - 1, 1);
+        break;
+    case 2:
+        flagPos = getPos(0, DIM_Y - 1);
+        bombPos1 = getPos(1, DIM_Y - 1);
+        bombPos2 = getPos(0, DIM_Y - 2);
+        break;
+    case 3:
+        flagPos = getPos(DIM_X - 1, DIM_Y - 1);
+        bombPos1 = getPos(DIM_X - 2, DIM_Y - 1);
+        bombPos2 = getPos(DIM_X - 1, DIM_Y - 2);
+        break;
+    }
+    // position flag
+    pPiece = std::make_unique<PieceRPS>(this->_info._M_this_player._M_id, false, FLAG_CHR, PointRPS(getXDim(flagPos) + 1, getYDim(flagPos) + 1));
+    vectorToFill.push_back(std::move(pPiece));
+    this->_info.addPiece({ this->_info._M_this_player._M_id, false, FLAG_CHR }, flagPos);
+    // position bomb 1
+    pPiece = std::make_unique<PieceRPS>(this->_info._M_this_player._M_id, false, BOMB_CHR, PointRPS(getXDim(bombPos1) + 1, getYDim(bombPos1) + 1));
+    vectorToFill.push_back(std::move(pPiece));
+    this->_info.addPiece({ this->_info._M_this_player._M_id, false, BOMB_CHR }, bombPos1);
+    // position bomb 2
+    pPiece = std::make_unique<PieceRPS>(this->_info._M_this_player._M_id, false, BOMB_CHR, PointRPS(getXDim(bombPos2) + 1, getYDim(bombPos2) + 1));
+    vectorToFill.push_back(std::move(pPiece));
+    this->_info.addPiece({ this->_info._M_this_player._M_id, false, BOMB_CHR }, bombPos2);
 }
 
 /**
@@ -649,8 +698,7 @@ RSPPlayer_312148190::move RSPPlayer_312148190::getBestMoveForPlayer(RSPPlayer_31
             if ((maxMove._M_from == -1 && maxMove._M_to == -1 && currScore >= maxScore) || (currScore > maxScore)) {
                 maxMove = currMove;
                 maxScore = currScore;
-            }
-            else if (currScore > anyScore) {
+            } else if (currScore > anyScore) {
                 anyMove = currMove;
                 anyScore = currScore;
             }
@@ -709,10 +757,13 @@ void RSPPlayer_312148190::getInitialPositions(int player,
     // set the player number
     this->_info._M_this_player._M_id = player;
 
-    // insert flags
-    positionPiecesOfType(FLAG_LIMIT, FLAG_CHR, vectorToFill);
-    // insert bombs
-    positionPiecesOfType(BOMB_LIMIT, BOMB_CHR, vectorToFill);
+
+    // position the flag and bombs (1 and 2 respectively)
+    positionInitial(vectorToFill);
+    // insert remaining flags if exist
+    positionPiecesOfType(FLAG_LIMIT-1, FLAG_CHR, vectorToFill);
+    // insert remaining bombs if exist
+    positionPiecesOfType(BOMB_LIMIT-2, BOMB_CHR, vectorToFill);
     // insert and choose joker
     positionPiecesOfType(JOKER_LIMIT, JOKER_CHR, vectorToFill);
     // insert rock
@@ -830,7 +881,7 @@ unique_ptr<Move> RSPPlayer_312148190::getMove()
     bestMove = getBestMoveForPlayer(this->_info);
 
     if (bestMove._M_from == -1 && bestMove._M_to == -1) {
-        return std::move(std::make_unique<MoveRPS>(PointRPS(-1,-1), PointRPS(-1,-1)));
+        return std::move(std::make_unique<MoveRPS>(PointRPS(-1, -1), PointRPS(-1, -1)));
     }
 
     retMove = std::make_unique<MoveRPS>(PointRPS(getXDim(bestMove._M_from) + 1, getYDim(bestMove._M_from) + 1), PointRPS(getXDim(bestMove._M_to) + 1, getYDim(bestMove._M_to) + 1));

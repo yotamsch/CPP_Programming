@@ -64,6 +64,7 @@ void TournamentManager::playMatch(std::string id_p1, std::string id_p2) {
 }
 
 void TournamentManager::updateScores(std::string id_p1, std::string id_p2, int winner) {
+    // lock the score board
     std::lock_guard<std::mutex> lock(this->scoreLock);
 
     if (winner == 0) {
