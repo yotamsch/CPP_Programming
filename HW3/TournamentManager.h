@@ -1,4 +1,10 @@
-
+/**
+ * @brief The header file of the Tournament Manager class
+ * 
+ * @file TournamentManager.h
+ * @author Tala Amouri
+ * @date 2018-06-09
+ */
 #ifndef __TOURNAMENT_MANAGER_H_
 #define __TOURNAMENT_MANAGER_H_
 
@@ -12,6 +18,7 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <set>
 #include <string>
 
 
@@ -20,10 +27,7 @@ private:
     static TournamentManager instance;
     // private default c'tor
     TournamentManager() = default;
-    ~TournamentManager()
-    {
-        std::cout << "in TournamentManager d'tor" << std::endl;
-    }
+    ~TournamentManager() { }
 
 public:
     // gets the static instance of the tournament manager (singelton)
@@ -62,10 +66,11 @@ public:
 
 private:
     // arranges and updates fights for the player with id (name)
-    void getFightsForPlayer(std::string name);
+    void getFightsForPlayer(std::string name, 
+    std::set<std::pair<std::string, std::string>>& playSet);
     // update the score of a player by id, when needed
     void updateScoreForId(std::string id, int score) {
-        if (id2GameNum[id] < 30) {
+        if (id2GameNum[id] > 0) {
             id2Score[id] += score;
         }
     }

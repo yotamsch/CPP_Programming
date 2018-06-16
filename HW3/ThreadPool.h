@@ -1,3 +1,10 @@
+/**
+ * @brief The header file of the Thread Pool class
+ * 
+ * @file ThreadPool.h
+ * @author Tala Amouri
+ * @date 2018-06-10
+ */
 #ifndef __THREAD_POOL_H_
 #define __THREAD_POOL_H_
 
@@ -32,7 +39,6 @@ public:
     // d'tor
     ~ThreadPool()
     {
-        std::cout << "in ThreadPool d'tor" << std::endl;
         stop();
     }
     // waits for all the threads in the pool to finish
@@ -46,7 +52,6 @@ private:
     // wait for all threads to join
     void wait_join()
     {
-        std::cout << "Waiting for threads" << std::endl;
         for (auto& thread : mThreads) {
             if (thread.joinable()) thread.join();
         }
@@ -56,7 +61,6 @@ private:
     {
         this->mStopping = true;
         wait_join();
-        std::cout << "queue size: " << this->mPlayQueue.size() << std::endl;
     }
 };
 

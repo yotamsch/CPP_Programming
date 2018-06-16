@@ -1,4 +1,10 @@
-
+/**
+ * @brief The main file of the tournament.
+ * 
+ * @file Main.cpp
+ * @author Yotam Sechayk
+ * @date 2018-06-07
+ */
 #include "TournamentManager.h"
 #include "ThreadPool.h"
 
@@ -14,6 +20,8 @@
 #define BUF_SIZE 4097
 #define MSG_INVALID_FORMAT "Please call using the following format: <exe> [-path <.so directory path> [-threads <number>]]"
 #define ERR_RETURN -1
+#define INF "[INFO] "
+#define ERR "[ERROR] "
 
 int main(int argc, char** argv)
 {
@@ -35,32 +43,34 @@ int main(int argc, char** argv)
 
     // collect command line settings
     for (int i = 1; i < argc; i++) {
-        if (path.compare(argv[i]) == 0 && argc > i + 1) {
+        if (path.compare(argv[i]) == 0) {
             if (argc < i + 2) {
-                std::cout << MSG_INVALID_FORMAT << std::endl;
+                std::cout << ERR  << MSG_INVALID_FORMAT << std::endl;
                 return ERR_RETURN;
             }
             soFilesDirectory = argv[i + 1];
             if (soFilesDirectory.at(soFilesDirectory.size() - 1) != '/') {
                 soFilesDirectory = soFilesDirectory + "/";
             }
-        } else if (threads.compare(argv[i]) == 0 && argc > i + 1) {
+        } else if (threads.compare(argv[i]) == 0) {
             if (argc < i + 2) {
-                std::cout << MSG_INVALID_FORMAT << std::endl;
+                std::cout << ERR  << MSG_INVALID_FORMAT << std::endl;
                 return ERR_RETURN;
             }
             try {
                 numOfThreads = std::stoi(argv[i + 1]);
             } catch (...) {
-                std::cout << "Please specify a valid threads number, '" << argv[i + 1] << "' is not a valid value." << std::endl;
+                std::cout << ERR  << "Please specify a valid threads number, '" << argv[i + 1] << "' is not a valid value." << std::endl;
                 return ERR_RETURN;
             }
             if (numOfThreads <= 0) {
-                std::cout << "The threads number should be at least 1." << std::endl;;
+                std::cout << ERR  << "The threads number should be at least 1." << std::endl;;
                 return ERR_RETURN;
             }
         }
     }
+
+    std::cout << INF << "Using .so files in: '" << soFilesDirectory << "'." << std::endl;
 
     // command string to get dynamic lib names
     std::string command_str = "ls " + soFilesDirectory + "*.so";
@@ -95,7 +105,7 @@ int main(int argc, char** argv)
     }
 
     if (soFileNames.size() <= 1) {
-        std::cout << "Not enough .so files in the directory. Needs 2 or more player algorithms." << std::endl;
+        std::cout << ERR  << "Not enough .so files in the directory. Needs 2 or more player algorithms." << std::endl;
         return ERR_RETURN;
     }
 
@@ -103,23 +113,17 @@ int main(int argc, char** argv)
     for (int i = 0; i < (int)soFileNames.size(); ++i) {
         dlib = dlopen(soFileNames[i].c_str(), RTLD_NOW);
         if (dlib == NULL) {
-             std::cout << "Error while attempting to open file: " << soFileNames[i] << std::endl;
+             std::cout << ERR << "Error while attempting to open file: " << soFileNames[i] << std::endl;
             // close opened libs
             for (itr = dl_list.begin(); itr != dl_list.end(); itr++) {
-                std::cout << "closing: " << *itr << std::endl;
                 dlclose(*itr);
             }
             return ERR_RETURN;
         }
-        std::cout << "adding: " << dlib << std::endl;
         dl_list.push_back(dlib);
     }
 
-
-
-
-    std::cout << "Starting tournamnt" << std::endl;
-    std::cout << "Using " << numOfThreads << " threads" << std::endl;
+    std::cout << INF << "Using " << numOfThreads << " threads, including main." << std::endl;
 
     // make sure the play queue and the needed information exists
     TournamentManager::get().initialize();
@@ -136,23 +140,17 @@ int main(int argc, char** argv)
     TournamentManager::get().getSortedScores(finalScores);
 
     // print the scores
-    int i = 1;
     for (auto& s : finalScores) {
-        std::cout << "#" << i++ << " - " << s.first << " : " << s.second << std::endl;
+        std::cout << s.first << " " << s.second << std::endl;
     }
 
+    // cleas algorithm registration before closing libs
     TournamentManager::get().clearAlgorithms();
-
-
-
 
     // close all the dynamic libs we opened
     for (itr = dl_list.begin(); itr != dl_list.end(); itr++) {
-        std::cout << "closing: " << *itr << std::endl;
         dlclose(*itr);
     }
-
-    std::cout << "closed all libs" << std::endl;
 
     // to handle leaks reported by valgrind (might be false leaks)
     pthread_exit(NULL);

@@ -1,15 +1,20 @@
+/**
+ * @brief The implementation file of the Thread Pool class
+ * 
+ * @file ThreadPool.cpp
+ * @author Yotam Sechayk
+ * @date 2018-06-11
+ */
 #include "ThreadPool.h"
 
 void ThreadPool::run(int numThreads)
 {
     // threaded play
     if (numThreads >= 1) {
-        std::cout << "Starting threads" << std::endl;
         this->start(numThreads);
     }
     // local play
     else {
-        std::cout << "Playing locally" << std::endl;
         std::string id_p1, id_p2;
         while (!mPlayQueue.empty()) {
             id_p1 = mPlayQueue.front().first;
@@ -33,7 +38,6 @@ void ThreadPool::start(int numThreads)
                     std::unique_lock<std::mutex> lock(mEventMutex);
                     mEventVar.wait(lock, [&] { return (mStopping || !mPlayQueue.empty()); });
                     if (mStopping) {
-                        std::cout << "ending thread: " << std::this_thread::get_id() << std::endl;
                         break;
                     }
                     id_p1 = mPlayQueue.front().first;
