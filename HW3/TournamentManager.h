@@ -47,14 +47,8 @@ public:
     void clearAlgorithms() { this->id2Factory.clear(); }
     // gets the sorted scores into the given vector
     void getSortedScores(std::vector<std::pair<std::string, int>>& finalScores);
-    // update the score of a player by id, when needed
-    void updateScoreForId(std::string id, int score) {
-        std::lock_guard<std::mutex> lock(this->scoreLock);
-        if (id2GameNum[id] < 30) {
-            id2Score[id] += score;
-            ++id2GameNum[id];
-        }
-    }
+    // update the player scores based on the play winner
+    void updateScores(std::string id_p1, std::string id_p2, int winner);
     // returns a player from id
     std::unique_ptr<PlayerAlgorithm> getPlayer(std::string id) {
         return this->id2Factory[id]();
@@ -69,6 +63,12 @@ public:
 private:
     // arranges and updates fights for the player with id (name)
     void getFightsForPlayer(std::string name);
+    // update the score of a player by id, when needed
+    void updateScoreForId(std::string id, int score) {
+        if (id2GameNum[id] < 30) {
+            id2Score[id] += score;
+        }
+    }
 };
 
 #endif // !__TOURNAMENT_MANAGER_H_

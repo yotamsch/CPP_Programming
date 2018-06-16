@@ -60,15 +60,22 @@ void TournamentManager::getSortedScores(std::vector<std::pair<std::string, int>>
 
 void TournamentManager::playMatch(std::string id_p1, std::string id_p2) {
     int gameResult = GameManager::get().PlayRPS(this->getPlayer(id_p1), this->getPlayer(id_p2));
+    this->updateScores(id_p1,id_p2, gameResult);
+}
 
-    if (gameResult == 0) {
+void TournamentManager::updateScores(std::string id_p1, std::string id_p2, int winner) {
+    std::lock_guard<std::mutex> lock(this->scoreLock);
+
+    if (winner == 0) {
         this->updateScoreForId(id_p1, 1);
         this->updateScoreForId(id_p2, 1);
     }
-    if (gameResult == 1) {
+    if (winner == 1) {
         this->updateScoreForId(id_p1, 3);
     }
-    if (gameResult == 2) {
+    if (winner == 2) {
         this->updateScoreForId(id_p2, 3);
     }
+    ++this->id2GameNum[id_p1];
+    ++this->id2GameNum[id_p2];
 }
