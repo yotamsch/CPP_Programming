@@ -28,17 +28,22 @@ bool TournamentManager::registerAlgorithm(std::string id, std::function<std::uni
     return true;
 }
 
-void TournamentManager::initialize()
+bool TournamentManager::initialize()
 {
+    if (this->soIds.size() <= 1) {
+        return false;
+    }
+    // get play queue for the players
     std::set<std::pair<std::string, std::string>> playSet;
     for (auto& name : this->soIds) {
         getFightsForPlayer(name, playSet);
     }
-
     // reset the game numbers
     for (auto& name : this->soIds) {
         id2GameNum[name] = 0;
     }
+
+    return true;
 }
 
 void TournamentManager::getFightsForPlayer(std::string name, 

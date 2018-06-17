@@ -5,8 +5,8 @@
  * @author Yotam Sechayk
  * @date 2018-06-07
  */
-#include "TournamentManager.h"
 #include "ThreadPool.h"
+#include "TournamentManager.h"
 
 #include <dlfcn.h>
 #include <iostream>
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     for (int i = 1; i < argc; i++) {
         if (path.compare(argv[i]) == 0) {
             if (argc < i + 2) {
-                std::cout << ERR  << MSG_INVALID_FORMAT << std::endl;
+                std::cout << ERR << MSG_INVALID_FORMAT << std::endl;
                 return ERR_RETURN;
             }
             soFilesDirectory = argv[i + 1];
@@ -54,17 +54,18 @@ int main(int argc, char** argv)
             }
         } else if (threads.compare(argv[i]) == 0) {
             if (argc < i + 2) {
-                std::cout << ERR  << MSG_INVALID_FORMAT << std::endl;
+                std::cout << ERR << MSG_INVALID_FORMAT << std::endl;
                 return ERR_RETURN;
             }
             try {
                 numOfThreads = std::stoi(argv[i + 1]);
             } catch (...) {
-                std::cout << ERR  << "Please specify a valid threads number, '" << argv[i + 1] << "' is not a valid value." << std::endl;
+                std::cout << ERR << "Please specify a valid threads number, '" << argv[i + 1] << "' is not a valid value." << std::endl;
                 return ERR_RETURN;
             }
             if (numOfThreads <= 0) {
-                std::cout << ERR  << "The threads number should be at least 1." << std::endl;;
+                std::cout << ERR << "The threads number should be at least 1." << std::endl;
+                ;
                 return ERR_RETURN;
             }
         }
@@ -105,7 +106,7 @@ int main(int argc, char** argv)
     }
 
     if (soFileNames.size() <= 1) {
-        std::cout << ERR  << "Not enough .so files in the directory. Needs 2 or more player algorithms." << std::endl;
+        std::cout << ERR << "Not enough .so files in the directory. Needs 2 or more player algorithms." << std::endl;
         return ERR_RETURN;
     }
 
@@ -113,20 +114,23 @@ int main(int argc, char** argv)
     for (int i = 0; i < (int)soFileNames.size(); ++i) {
         dlib = dlopen(soFileNames[i].c_str(), RTLD_NOW);
         if (dlib == NULL) {
-             std::cout << ERR << "Error while attempting to open file: " << soFileNames[i] << std::endl;
-            // close opened libs
-            for (itr = dl_list.begin(); itr != dl_list.end(); itr++) {
-                dlclose(*itr);
-            }
-            return ERR_RETURN;
+            std::cout << INF << "Error while attempting to open file: " << soFileNames[i] << ", skipping it." << std::endl;
+            continue;
         }
         dl_list.push_back(dlib);
     }
 
-    std::cout << INF << "Using " << numOfThreads << " threads, including main." << std::endl;
+    std::cout << INF << "Using " << numOfThreads << " threads (including main), on " << dl_list.size() << " algorithms." << std::endl;
 
     // make sure the play queue and the needed information exists
-    TournamentManager::get().initialize();
+    if (TournamentManager::get().initialize() == false) {
+        std::cout << ERR << "Not enough algorithms were able to register." << std::endl;
+        // close all the dynamic libs we opened
+        for (itr = dl_list.begin(); itr != dl_list.end(); itr++) {
+            dlclose(*itr);
+        }
+        return ERR_RETURN;
+    }
 
     // create the thread play pool (works with 0 or more additional threads)
     ThreadPool playPool(TournamentManager::get().getPlayQueue());
@@ -152,6 +156,6 @@ int main(int argc, char** argv)
         dlclose(*itr);
     }
 
-    // to handle leaks reported by valgrind (might be false leaks)
+    // makes sure all sub-threads were demolished and exists cleanly
     pthread_exit(NULL);
 }

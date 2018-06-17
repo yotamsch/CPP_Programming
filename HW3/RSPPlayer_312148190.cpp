@@ -278,7 +278,7 @@ void RSPPlayer_312148190::positionInitial(std::vector<unique_ptr<PiecePosition>>
     int flagPos = -1;
     int bombPos1 = -1;
     int bombPos2 = -1;
-    
+
     switch (cornerChoice) {
     case 0:
         flagPos = getPos(0, 0);
@@ -757,13 +757,12 @@ void RSPPlayer_312148190::getInitialPositions(int player,
     // set the player number
     this->_info._M_this_player._M_id = player;
 
-
     // position the flag and bombs (1 and 2 respectively)
     positionInitial(vectorToFill);
     // insert remaining flags if exist
-    positionPiecesOfType(FLAG_LIMIT-1, FLAG_CHR, vectorToFill);
+    positionPiecesOfType(FLAG_LIMIT - 1, FLAG_CHR, vectorToFill);
     // insert remaining bombs if exist
-    positionPiecesOfType(BOMB_LIMIT-2, BOMB_CHR, vectorToFill);
+    positionPiecesOfType(BOMB_LIMIT - 2, BOMB_CHR, vectorToFill);
     // insert and choose joker
     positionPiecesOfType(JOKER_LIMIT, JOKER_CHR, vectorToFill);
     // insert rock

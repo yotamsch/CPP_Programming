@@ -45,8 +45,8 @@ private:
 public:
     // registers an algorithm into the tournament
     bool registerAlgorithm(std::string id, std::function<std::unique_ptr<PlayerAlgorithm>()> factoryMethod);
-    // initialize all the needed elements
-    void initialize();
+    // initialize all the needed elements (true on success)
+    bool initialize();
     // clears the algorithm factory list
     void clearAlgorithms() { this->id2Factory.clear(); }
     // gets the sorted scores into the given vector
