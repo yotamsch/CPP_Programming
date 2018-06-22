@@ -16,40 +16,85 @@
 template <typename GAME_PIECE>
 using PieceInfo = std::unique_ptr<const std::pair<int, GAME_PIECE>>;
 
-// the Board Dimension element
-using Dim = std::pair<size_t, size_t>;
-
-template <size_t ROWS, size_t COLS, typename GAME_PIECE, size_t PLAYERS = 2>
+template <int ROWS, int COLS, typename GAME_PIECE, int PLAYERS = 2>
 class GameBoard {
+private:
+    std::array<PieceInfo<GAME_PIECE>, ROWS * COLS> _board;
+
 public:
-    template <decltype(typedef[](PieceInfo&) -> bool) FILTER = [](PieceInfo&) { return true; }>
+    GameBoard() {}
+    ~GameBoard() {}
+
     class iterator {
     private:
-        PieceInfo* _pos;
+        PieceInfo<GAME_PIECE>* _pos;
         int _loc;
+        std::function<bool(const std::pair<int, GAME_PIECE>&)> _filter;
 
     public:
-        iterator(PieceInfo* pos = nullptr, int loc = 0)
+        iterator(PieceInfo<GAME_PIECE>* pos = nullptr, int loc = 0)
             : _pos(pos)
-            , _loc(loc){};
-        std::tuple<int, int, GAME_PIECE, int> operator*() { return std::make_tuple(row(_loc), col(_loc), *_pos->first, *_pos->second); }
-        iterator operator++() { return iterator(++_pos, ++_loc); }
+            , _loc(loc)
+            , _filter([](const std::pair<int, GAME_PIECE>&) { return true; })
+        {
+        }
+        std::tuple<int, int, GAME_PIECE, int> operator*() { return std::make_tuple(row(_loc), col(_loc), (*_pos)->second, (*_pos)->first); }
+        iterator operator++()
+        {
+            do {
+                ++_pos;
+                ++_loc;
+            } while (!_filter(*(*_pos)) && _loc < COLS * ROWS);
+            if (_loc >= COLS * ROWS) {
+                _filter = [](const std::pair<int, GAME_PIECE>&) { return true; };
+            }
+            return iterator(_pos, _loc);
+        }
         bool operator!=(iterator other) const { return _pos != other._pos; }
+        void setFilter(std::function<bool(const std::pair<int, GAME_PIECE>&)> filter)
+        {
+            _filter = filter;
+        }
 
     private:
         int row(int loc) { return loc / COLS; }
         int col(int loc) { return loc % COLS; }
     };
-    iterator<> begin() { return &_board.at(0); }
-    iterator<> end() { return &_board.at(ROWS * COLS - 1) + 1; }
-    PieceInfo<GAME_PIECE> getPiece(int row, int col);
-    PieceInfo<GAME_PIECE> setPiece(int row, int col, GAME_PIECE piece, int player);
+    iterator begin() { return &_board.at(0); }
+    iterator end() { return &_board.at(ROWS * COLS - 1) + 1; }
 
-private:
-    std::array<PieceInfo, ROWS * COLS> _board;
+    PieceInfo<GAME_PIECE> getPiece(int row, int col)
+    {
+        if (_board[row * COLS + col] == nullptr) {
+            return nullptr;
+        }
+        return std::move(std::make_unique<std::pair<int, GAME_PIECE>>(_board[row * COLS + col]->first, _board[row * COLS + col]->second));
+    }
 
-public:
-    Dim getDim() const { return std::make_pair(ROWS, COLS); }
+    PieceInfo<GAME_PIECE> setPiece(int row, int col, GAME_PIECE piece, int player)
+    {
+        auto prev_piece = getPiece(row, col);
+        _board[row * COLS + col] = std::make_unique<std::pair<int, GAME_PIECE>>(player, piece);
+        return std::move(prev_piece);
+    }
+
+    GameBoard<ROWS, COLS, GAME_PIECE, PLAYERS>& allPiecesOfPlayer(int playerNum)
+    {
+        setFilter([playerNum](const std::pair<int, GAME_PIECE>& p) { return p.first == playerNum; });
+        return *this;
+    }
+
+    GameBoard<ROWS, COLS, GAME_PIECE, PLAYERS>& allOccureneceOfPiece(GAME_PIECE piece)
+    {
+        setFilter([piece](const std::pair<int, GAME_PIECE>& p) { return p.second == piece; });
+        return *this;
+    }
+
+    GameBoard<ROWS, COLS, GAME_PIECE, PLAYERS>& allOccureneceOfPieceForPlayer(GAME_PIECE piece, int playerNum)
+    {
+        setFilter([piece,playerNum](const std::pair<int, GAME_PIECE>& p) { return (p.second == piece && p.first == playerNum); });
+        return *this;
+    }
 };
 
 #endif // !__GAME_BOARD_H_

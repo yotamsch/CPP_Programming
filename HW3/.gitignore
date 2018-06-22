@@ -4,3 +4,4 @@ ex3
 *.rps*
 *.output
 *tests
+leak_info.txt
