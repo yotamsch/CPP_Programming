@@ -36,13 +36,11 @@ public:
             : _pos(pos)
             , _loc(loc)
         {
-            if (_pos == nullptr || _loc >= ROWS * COLS)
-                return;
-            auto r = filter(*(*_pos));
+            auto r = *_pos == nullptr ? false : filter(*(*_pos));
             while (!r && _loc < ROWS * COLS) {
                 ++_pos;
                 ++_loc;
-                r = filter(*(*_pos));
+                r = *_pos == nullptr ? false : filter(*(*_pos));
             }
         }
         std::tuple<int, int, GAME_PIECE, int> operator*() { return std::make_tuple(row(_loc), col(_loc), (*_pos)->second, (*_pos)->first); }
@@ -52,7 +50,7 @@ public:
             do {
                 ++_pos;
                 ++_loc;
-                r = filter(*(*_pos));
+                r = *_pos == nullptr ? false : filter(*(*_pos));
             } while (!r && _loc < COLS * ROWS);
             // if reached the end, reset the filter
             if (_loc >= COLS * ROWS) {

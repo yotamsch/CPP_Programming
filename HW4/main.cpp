@@ -127,10 +127,36 @@ static bool test3() {
 	return true;
 }
 
+static bool test4()
+{
+    GameBoard<4, 3, char> board;
+
+	ASSERT_TRUE(board.setPiece(0, 0, 'A', 1) == nullptr);
+	ASSERT_TRUE(board.setPiece(1, 1, 'B', 0) == nullptr);
+	ASSERT_TRUE(board.setPiece(2, 2, 'C', 1) == nullptr);
+    int occurence[2] = { 0, 0 };
+	int pl = 0;
+    for (auto pieceInfo : board) {
+		pl = get<3>(pieceInfo);
+        occurence[pl]++;
+    }
+    ASSERT_FALSE(occurence[0] != 1);
+    ASSERT_FALSE(occurence[1] != 2);
+
+	auto a = board.getPiece(0,0);
+	auto b = board.setPiece(0,0,'C',1);
+	ASSERT_TRUE(a->first == b->first && a->second == b->second);
+
+	ASSERT_TRUE(board.getPiece(-1,10) == nullptr);
+	ASSERT_TRUE(board.setPiece(-1,10,'C',1) == nullptr);
+    return true;
+}
+
 int main()
 {
     RUN_TEST(test1);
     RUN_TEST(test2);
     RUN_TEST(test3);
+    RUN_TEST(test4);
     return 0;
 }
