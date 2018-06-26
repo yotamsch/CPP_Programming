@@ -83,7 +83,6 @@ public:
      */
     PieceInfo<GAME_PIECE> getPiece(int row, int col)
     {
-        // TODO should i handle edge cases?
         if (!isPositionLegal(row, col)) {
             return nullptr;
         }
@@ -104,8 +103,10 @@ public:
      */
     PieceInfo<GAME_PIECE> setPiece(int row, int col, GAME_PIECE piece, int player)
     {
-        // TODO should i handle edge cases?
         if (!isPositionLegal(row, col)) {
+            return nullptr;
+        }
+        if (player < 0 || player >= PLAYERS) {
             return nullptr;
         }
         auto prev_piece = getPiece(row, col);
