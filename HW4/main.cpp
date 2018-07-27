@@ -152,11 +152,43 @@ static bool test4()
     return true;
 }
 
+static bool test5()
+{
+    GameBoard<4, 3, const char*> board;
+
+	ASSERT_TRUE(board.setPiece(0, 0, "aaa", 1) == nullptr);
+	ASSERT_TRUE(board.setPiece(1, 1, "bbb", 0) == nullptr);
+	ASSERT_TRUE(board.setPiece(2, 2, "ccc", 1) == nullptr);
+    int occurence[2] = { 0, 0 };
+	int pl = 0;
+    for (auto pieceInfo : board) {
+		auto st = get<2>(pieceInfo);
+		pl = get<3>(pieceInfo);
+        occurence[pl]++;
+		std::cout << st << std::endl;
+    }
+	for (auto pieceInfo : board.allPiecesOfPlayer(1)) {
+		std::cout << get<2>(pieceInfo) << std::endl;
+		ASSERT_TRUE(get<3>(pieceInfo) == 1);
+	}
+    ASSERT_FALSE(occurence[0] != 1);
+    ASSERT_FALSE(occurence[1] != 2);
+
+	auto a = board.getPiece(0,0);
+	auto b = board.setPiece(0,0,"ddd",1);
+	ASSERT_TRUE(a->first == b->first && a->second == b->second);
+
+	ASSERT_TRUE(board.getPiece(-1,10) == nullptr);
+	ASSERT_TRUE(board.setPiece(-1,10,"ddd",1) == nullptr);
+    return true;
+}
+
 int main()
 {
     RUN_TEST(test1);
     RUN_TEST(test2);
     RUN_TEST(test3);
     RUN_TEST(test4);
+    RUN_TEST(test5);
     return 0;
 }
